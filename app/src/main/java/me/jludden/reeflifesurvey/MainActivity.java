@@ -621,10 +621,13 @@ public class MainActivity extends AppCompatActivity implements
             throw new NullPointerException("MainActivity^showBottomSheet something null"); //todo error signature
         }
 
+        //set up text fields
         topText.setText(siteInfo.getEcoRegion());
-        bottomText.setText(mSurveySiteList.codeList(siteInfo.getCode(), 25)); //todo
+        bottomText.setText(mSurveySiteList.codeList(siteInfo.getCode(), -1)); //todo
         bottomText.setMovementMethod(new ScrollingMovementMethod());
+        bottomText.scrollTo(0,0);
 
+        //set up image carousel
         bottomSheetDisplayHelper(siteInfo);
     }
 
@@ -666,9 +669,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
-
-    }
+    public void onListFragmentInteraction(DummyContent.DummyItem item) { }
 
     @Override
     public void onFragmentInteraction(Uri uri) { }

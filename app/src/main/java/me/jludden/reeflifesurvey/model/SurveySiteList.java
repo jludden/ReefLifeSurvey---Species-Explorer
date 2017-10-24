@@ -52,6 +52,7 @@ public class SurveySiteList {
     public String codeSummary(String code){
         return codeList(code, 3);    //todo
     }
+    //@param len number of survey sites, or -1 for no limit
     public String codeList(String code, int len){ //todo change len to charlen instead of numsites
         List<SurveySite> list = ITEM_MAP.get(code);
         if(list == null) return "Null - no sites";
@@ -61,12 +62,15 @@ public class SurveySiteList {
         int iterCount = 0;
         for(SurveySite tSite : list){
             nameBuilder.append(tSite.getSiteName()+", ");
-            if(++iterCount>len) {
-                nameBuilder.append(" ...");
+            if(len!=-1 && (++iterCount>len || nameBuilder.length()>len*10)) {
                 break;
             }
         }
 
+        nameBuilder.delete(nameBuilder.length() - 2,nameBuilder.length()); //remove trailing comma
+        if(++iterCount>len) {
+            nameBuilder.append(" ...");
+        }
         return nameBuilder.toString();
     }
 
