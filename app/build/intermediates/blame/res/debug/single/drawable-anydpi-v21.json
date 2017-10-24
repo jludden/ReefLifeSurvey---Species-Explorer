@@ -1,0 +1,30 @@
+[
+    {
+        "merged": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\ic_fab_fullscreen.xml",
+        "source": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\generated\\res\\pngs\\debug\\drawable-anydpi-v21\\ic_fab_fullscreen.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\ic_star_border.xml",
+        "source": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\generated\\res\\pngs\\debug\\drawable-anydpi-v21\\ic_star_border.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\design_ic_visibility_off.xml",
+        "source": "C:\\Users\\Jason\\.android\\build-cache\\946cede1c61562d7f17f2bfecd7e9ed00a419dc0\\output\\res\\drawable-anydpi-v21\\design_ic_visibility_off.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\ic_fab_add_loc.xml",
+        "source": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\generated\\res\\pngs\\debug\\drawable-anydpi-v21\\ic_fab_add_loc.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\design_ic_visibility.xml",
+        "source": "C:\\Users\\Jason\\.android\\build-cache\\946cede1c61562d7f17f2bfecd7e9ed00a419dc0\\output\\res\\drawable-anydpi-v21\\design_ic_visibility.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\ic_star_selected.xml",
+        "source": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\generated\\res\\pngs\\debug\\drawable-anydpi-v21\\ic_star_selected.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\ic_fab_star_white.xml",
+        "source": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\generated\\res\\pngs\\debug\\drawable-anydpi-v21\\ic_fab_star_white.xml"
+    }
+]

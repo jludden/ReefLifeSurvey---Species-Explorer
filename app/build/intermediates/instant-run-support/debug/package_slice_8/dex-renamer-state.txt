@@ -1,0 +1,4 @@
+#Tue Oct 24 16:28:14 CST 2017
+base.0=C\:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\5\\slice_8
+renamed.0=classes.dex
+file.0=C\:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\5\\slice_8\\classes.dex

@@ -1,0 +1,7 @@
+#Tue Oct 24 22:02:31 CST 2017
+base.0=C\:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10000\\instant-run-bootstrap_61e3a98fd88118a09c71b76de31d136df09b34af
+renamed.1=classes2.dex
+renamed.0=classes.dex
+file.1=C\:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10000\\instant-run_dbfc1e813e7c99043c1064a4812eaae8d0a2c39e\\classes.dex
+base.1=C\:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10000\\instant-run_dbfc1e813e7c99043c1064a4812eaae8d0a2c39e
+file.0=C\:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10000\\instant-run-bootstrap_61e3a98fd88118a09c71b76de31d136df09b34af\\classes.dex

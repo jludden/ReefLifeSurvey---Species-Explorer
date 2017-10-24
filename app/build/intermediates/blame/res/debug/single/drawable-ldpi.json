@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\ic_star_border.png",
+        "source": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\generated\\res\\pngs\\debug\\drawable-ldpi\\ic_star_border.png"
+    },
+    {
+        "merged": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\ic_fab_add_loc.png",
+        "source": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\generated\\res\\pngs\\debug\\drawable-ldpi\\ic_fab_add_loc.png"
+    },
+    {
+        "merged": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\ic_fab_fullscreen.png",
+        "source": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\generated\\res\\pngs\\debug\\drawable-ldpi\\ic_fab_fullscreen.png"
+    },
+    {
+        "merged": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\ic_fab_star_white.png",
+        "source": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\generated\\res\\pngs\\debug\\drawable-ldpi\\ic_fab_star_white.png"
+    },
+    {
+        "merged": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\ic_star_selected.png",
+        "source": "C:\\Users\\Jason\\Google Drive\\AndroidStudioProjects\\ReefLifeSurvey\\app\\build\\generated\\res\\pngs\\debug\\drawable-ldpi\\ic_star_selected.png"
+    }
+]
