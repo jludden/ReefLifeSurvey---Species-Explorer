@@ -1,11 +1,18 @@
 package me.jludden.reeflifesurvey;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 
 import me.jludden.reeflifesurvey.model.SurveySiteList;
 
@@ -22,14 +29,26 @@ import me.jludden.reeflifesurvey.model.SurveySiteList;
 public class ReefLifeDataFragment extends Fragment implements LoaderManager.LoaderCallbacks<SurveySiteList> {
 
     public static final String TAG = ".jludden.SurveySites";
-    //private List<SurveySiteList.SurveySite> mSurveySites = new ArrayList<>(); //TODO can i make  this a generic class?
-    private SurveySiteList mSurveySites = new SurveySiteList();
+    private ReefLifeDataUpdateCallback mCallbacks;
+    private SurveySiteList mSurveySites = new SurveySiteList(); //List of survey sites, fully parsed (api_site_surveys.json)
+    private JSONObject mFishSpecies;                               //Fish species in raw json form (api_species.json)
+
+    //private JSONObject mFishData =
 
     /**
      * define callback to retrieve data from this fragment
+     * this can be implemented by the main activity, and the reference passed to fragments
      */
     public interface ReefLifeDataRetrievalCallback {
         SurveySiteList retrieveSurveySiteList();
+        JSONObject retrieveFishSpecies();
+    }
+
+    /*
+     * define callback to be notified when the data changes
+     */
+    public interface ReefLifeDataUpdateCallback {
+        void onDataFragmentLoadFinished();
     }
 
     @Override
@@ -42,6 +61,37 @@ public class ReefLifeDataFragment extends Fragment implements LoaderManager.Load
 
     public SurveySiteList getSurveySites() {
         return mSurveySites;
+    }
+
+    public JSONObject getFishSpecies() {
+        if(mFishSpecies == null) {
+            try {
+                String result = LoaderUtils.loadStringFromDisk(R.raw.api_species, getContext());
+                mFishSpecies = new JSONObject(result);
+            } catch(IOException e) {
+                Log.e("jludden.reeflifesurvey","error reading fish species file (api_species.json) "+e.toString());
+            } catch(JSONException e) {
+                Log.e("jludden.reeflifesurvey","error parsing fish species json (api_species.json) "+e.toString());
+            }
+        }
+        return mFishSpecies;
+    }
+
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+        String errMsg = "";
+
+        if(context instanceof ReefLifeDataFragment.ReefLifeDataUpdateCallback){
+            mCallbacks = (ReefLifeDataFragment.ReefLifeDataUpdateCallback) context;
+        } else {
+            errMsg += context.toString() + "must implement" +
+                    ReefLifeDataFragment.ReefLifeDataUpdateCallback.class.getName();
+        }
+
+        if(errMsg.length() > 0){
+            throw new ClassCastException(errMsg);
+        }
     }
 
 //    public void setSurveySites(List<SurveySiteList.SurveySite> sites, boolean clearList) {
@@ -79,6 +129,9 @@ public class ReefLifeDataFragment extends Fragment implements LoaderManager.Load
     public void onLoadFinished(Loader<SurveySiteList> loader, SurveySiteList data) {
         Log.d("jludden.reeflifesurvey"  ,"ReefLifeDataFragment onLoadFinished loaderid: "+loader.getId()+" data length: "+data.ITEMS.size()+" realm hashmap size: "+data.ITEM_MAP.size()+" simple realm list size: "+data.SITE_CODE_LIST.size());
         if(data!=null) mSurveySites = data;
+
+        //notify activity
+        mCallbacks.onDataFragmentLoadFinished();
     }
 
     /**

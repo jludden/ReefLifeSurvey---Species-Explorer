@@ -6,10 +6,10 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 
-import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard;
 import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard.CardDetails;
 import me.jludden.reeflifesurvey.LoaderUtils;
 import me.jludden.reeflifesurvey.R;
+import me.jludden.reeflifesurvey.ReefLifeDataFragment;
 import me.jludden.reeflifesurvey.model.SurveySiteList;
 import me.jludden.reeflifesurvey.model.SurveySiteList.SurveySite;
 import okhttp3.OkHttpClient;
@@ -40,15 +40,28 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
     private List<CardDetails> mData; //final, sorted list of fish cards TODO why not just InfoCard, which is already a card list
     private CardViewFragment.CardType mCardType;
     private final static boolean DOWNLOAD_FISH_SPECIES_FROM_GITHUB = false;
-    private static JSONObject mFishData;    //json object from api_species.json
+    //private static JSONObject mFishData;    //json object from api_species.json
     private Map<String, CardDetails> mCardDict; //map of fish ID to fish card details. these values are then sorted to the final, mData, order
     private Iterator<CardDetails> mCardListIterator; //iterator of fish IDs in sorted order
     private String mNextSpeciesKey; //todo del
+    private ReefLifeDataFragment.ReefLifeDataRetrievalCallback mDataRetrievalCallback;
 
     public InfoCardLoader(Context context, CardViewFragment.CardType cardType) {
         super(context);
         mCardType = cardType;
         if(DEBUG) Log.d("jludden.reeflifesurvey"  , "CardInfoLoader Created. Card Type to load: " + cardType);
+
+        String errMsg = "";
+        if(context instanceof ReefLifeDataFragment.ReefLifeDataRetrievalCallback){
+            mDataRetrievalCallback = (ReefLifeDataFragment.ReefLifeDataRetrievalCallback) context;
+        } else {
+            errMsg += context.toString() + "must implement" +
+                    ReefLifeDataFragment.ReefLifeDataRetrievalCallback.class.getName();
+        }
+
+        if(errMsg.length() > 0){
+            throw new ClassCastException(errMsg);
+        }
     }
 
     /**
@@ -167,12 +180,13 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
     private void loadFishCardsIncremental() throws IOException, JSONException {
 
         // Call to get fish species data
-        if(mFishData == null) {
-            String result = getFishSpeciesJSON();
-            //Log.d("jludden.reeflifesurvey"  , "getFishInCards Download response: " + result.substring(0, 50000)); //TODO cache the JSON strings for future loads
-            //"2":["Amphiprion akallopisos","Skunk Clownfish","http://reeflifesurvey.com/species/4605/",0,["http://dbzcuiesi59ut.cloudfront.net/0/species_ab_57c1476628af3.w1300.h866.jpg"]],
-            mFishData = new JSONObject(result);
-        }
+//        if(mFishData == null) {
+//            mFishData = mDataRetrievalCallback.retrieveFishSpecies();
+//            /*String result = getFishSpeciesJSON();
+//            //Log.d("jludden.reeflifesurvey"  , "getFishInCards Download response: " + result.substring(0, 50000)); //TODO cache the JSON strings for future loads
+//            //"2":["Amphiprion akallopisos","Skunk Clownfish","http://reeflifesurvey.com/species/4605/",0,["http://dbzcuiesi59ut.cloudfront.net/0/species_ab_57c1476628af3.w1300.h866.jpg"]],
+//            mFishData = new JSONObject(result);*/
+//        }
 
         // Call to set up the site surveys TODO return type + should this be in constructor? Or can we cache?
         //TODO can we just return mCardDict with species added, but no cards added yet
@@ -205,7 +219,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
             CardDetails cardDetails = mCardDict.get(speciesKey) ; // infocard shell already created - time to add details
             //Log.d("jludden.reeflifesurvey"  , "getFishInCards ID: "+cardDetails.getId()+" VS SPECIESKEY: " + speciesKey); //YES THEY ARE THE SAME
 
-           parseSpeciesDetailsHelper(cardDetails);
+           parseSpeciesDetailsHelper(cardDetails, mDataRetrievalCallback);
 
             mData.add(cardDetails); //Add card to final card list
         }
@@ -222,8 +236,9 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
      * @return the same fishCard, with details added (name, image url, etc.)
      * Created 10/24
      */
-    private static CardDetails parseSpeciesDetailsHelper(CardDetails fishCard) throws JSONException{
-        JSONArray basicData = mFishData.getJSONArray(fishCard.getId());
+    private static CardDetails parseSpeciesDetailsHelper(CardDetails fishCard, ReefLifeDataFragment.ReefLifeDataRetrievalCallback dataRetrievalCallback) throws JSONException{
+        JSONObject fishSpecies = dataRetrievalCallback.retrieveFishSpecies();
+        JSONArray basicData = fishSpecies.getJSONArray(fishCard.getId());
         fishCard.cardName = basicData.getString(0);
         fishCard.commonNames = basicData.getString(1);
 
@@ -338,7 +353,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
      */
 
     //10/24 todo currently only called from mapview->bottomsheet
-    public static List<CardDetails> loadSingleSite(SurveySite site) throws JSONException{
+    public static List<CardDetails> loadSingleSite(SurveySite site, ReefLifeDataFragment.ReefLifeDataRetrievalCallback dataRetrievalCallback) throws JSONException {
         List<CardDetails> fishCards = new ArrayList<>();
         int CARDS_TO_LOAD = 5;
         int cards_loaded = 0;
@@ -358,7 +373,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
                 fishCards.get(index).setFoundInSites(site, fullSpeciesJSON.getInt(species));
             }
             else{
-                fishCards.add(parseSpeciesDetailsHelper(fishCard));
+                fishCards.add(parseSpeciesDetailsHelper(fishCard, dataRetrievalCallback));
             }
         }
         return fishCards;

@@ -67,6 +67,7 @@ public class MapViewFragment extends Fragment
     private ReefLifeDataFragment.ReefLifeDataRetrievalCallback mDataRetrievalCallback;
 
     private MapViewFragmentInteractionListener mListener;
+
     public interface MapViewFragmentInteractionListener{
         void showBottomSheet(SurveySiteList.SurveySite siteInfo);
         FloatingActionButton getFloatingActionButton(); //// TODO: 9/14/2017
@@ -349,7 +350,14 @@ public class MapViewFragment extends Fragment
         //todo remove from preferences list
     }
 
+    public void onDataFragmentLoadFinished() {
+        if(mMap != null) { //make sure that onMapReady has already been called
+            addSurveySites();
+        }
+    }
+
     //Add the loaded survey sites to the map
+    //called both when the map has finished loading and the datafragment has finished loading
     private void addSurveySites() {
         if (mMap == null) {
             Log.e("ludden.reeflifesurvey" ,"MapViewFragment addSurveySites mMap null");

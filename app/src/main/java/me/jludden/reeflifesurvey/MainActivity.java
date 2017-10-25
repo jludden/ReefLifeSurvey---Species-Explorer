@@ -57,6 +57,7 @@ import com.google.android.gms.maps.GoogleMap;
 //import com.google.android.gms.maps.SupportMapFragment;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +71,9 @@ public class MainActivity extends AppCompatActivity implements
         CountryListFragment.OnListFragmentInteractionListener,
         CardViewFragment.OnCardViewFragmentInteractionListener,
         MapViewFragment.MapViewFragmentInteractionListener,
-        ReefLifeDataFragment.ReefLifeDataRetrievalCallback, BaseSliderView.OnSliderClickListener {
+        ReefLifeDataFragment.ReefLifeDataRetrievalCallback,
+        ReefLifeDataFragment.ReefLifeDataUpdateCallback,
+        BaseSliderView.OnSliderClickListener {
 
 
     private GoogleMap mMap;
@@ -269,7 +272,9 @@ public class MainActivity extends AppCompatActivity implements
             fragmentManager.beginTransaction()
                     .add(mDataFragment, ReefLifeDataFragment.TAG)
                     .commit();
-        }
+        } /*else { TODO not sure how this fragment behaves during a config change
+            mDataFragment.setTargetFragment(this, mDataFragment.getTargetRequestCode());
+        }*/
 
 //
 //        SupportMapFragment mapFragment  = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(
@@ -434,6 +439,11 @@ public class MainActivity extends AppCompatActivity implements
 
     public SurveySiteList retrieveSurveySiteList(){
         return mDataFragment.getSurveySites();
+    }
+
+    @Override
+    public JSONObject retrieveFishSpecies() {
+        return mDataFragment.getFishSpecies();
     }
 
     private void launchFragment(Fragment newFragment, String tag) {
@@ -638,7 +648,7 @@ public class MainActivity extends AppCompatActivity implements
         //todo show a fish carousel
         try{
             //Load fish cards
-            List<InfoCard.CardDetails> fishCards = InfoCardLoader.loadSingleSite(siteInfo);
+            List<InfoCard.CardDetails> fishCards = InfoCardLoader.loadSingleSite(siteInfo, this);
             Log.d("jludden.reeflifesurvey", "BottomSheet fishCards loaded: "+fishCards.size());
             if(fishCards.size() > 0 ) Log.d("jludden.reeflifesurvey", "BottomSheet fishCards loaded: "+fishCards.get(0).commonNames);
 
@@ -677,7 +687,9 @@ public class MainActivity extends AppCompatActivity implements
     //todo move to bottomsheet class
     @Override
     protected void onStop() {
-        mBottomSheetImageCarousel.stopAutoCycle(); //prevent a memory leak
+        if(mBottomSheetImageCarousel != null) {
+            mBottomSheetImageCarousel.stopAutoCycle(); //prevent a memory leak
+        }
         super.onStop();
     }
 
@@ -731,5 +743,18 @@ public class MainActivity extends AppCompatActivity implements
     public void onSliderClick(BaseSliderView slider) {
         Log.d("jludden.reeflifesurvey","main activity - bottom sheet - image carousel onSliderClick: "+slider.getDescription());
         //todo launch fish card details activity
+    }
+
+    @Override
+    public void onDataFragmentLoadFinished() {
+        MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
+        if (mapFrag != null && mapFrag.isVisible()) {
+            mapFrag.onDataFragmentLoadFinished();
+        }
+
+        /*CardViewFragment viewFragment = (CardViewFragment) getSupportFragmentManager().findFragmentByTag(CardViewFragment.TAG);
+        if (viewFragment != null && viewFragment.isVisible()) {
+            viewFragment.();
+        }*/
     }
 }
