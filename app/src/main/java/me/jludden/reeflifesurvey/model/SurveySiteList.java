@@ -68,7 +68,7 @@ public class SurveySiteList {
         }
 
         nameBuilder.delete(nameBuilder.length() - 2,nameBuilder.length()); //remove trailing comma
-        if(++iterCount>len) {
+        if(len!=-1 && (++iterCount>len || nameBuilder.length()>len*10)) {
             nameBuilder.append(" ...");
         }
         return nameBuilder.toString();
