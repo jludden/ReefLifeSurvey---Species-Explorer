@@ -40,7 +40,7 @@ class SurveySiteListLoader extends AsyncTaskLoader<SurveySiteList> {
         Log.d("jludden.reeflifesurvey"  ,"SurveySiteListLoader loadInBackground()");
 
         //Add some coordinates for reef survey sites
-        JSONObject surveySites = InfoCardLoader.loadFishSurveySites(getContext());
+        JSONObject surveySites = LoaderUtils.loadFishSurveySites(getContext());
         SurveySiteList siteList = LoaderUtils.parseSurveySites(surveySites);
 
         return siteList;

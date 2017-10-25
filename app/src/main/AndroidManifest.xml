@@ -39,7 +39,7 @@
 
         <!--http://www.androidhive.info/2013/09/android-fullscreen-image-slider-with-swipe-and-pinch-zoom-gestures/-->
         <activity
-            android:name="me.jludden.reeflifesurvey.BrowseFish.FullScreenImageActivity"
+            android:name="me.jludden.reeflifesurvey.FullScreenImageActivity.FullScreenImageActivity"
             android:theme="@android:style/Theme.Holo.NoActionBar">
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->

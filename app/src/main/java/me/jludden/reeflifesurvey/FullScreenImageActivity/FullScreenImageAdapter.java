@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.BrowseFish;
+package me.jludden.reeflifesurvey.FullScreenImageActivity;
 
 /**
  * Created by Jason on 6/17/2017.

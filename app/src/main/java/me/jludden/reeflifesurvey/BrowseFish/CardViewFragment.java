@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 
 import android.support.v4.app.Fragment;
@@ -68,6 +69,21 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
         Countries
     }
 
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnCardViewFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFishDetailsRequested(InfoCard.CardDetails cardDetails);
+    }
+
     public CardViewFragment() {
         // Required empty public constructor
     }
@@ -128,7 +144,7 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
             mLayoutManager = new LinearLayoutManager(context);
             mRecyclerView.setLayoutManager(mLayoutManager);
 
-            mViewAdapter = new CardViewAdapter(this, InfoCard.ITEMS, mRecyclerView); //todo reconcile infocard.items with the onloadfinished(arraylist<InfoCard.CardDetails>)
+            mViewAdapter = new CardViewAdapter(this, InfoCard.ITEMS, mRecyclerView, mListener); //todo reconcile infocard.items with the onloadfinished(arraylist<InfoCard.CardDetails>)
             mRecyclerView.setAdapter(mViewAdapter);
 
             //Set OnScroll listener
@@ -171,10 +187,13 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
         return view;
     }
 
+    //TODO this does not appear to work anymore
+    //consider         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
     private void setTitleBar() {
 
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         actionBar.setTitle(TITLE);
+
 
         String subtitle = "";
         for(SurveySiteList.SurveySite site : SurveySiteList.SELECTED_SURVEY_SITES){
@@ -210,7 +229,7 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
     // TODO: Rename method, update argument and hook method into UI event
 //    public void onButtonPressed(Uri uri) {
 //        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
+//            mListener.onFishDetailsRequested(uri);
 //        }
 //    }
 
@@ -317,21 +336,6 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoaderReset(Loader<List<CardDetails>> loader) {
 
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnCardViewFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 
     public static class CardViewSettings {

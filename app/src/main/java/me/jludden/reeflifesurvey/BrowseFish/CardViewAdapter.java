@@ -39,13 +39,14 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private RequestOptions mGlideRequestOptions;
     private RecyclerView mRecyclerView;
     private CardViewFragment mCardViewFragment;
-    //private final OnListFragmentInteractionListener mListener;
+    private final CardViewFragment.OnCardViewFragmentInteractionListener mListener;
 
     private static final int TYPE_HEADER = 0;
     public static final int TYPE_ITEM = 1;
 
     //todo add param for listener
-    public CardViewAdapter(CardViewFragment parent, List<InfoCard.CardDetails> items, RecyclerView listView) {
+    public CardViewAdapter(CardViewFragment parent, List<InfoCard.CardDetails> items, RecyclerView listView,
+                           CardViewFragment.OnCardViewFragmentInteractionListener listener) {
         this.mCardList = items;
         this.glide = Glide.with(parent); //cache the Glide RequestManager object
         this.mGlideRequestOptions = new RequestOptions().placeholder(R.drawable.ic_menu_camera); //todo change placeholder image
@@ -57,6 +58,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.mAllCardList.addAll(items);
         this.mRecyclerView = listView;
         this.mCardViewFragment = parent;
+        this.mListener = listener;
 
         //setHasStableIds(true);//todo not sure what this does testing it out
     }
@@ -154,18 +156,13 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 }
             });
 
-            //todo should this be more than just the image view?
-            vhItem.mImageView.setOnLongClickListener(new View.OnLongClickListener() {
+            vhItem.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onLongClick(View v) {
-                    Log.d("jludden.reeflifesurvey", "Card OnLongPress - Hiding");
-                    //TODO on long press... show menu? hide could be an option...
-                    //hideCard(holder.getAdapterPosition());
-                    //todo mRecyclerView.getviewholderfor...
-                    return false;
+                public void onClick(View v) {
+                    Log.d("jludden.reeflifesurvey", "Card onClick - Launching new fragment");
+                    mListener.onFishDetailsRequested(mCardList.get(realPosition));
                 }
             });
-
 
            /* holder.setOn
         holder.mView.setOnClickListener(new View.OnClickListener() {

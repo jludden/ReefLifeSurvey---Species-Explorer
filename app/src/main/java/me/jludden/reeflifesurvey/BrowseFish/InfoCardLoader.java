@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import static me.jludden.reeflifesurvey.BuildConfig.DEBUG;
+import static me.jludden.reeflifesurvey.LoaderUtils.loadFishSurveySites;
 
 /**
  * Created by Jason on 5/1/2017.
@@ -104,13 +105,16 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
     public List<CardDetails> loadInBackground() {
         Log.d("jludden.reeflifesurvey"  , "CardInfoLoader loadInBackground called");
 
-        if(mData == null) mData = new ArrayList<>();
-         else {
+        if(mData == null) {
+            mData = new ArrayList<>();
+        }
+        else {
         // TODO jank - loader manager won't call load finished if the data reference is the same?
         // TODO UPDATE 8/12 seems fine UPDATE 10/12 it will mostly work with the adapter, but loadfinished is definitely not called
             ArrayList<CardDetails> tempList = new ArrayList<>();
             tempList.addAll(mData);
-            mData = tempList;   }
+            mData = tempList;
+        }
 
         try {
 
@@ -378,28 +382,6 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
         }
         return fishCards;
     }
-
-
-    /**
-     * Loads the Reef Life Survey survey site data layer, from disk or
-     * @param context
-     * @return json
-     */
-    public static JSONObject loadFishSurveySites(Context context){
-        try {
-            String surveys = LoaderUtils.loadStringFromDisk(R.raw.api_site_surveys, context); //TODO this can cause out of memory crash
-            JSONObject json = new JSONObject(surveys);
-            return json; //TODO
-
-        } catch (IOException e) {
-            Log.d("jludden.reeflifesurvey"  , "SurveySiteListLoader setupFishLocations ioexception: " + e.toString());
-        } catch (JSONException e){
-            Log.d("jludden.reeflifesurvey"  , "SurveySiteListLoader setupFishLocations JSONException: " + e.toString());
-
-        }
-        return null;
-    }
-
 
     public JSONObject setupFishLocations(){
         try {

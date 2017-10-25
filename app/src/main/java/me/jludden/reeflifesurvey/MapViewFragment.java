@@ -49,8 +49,8 @@ public class MapViewFragment extends Fragment
         implements OnMapReadyCallback, GoogleMap.OnMapClickListener,
         GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener {
 
-    private static MapViewFragment mapFragment;
-    static View rootView;
+    private MapViewFragment mapFragment; //todo just use fragment manager
+    View rootView;
     private GoogleMap mMap;
     private MapView mMapView;
    // private MapCallback mMapCallback;
@@ -80,14 +80,8 @@ public class MapViewFragment extends Fragment
     }
 
     public static MapViewFragment newInstance() {
-        if(mapFragment == null) {
-            mapFragment = new MapViewFragment();
-            mapFragment.setRetainInstance(true);
-        }
-        //        Bundle args = new Bundle();
-        //        args.putInt(ARG_PARAM1, typeToLoad.ordinal());
-        //        args.putString(ARG_PARAM2, param2);
-        //        fragment.setArguments(args);
+        MapViewFragment mapFragment = new MapViewFragment();
+        mapFragment.setRetainInstance(true);
         return mapFragment;
     }
 

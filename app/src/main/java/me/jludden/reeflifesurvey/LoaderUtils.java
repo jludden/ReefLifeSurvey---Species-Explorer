@@ -42,7 +42,26 @@ import okhttp3.Response;
 
 public class LoaderUtils {
     //region Loading Utility Functions
-    //TODO - move these utility functions to a utility class
+    /**
+     * Loads the Reef Life Survey survey site data layer, from disk or
+     * @param context
+     * @return json
+     */
+    public static JSONObject loadFishSurveySites(Context context){
+        try {
+            String surveys = LoaderUtils.loadStringFromDisk(R.raw.api_site_surveys, context); //TODO this can cause out of memory crash
+            JSONObject json = new JSONObject(surveys);
+            return json; //TODO
+
+        } catch (IOException e) {
+            Log.d("jludden.reeflifesurvey"  , "SurveySiteListLoader setupFishLocations ioexception: " + e.toString());
+        } catch (JSONException e){
+            Log.d("jludden.reeflifesurvey"  , "SurveySiteListLoader setupFishLocations JSONException: " + e.toString());
+
+        }
+        return null;
+    }
+
     /**
      * Loads a resource file, such as a string in json-format, from disk
      *

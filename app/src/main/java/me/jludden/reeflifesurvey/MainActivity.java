@@ -5,7 +5,6 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -42,7 +41,8 @@ import com.daimajia.androidanimations.library.YoYo;
 import me.jludden.reeflifesurvey.BrowseFish.CardViewFragment;
 import me.jludden.reeflifesurvey.BrowseFish.CardViewFragment.CardViewSettings;
 
-import me.jludden.reeflifesurvey.BrowseFish.FullScreenImageActivity;
+import me.jludden.reeflifesurvey.BrowseFish.DetailsViewFragment;
+import me.jludden.reeflifesurvey.FullScreenImageActivity.FullScreenImageActivity;
 import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader;
 import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard;
 import me.jludden.reeflifesurvey.CountryList.CountryListFragment;
@@ -59,7 +59,6 @@ import com.google.android.gms.maps.GoogleMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static com.daimajia.androidanimations.library.Techniques.SlideInUp;
@@ -72,8 +71,7 @@ public class MainActivity extends AppCompatActivity implements
         CardViewFragment.OnCardViewFragmentInteractionListener,
         MapViewFragment.MapViewFragmentInteractionListener,
         ReefLifeDataFragment.ReefLifeDataRetrievalCallback,
-        ReefLifeDataFragment.ReefLifeDataUpdateCallback,
-        BaseSliderView.OnSliderClickListener {
+        ReefLifeDataFragment.ReefLifeDataUpdateCallback {
 
 
     private GoogleMap mMap;
@@ -93,13 +91,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-//        ViewGroup root = (ViewGroup) findViewById(R.id.drawer_layout);
-//        root.seton
-//        root.onInterceptTouchEvent( new ViewGroup
-//            if (activity.getCurrentFocus()!=null) { inputMethodManager.hideSoftInputFromWindow(activity.getCurre‌​ntFocus().getWindowT‌​oken(), 0); }
-//        );
+        setSupportActionBar(toolbar); //todo could this be the collapsing toolbar?
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 //This will set Expanded text to transparent so it wount overlap the content of the toolbar
@@ -125,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements
      //   collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
 
         ToggleButton mToolbarButton_starred = (ToggleButton) findViewById(R.id.toolbar_button_starred);
-        //todo set all toolbar buttons to have *this* as checkedchangelistener. then use buttonview.getID or whatever to select logic
         mToolbarButton_starred.setOnCheckedChangeListener(this);
         ((ToggleButton) findViewById(R.id.toolbar_button_loadAll)).setOnCheckedChangeListener(this);
 
@@ -208,11 +199,6 @@ public class MainActivity extends AppCompatActivity implements
 
         //Set up the bottom sheet
         View bottomSheet = findViewById(R.id.bottom_sheet);
-
-
-        //BottomSheetDialogFragment btm = (BottomSheetDialogFragment) bottomSheet;
-
-
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
@@ -227,7 +213,6 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 Log.d("jludden.reeflifesurvey"  , "Bottom Sheet OnStateChanged: "+newState);
-
             }
 
             /**
@@ -244,15 +229,23 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
         //bottomSheet.addTouchables();
-//        View btm = findViewById(R.id.bottom_sheet_top);
-//        btm.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                Log.d("jludden.reeflifesurvey"  , "Bottom Sheet Top TextView clicked.. hidden?: "+v.isShown());
-//
-//            }
-//        });
+        View btm = findViewById(R.id.bottom_sheet_top);
+        btm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Log.d("jludden.reeflifesurvey"  , "Bottom Sheet Top TextView clicked.. hidden?: "+v.isShown());
+                //todo refactor this
+                //if the detailsviewfragment is showing, and they click the top of bottom sheet,
+                //navigate them back to the mapview
+                MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
+
+                if (mapFrag != null && !mapFrag.isVisible()) {
+                    Log.d("jludden.reeflifesurvey"  , "Bottom Sheet TEST1 PASSED");
+                    launchUIFragment(mapFrag,MapViewFragment.TAG);
+                }
+            }
+        });
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -393,12 +386,10 @@ public class MainActivity extends AppCompatActivity implements
             toolbar.setExpanded(true,true);
             mFAB.show();
         } else if (id == R.id.nav_gallery) {
-//            Intent intent = new Intent(this,
-//                    MapViewFragment.class);
-//            startActivity(intent);
-//            return true; //TODO bad
-
-            newFragment = MapViewFragment.newInstance();
+            newFragment = getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
+            if (newFragment == null) {
+                newFragment = MapViewFragment.newInstance();
+            }
             tag = MapViewFragment.TAG;
 
             //hide a bunch of shit
@@ -429,7 +420,7 @@ public class MainActivity extends AppCompatActivity implements
 //
 //        }
 
-        launchFragment(newFragment, tag);
+        launchUIFragment(newFragment, tag);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -437,6 +428,7 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
+    @Override
     public SurveySiteList retrieveSurveySiteList(){
         return mDataFragment.getSurveySites();
     }
@@ -446,7 +438,20 @@ public class MainActivity extends AppCompatActivity implements
         return mDataFragment.getFishSpecies();
     }
 
-    private void launchFragment(Fragment newFragment, String tag) {
+    @Override
+    public void onDataFragmentLoadFinished() {
+        MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
+        if (mapFrag != null && mapFrag.isVisible()) {
+            mapFrag.onDataFragmentLoadFinished();
+        }
+
+        /*CardViewFragment viewFragment = (CardViewFragment) getSupportFragmentManager().findFragmentByTag(CardViewFragment.TAG);
+        if (viewFragment != null && viewFragment.isVisible()) {
+            viewFragment.();
+        }*/
+    }
+
+    private void launchUIFragment(Fragment newFragment, String tag) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.content_frame, newFragment, tag)
@@ -455,7 +460,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     //todo - launch activity - right now just the full screen quiz mode
-    private void launchFullScreenQuizModeActivity(){
+    public void launchFullScreenQuizModeActivity(){
         //get data from CardViewFragment TODO whole list of card data?
         Intent i = getIntent();
         InfoCard.CardDetails cardInfo = (InfoCard.CardDetails) i.getParcelableExtra("cardInfo");
@@ -467,10 +472,7 @@ public class MainActivity extends AppCompatActivity implements
         //                Bundle b = new Bundle();
         //                b.putParcelable("cardInfo", cardInfo);
         //                imgFragment.setArguments(b);
-        //                launchFragment(imgFragment);
-
-        //mImageView.setImageBitmap(BitmapFactory.decodeFile("pathToImageFile"));
-
+        //                launchUIFragment(imgFragment);
         //launch full screen image activity on button click
         Intent intent = new Intent(MainActivity.this,
                 FullScreenImageActivity.class);
@@ -638,13 +640,14 @@ public class MainActivity extends AppCompatActivity implements
         bottomText.scrollTo(0,0);
 
         //set up image carousel
-        bottomSheetDisplayHelper(siteInfo);
+        createImageCarousel(siteInfo);
     }
 
+    //BottomSheet related:
     //helper function to load and display a fish carousel in the bottom sheet,
     //based on fish that can be found in the survey site
     //todo move to bottomsheet class
-    private void bottomSheetDisplayHelper(@Nullable SurveySiteList.SurveySite siteInfo) {
+    private void createImageCarousel(@Nullable SurveySiteList.SurveySite siteInfo) {
         //todo show a fish carousel
         try{
             //Load fish cards
@@ -657,14 +660,7 @@ public class MainActivity extends AppCompatActivity implements
             mBottomSheetImageCarousel.removeAllSliders();
 
             for(InfoCard.CardDetails card : fishCards) {
-                String name = card.cardName;
-                TextSliderView textSliderView = new TextSliderView(this);
-                textSliderView
-                        .description(name)
-                        .image(card.imageURL)
-                        .setScaleType(BaseSliderView.ScaleType.Fit)
-                        .setOnSliderClickListener(this);
-
+                TextSliderView textSliderView = createCarouselEntry(card);
                 mBottomSheetImageCarousel.addSlider(textSliderView);
             }
             //mDemoSlider.addOnPageChangeListener(this);
@@ -674,15 +670,59 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    //BottomSheet related:
+    //creates a TextSliderView (a fish preview image, with description and onclick listener) that can be added to a SliderLayout (an image carousel of fish previews)
+    private TextSliderView createCarouselEntry(final InfoCard.CardDetails card){
+        String name = card.cardName;
+        TextSliderView textSliderView = new TextSliderView(this);
+        textSliderView
+                .description(name)
+                .image(card.imageURL)
+                .setScaleType(BaseSliderView.ScaleType.Fit)
+                .setOnSliderClickListener(new BaseSliderView.OnSliderClickListener() {
+                    @Override
+                    public void onSliderClick(BaseSliderView slider) {
+                        onFishDetailsRequested(card);
+                    }
+                });
+        return textSliderView;
+    }
+
     public FloatingActionButton[] getFABmenu(){
         return mFABmenu;
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) { }
+    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+        //TODO delete (old stuff from countrylist)
+    }
 
+    /**
+     * Called from CardViewFragment to launch a details mode for the fish card
+     * @param cardDetails
+     */
     @Override
-    public void onFragmentInteraction(Uri uri) { }
+    public void onFishDetailsRequested(InfoCard.CardDetails cardDetails) {
+        Log.d("jludden.reeflifesurvey", "MainActivity onFishDetailsRequested: "+cardDetails.toString());
+
+        //hide a bunch of shit todo probably want at least a fab or a bottom bar, cant decide
+        mFAB.hide();
+        hideFABmenu();
+        mBottomSheetButton.setVisibility(View.GONE);
+        AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
+        toolbar.setExpanded(false,true);
+        View bottomSheet = findViewById(R.id.bottom_sheet);
+        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        if(bottomSheetBehavior.getState()==BottomSheetBehavior.STATE_EXPANDED) {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+
+
+        Fragment newFragment = DetailsViewFragment.newInstance(cardDetails, "whatever");
+        String tag = DetailsViewFragment.TAG;
+
+        launchUIFragment(newFragment, tag);
+    }
 
     //todo move to bottomsheet class
     @Override
@@ -695,6 +735,7 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * Override the default dispatchTouchEvent to hide the keyboard from the search box, if it is up
+     * todo there is another touch listener in this class that handles hiding the fab menu. reconcile?
      * @param ev motion event passed on to super
      * @return result from super.dispatch
      */
@@ -736,25 +777,5 @@ public class MainActivity extends AppCompatActivity implements
             default:
                 Log.d("jludden.reeflifesurvey","unhandled toggle button pressed: "+buttonView.getId());
         }
-    }
-
-    //todo move to bottom sheet class
-    @Override
-    public void onSliderClick(BaseSliderView slider) {
-        Log.d("jludden.reeflifesurvey","main activity - bottom sheet - image carousel onSliderClick: "+slider.getDescription());
-        //todo launch fish card details activity
-    }
-
-    @Override
-    public void onDataFragmentLoadFinished() {
-        MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
-        if (mapFrag != null && mapFrag.isVisible()) {
-            mapFrag.onDataFragmentLoadFinished();
-        }
-
-        /*CardViewFragment viewFragment = (CardViewFragment) getSupportFragmentManager().findFragmentByTag(CardViewFragment.TAG);
-        if (viewFragment != null && viewFragment.isVisible()) {
-            viewFragment.();
-        }*/
     }
 }
