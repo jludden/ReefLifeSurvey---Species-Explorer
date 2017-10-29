@@ -277,9 +277,9 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
     public void onLoadFinished(Loader<List<CardDetails>> loader, List<CardDetails> data) {
 
         //update cards from the sharedpreferences data
-        for(CardDetails card : data){
+     /*   for(CardDetails card : data){
             if(getPref(card.getId(),InfoCard.PREF_FAVORITED)) card.favorited = true;
-        }
+        }*/
         onFilterApplied(); //reapply any filters
 
         int iCountPrev = mViewAdapter.getItemCount();
@@ -298,18 +298,7 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
         // (MainActivity) getActivity().setCardDetails(data)
     }
 
-    private boolean getPref(String id, String valKey){
-        SharedPreferences prefs = getActivity().getSharedPreferences(
-                "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
 
-        String key = InfoCard.generateSharedPrefKey(id,valKey); //"me.jludden.reeflifesurvey.CardPref_" + id + "_" + valKey;
-        boolean temp=prefs.getBoolean(key, false);
-        if(temp) Log.d("jludden.reeflifesurvey"  , "OnLoadFinished getPref-TRUE id: " + id + " key: " + valKey + " result: "+temp );
-        return temp;//prefs.getBoolean(key, false);
-
-        // use a default value using new Date()
-        //long l = prefs.getLong(dateTimeKey, new Date().getTime());
-    }
 
     /**
      * Applies any filters to the list of card

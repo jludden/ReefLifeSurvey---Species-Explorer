@@ -5,11 +5,26 @@
     android:layout_height="match_parent">
 
 
-    <ImageView
+    <!--<ImageView
         android:id="@+id/details_image_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_menu_camera" />
+        app:srcCompat="@drawable/ic_menu_camera" />-->
+
+    <com.daimajia.slider.library.SliderLayout
+        android:id="@+id/details_image_carousel"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
+
+    <CheckBox
+        android:id="@+id/favorite_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:button="@drawable/ic_star_border" />
+
+    <!--        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/card_image"-->
 
     <TextView
         android:id="@+id/details_text"

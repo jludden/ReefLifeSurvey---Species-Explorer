@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -42,6 +43,21 @@ import okhttp3.Response;
 
 public class LoaderUtils {
     //region Loading Utility Functions
+
+    /**
+     * Parses a string containing one or more urls into a list of url strings
+     * @param input input string
+     * @return list of strings that match a web url
+     */
+    public static List<String> parseURLs(String input) {
+        List<String> urlList = new ArrayList<>();
+        Matcher m = android.util.Patterns.WEB_URL.matcher(input);//.matches();
+        while(m.find()){
+            urlList.add(m.group());
+        }
+        return urlList;
+    }
+
     /**
      * Loads the Reef Life Survey survey site data layer, from disk or
      * @param context

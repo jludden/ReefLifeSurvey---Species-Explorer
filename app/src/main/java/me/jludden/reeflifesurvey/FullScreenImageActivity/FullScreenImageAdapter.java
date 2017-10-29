@@ -77,7 +77,7 @@ public class FullScreenImageAdapter extends PagerAdapter {
             //todo trying the just glide
             //todo cache glide.with
             Glide.with(mActivity)
-                    .load(cardDetails.imageURL)
+                    .load(cardDetails.getPrimaryImageURL())
                     .into(mImgDisplay);
 
           //   Try to draw from drawable first, then fall back to bitmap

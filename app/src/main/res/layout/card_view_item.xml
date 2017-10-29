@@ -58,8 +58,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/card_image"
-            android:button="@drawable/ic_star_border"
-        />
+            android:button="@drawable/ic_star_border" />
 
     </RelativeLayout>
 

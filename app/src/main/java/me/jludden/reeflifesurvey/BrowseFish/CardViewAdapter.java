@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.security.AccessController.getContext;
+import static me.jludden.reeflifesurvey.MiscUtilFunctions.onFavoritesButtonClick;
+import static me.jludden.reeflifesurvey.MiscUtilFunctions.savePref;
+import static me.jludden.reeflifesurvey.MiscUtilFunctions.setUpFavoritesButton;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link InfoCard.CardDetails} and makes a call to the
@@ -129,32 +132,15 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             final InfoCard.CardDetails cardDetails = mCardList.get(realPosition);
             // Log.d("jludden.reeflifesurvey"  , "CardViewAdapter onBind FishCardVH. CardListSize: "+ mCardList.size()+ " HiddenListSize: "+mHiddenList.size()+" adapter pos: "+ position + " datasource pos: "+position);
 
-            glide.load(cardDetails.imageURL).apply(mGlideRequestOptions).into(vhItem.mImageView);
+            glide.load(cardDetails.getPrimaryImageURL()).apply(mGlideRequestOptions).into(vhItem.mImageView);
 
             vhItem.mOverlayView.setText(cardDetails.cardName); //picture overlay text
 
             //set up details below image
             vhItem.mContentView.setText(cardDetails.toString());
             //if(getPref(cardDetails.id,PREF_FAVORITED)) cardDetails.favorited = true;
-            if (cardDetails.favorited)
-                vhItem.mFavoriteBtn.setButtonDrawable(R.drawable.ic_star_selected); //todo check the SharedPreferences cache
 
-            //set up favorites star button
-            vhItem.mFavoriteBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("jludden.reeflifesurvey", "CardViewAdapter Card Favorites onClick. now favorited: " + !cardDetails.favorited);
-
-                    if (cardDetails.favorited) {
-                        vhItem.mFavoriteBtn.setButtonDrawable(R.drawable.ic_star_border);
-                        cardDetails.favorited = false;
-                    } else {
-                        cardDetails.favorited = true;
-                        vhItem.mFavoriteBtn.setButtonDrawable(R.drawable.ic_star_selected);
-                    }
-                    savePref(cardDetails.id, InfoCard.PREF_FAVORITED, cardDetails.favorited);
-                }
-            });
+            setUpFavoritesButton(cardDetails, vhItem.mFavoriteBtn, mCardViewFragment.getActivity());
 
             vhItem.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -210,7 +196,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         while(i < getItemCount()){
             realPosition = getDataSourcePosition(i);
             cardDetails = mCardList.get(realPosition);
-            if(getItemViewType(i) == CardViewAdapter.TYPE_ITEM && !cardDetails.favorited) {
+            if(getItemViewType(i) == CardViewAdapter.TYPE_ITEM && !cardDetails.getFavorited(mCardViewFragment.getActivity())) {
                 hideCard(i);
             }
             else {
@@ -300,15 +286,6 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         super.onAttachedToRecyclerView(recyclerView);
     }
 
-    private void savePref(String id, String valKey, boolean val){
-        Log.d("jludden.reeflifesurvey"  , "CardViewAdapter Saving Preference for Card: " + id + " key: " + valKey + " val: "+val );
-
-        SharedPreferences prefs = mCardViewFragment.getActivity().getSharedPreferences(
-                "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
-
-        String key = InfoCard.generateSharedPrefKey(id,valKey);//"me.jludden.reeflifesurvey.CardPref_" + id + "_" + valKey;
-        prefs.edit().putBoolean(key, val).apply();
-    }
 
     /**
      * Returns a filter that can be used to constrain data with a filtering

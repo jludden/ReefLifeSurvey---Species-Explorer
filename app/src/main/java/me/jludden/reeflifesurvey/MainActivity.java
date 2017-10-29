@@ -677,7 +677,7 @@ public class MainActivity extends AppCompatActivity implements
         TextSliderView textSliderView = new TextSliderView(this);
         textSliderView
                 .description(name)
-                .image(card.imageURL)
+                .image(card.getPrimaryImageURL())
                 .setScaleType(BaseSliderView.ScaleType.Fit)
                 .setOnSliderClickListener(new BaseSliderView.OnSliderClickListener() {
                     @Override

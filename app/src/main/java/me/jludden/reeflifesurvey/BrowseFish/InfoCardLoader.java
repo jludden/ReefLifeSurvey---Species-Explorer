@@ -247,19 +247,19 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
         fishCard.commonNames = basicData.getString(1);
 
         //Parse out image URL
+        //todo can do this better. dont set imageurl, just use the first one of the list, etc.
         String imageURL = basicData.getString(4);
         if (imageURL.length() <= 10)  Log.d("jludden.reeflifesurvey"  , "parseSpeciesDetailsHelper no image found1 for card (image url too short): " + fishCard.getId());
-        else {             //TODO how about some regex
+        else {
             imageURL = imageURL.substring(2, imageURL.length() - 2); //remove brackets and quotes
             imageURL = imageURL.replace("\\", ""); //remove weird backslashes
-
-            if (imageURL.substring(4).contains("http")) {//it may have multiple urls, so try to find just the first one:
-                int secondIndex = imageURL.substring(4).indexOf("http");
-                imageURL = imageURL.substring(0, secondIndex + 1);
-                fishCard.hasMultipleImages = true;
+            List<String> urls = LoaderUtils.parseURLs(imageURL);
+            if (urls.size() < 1)
+                Log.d("jludden.reeflifesurvey", "parseSpeciesDetailsHelper no image found1 for card (image url too short): " + fishCard.getId());
+            else {
+                Log.d("jludden.reeflifesurvey", "parseSpeciesDetailsHelper url parsing for: " + fishCard.getId() + " full: " + imageURL + "\n #1: " + urls.get(0));
+                fishCard.imageURLs = urls;
             }
-            fishCard.imageURL = imageURL;
-            Log.d("jludden.reeflifesurvey"  , "parseSpeciesDetailsHelper "+fishCard.cardName+" image url: "+imageURL);
         }
 
         return fishCard;
@@ -357,8 +357,9 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
      */
 
     //10/24 todo currently only called from mapview->bottomsheet
+            //would like it to be called during the normal incremental load for each site, then have results aggregated
     public static List<CardDetails> loadSingleSite(SurveySite site, ReefLifeDataFragment.ReefLifeDataRetrievalCallback dataRetrievalCallback) throws JSONException {
-        List<CardDetails> fishCards = new ArrayList<>();
+        List<CardDetails> fishCards = new ArrayList<>(); //todo...
         int CARDS_TO_LOAD = 5;
         int cards_loaded = 0;
         String species;
@@ -372,12 +373,17 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
             species = speciesList.next();
 
             CardDetails fishCard = new CardDetails(species);
+            int numSightings = fullSpeciesJSON.getInt(species); //number of sightings of this fish in this survey site (may not be accurate due to datasource)
+
+            //Log.d("jludden.reeflifesurvey"  , "load single site. already );
             if(fishCards.contains(fishCard)) { //todo verify using overriden equals() func
                 int index = fishCards.indexOf(fishCard);
-                fishCards.get(index).setFoundInSites(site, fullSpeciesJSON.getInt(species));
+                fishCards.get(index).setFoundInSites(site, numSightings);
             }
             else{
-                fishCards.add(parseSpeciesDetailsHelper(fishCard, dataRetrievalCallback));
+                fishCard = parseSpeciesDetailsHelper(fishCard, dataRetrievalCallback);
+                fishCard.setFoundInSites(site, numSightings);
+                fishCards.add(fishCard);
             }
         }
         return fishCards;

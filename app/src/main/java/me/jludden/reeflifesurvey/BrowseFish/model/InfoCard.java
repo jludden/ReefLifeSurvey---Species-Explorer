@@ -1,18 +1,22 @@
 package me.jludden.reeflifesurvey.BrowseFish.model;
 
+import android.app.Activity;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import me.jludden.reeflifesurvey.CountryList.model.CityInfo;
 import me.jludden.reeflifesurvey.model.SurveySiteList;
-
+import me.jludden.reeflifesurvey.MiscUtilFunctions;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+
+import static me.jludden.reeflifesurvey.MiscUtilFunctions.getPref;
 
 /**
  * Helper class for providing sample cardName for user interfaces created by
@@ -85,14 +89,12 @@ public class InfoCard {
         public String cardName;
         public String language;// = "Indonesian"; //todo remove defaults
         public String subregion;// = "South-Eastern Asia";
-//        public CityInfo capitalCity;
         public CityInfo capitalCity;
         public String commonNames;
-        public String imageURL;
         public int numSightings; //TODO this could redone... times seen per survey site... Dictionary<SurveySiteList.SurveySite, Integer> FoundInSites
         public Dictionary<SurveySiteList.SurveySite, Integer> FoundInSites = new Hashtable<>();
         public boolean favorited = false;
-        public boolean hasMultipleImages = false;
+        public List<String> imageURLs;
 
         public CardDetails(String id) {
             this.id = id;
@@ -110,8 +112,14 @@ public class InfoCard {
             this.capitalCity = city;
         }
 
+        //todo performance impact? we are not caching this value but preferences should be in memory
+        public boolean getFavorited(Activity activity) {
+            if(getPref(id, InfoCard.PREF_FAVORITED, activity)) this.favorited = true;
+            return this.favorited;
+        }
+
         public void setFoundInSites(SurveySiteList.SurveySite site, int sightingsCount){
-            int prevCount = FoundInSites.get(site);
+            int prevCount = FoundInSites.get(site) != null ? FoundInSites.get(site) : 0;
             FoundInSites.put(site, prevCount+sightingsCount);
         }
 
@@ -198,6 +206,15 @@ public class InfoCard {
 
         public String getId() {
             return id;
+        }
+
+        public String getPrimaryImageURL() {
+            if(imageURLs == null || imageURLs.get(0) == null) {
+                Log.d("jludden.reeflifesurvey", "Card "+getId()+ "-"+cardName+" no primary URL found");
+                return "";
+            } else {
+                return imageURLs.get(0);
+            }
         }
     }
 }
