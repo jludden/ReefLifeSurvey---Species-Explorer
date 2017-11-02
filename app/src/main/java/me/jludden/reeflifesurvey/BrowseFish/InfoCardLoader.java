@@ -34,6 +34,43 @@ import static me.jludden.reeflifesurvey.LoaderUtils.loadFishSurveySites;
 
 /**
  * Created by Jason on 5/1/2017.
+ *
+ * Loads and parses data from the ReefLifeSurvey API into a List of InfoCard.CardDetails
+ *
+     Request siteRequest = new Request.Builder()
+     .url("https://yanirs.github.io/tools/rls/api-site-surveys.json")
+     .build();
+     Response siteResponse = client.newCall(siteRequest).execute();
+     String siteResult = siteResponse.body().string();
+     Log.d("jludden.reeflifesurvey"  ,"getFishInCards siteResult: "+ siteResult.substring(0,50000));
+
+     *** JSON FORMAT ***
+     {code: [
+     realm,
+     ecoregion,
+     name,
+     longitude,
+     latitude,
+     number_of_surveys,
+     {
+     fishSpecies: surveyedCount
+     }], ... }
+
+     such as:
+     {"NSW1":[
+     "Temperate Australasia",
+     "Cape Howe",
+     "Green Cape SE",
+     150.05,
+     -37.26,
+     4,
+     {
+     "1027":3,
+     "3005":3,
+     "3087":1,
+     "791":4
+     }], ... }
+ *
  */
 
 public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
@@ -46,6 +83,8 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
     private Iterator<CardDetails> mCardListIterator; //iterator of fish IDs in sorted order
     private String mNextSpeciesKey; //todo del
     private ReefLifeDataFragment.ReefLifeDataRetrievalCallback mDataRetrievalCallback;
+    private final int NUM_LOAD_PER_ITER = 20; //load 20 cards per iteration
+
 
     public InfoCardLoader(Context context, CardViewFragment.CardType cardType) {
         super(context);
@@ -106,7 +145,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
         Log.d("jludden.reeflifesurvey"  , "CardInfoLoader loadInBackground called");
 
         if(mData == null) {
-            mData = new ArrayList<>();
+            mData = new ArrayList<>(NUM_LOAD_PER_ITER);
         }
         else {
         // TODO jank - loader manager won't call load finished if the data reference is the same?
@@ -121,6 +160,10 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
           //  getBasetripCountries();
 
             loadFishCardsIncremental(); //Load more fish cards into mData
+
+            //loadFishCardsIncrementalTWO(); TODO
+            //  mCardDict - dictionary of id, fishCard to check against
+            //  return mCardDict.Values() or whatever
 
             /*
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
@@ -167,6 +210,43 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
 //        Log.d("jludden.reeflifesurvey"  ,"getBasetripCountries Download response2: "+strStart+" substring: "+result.substring(strStart,strStart+300));
 
         return result;
+    }
+
+
+    //todo switching to a new model for loading fish cards into the card list fragment & adapter
+    //  this has the benefit of correcting the fish found in each location,
+    //  but may be worse performance wise
+    //incrementally loads fish cards into mData, based on selected survey sites
+    private void loadFishCardsIncrementalTWO() throws IOException, JSONException {
+
+        //todo this list of selected sites should be moved from a static reference to a member on the data frag
+        //  List<SurveySite> SELECTED_SURVEY_SITES
+        //TODO loadSingleSite isn't properly filtering out cards already picked up (by other sites or previous iterations)
+        //  either it must check mData.contains (poor performance) or a Dictionary(id, fishCard)
+        //  ideally I would like to see this class's static data member be a dictionary,
+        //  and then it can return a list using dictionary
+        //TODO performance - when picking back up, all the sites will start looping from the beginning of a new site.getSpeciesFound().keys() iterator
+        //  SurveySite could potentially cache the iterator and pick it back up?
+        //      how would that behave with the card carousel? should that show 5 new fish each time, or the same 5?
+        //  site could potentially      JSONObject fullSpeciesJSON = site.getSpeciesFound();
+        //        Iterator<String> speciesList = fullSpeciesJSON.keys();
+
+      /*  int numSitesLeftToLoad = SurveySiteList.SELECTED_SURVEY_SITES.size();
+        int numLoaded = 0;
+        int numPerSite;
+
+
+        for(SurveySite site : SurveySiteList.SELECTED_SURVEY_SITES) {
+
+            if (CardViewFragment.CardViewSettings.LOAD_ALL) numPerSite = 999;
+            else {
+                numPerSite = (NUM_LOAD_PER_ITER - numLoaded) / numSitesLeftToLoad--;
+            }
+            List<CardDetails> siteList = loadSingleSite(site, mDataRetrievalCallback, numPerSite);
+            numLoaded += siteList.size();
+
+            mData.addAll(siteList);
+        }*/
     }
 
     //todo update to use loadsinglesite
@@ -232,39 +312,6 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
     //10/24 -
     //
 
-    /**
-     * takes the fishcard in, which really just has an id
-     *   jumps to the api_species json and maps out the fields for the species onto the fishCard
-     *   ASSUMES mFishData (the raw json from api_species)
-     * @param fishCard input card, which should be empty besides the ID
-     * @return the same fishCard, with details added (name, image url, etc.)
-     * Created 10/24
-     */
-    private static CardDetails parseSpeciesDetailsHelper(CardDetails fishCard, ReefLifeDataFragment.ReefLifeDataRetrievalCallback dataRetrievalCallback) throws JSONException{
-        JSONObject fishSpecies = dataRetrievalCallback.retrieveFishSpecies();
-        JSONArray basicData = fishSpecies.getJSONArray(fishCard.getId());
-        fishCard.cardName = basicData.getString(0);
-        fishCard.commonNames = basicData.getString(1);
-
-        //Parse out image URL
-        //todo can do this better. dont set imageurl, just use the first one of the list, etc.
-        String imageURL = basicData.getString(4);
-        if (imageURL.length() <= 10)  Log.d("jludden.reeflifesurvey"  , "parseSpeciesDetailsHelper no image found1 for card (image url too short): " + fishCard.getId());
-        else {
-            imageURL = imageURL.substring(2, imageURL.length() - 2); //remove brackets and quotes
-            imageURL = imageURL.replace("\\", ""); //remove weird backslashes
-            List<String> urls = LoaderUtils.parseURLs(imageURL);
-            if (urls.size() < 1)
-                Log.d("jludden.reeflifesurvey", "parseSpeciesDetailsHelper no image found1 for card (image url too short): " + fishCard.getId());
-            else {
-                Log.d("jludden.reeflifesurvey", "parseSpeciesDetailsHelper url parsing for: " + fishCard.getId() + " full: " + imageURL + "\n #1: " + urls.get(0));
-                fishCard.imageURLs = urls;
-            }
-        }
-
-        return fishCard;
-    }
-
     //merge fish species from json to the dictionary keys. then we will add the cards to the dictionary in getfishcards
     //todo shouldn't we be switching to using the SurveySiteList object, instead of raw json
     //todo delete this. we should separate processing of sites and species
@@ -320,47 +367,12 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
         return null;
     }
 
-    /*
-     * Request siteRequest = new Request.Builder()
-     .url("https://yanirs.github.io/tools/rls/api-site-surveys.json")
-     .build();
-     Response siteResponse = client.newCall(siteRequest).execute();
-     String siteResult = siteResponse.body().string();
-     Log.d("jludden.reeflifesurvey"  ,"getFishInCards siteResult: "+ siteResult.substring(0,50000));
-
-      *** JSON FORMAT ***
-            {code: [
-                realm,
-                ecoregion,
-                name,
-                longitude,
-                latitude,
-                number_of_surveys,
-                {
-                    fishSpecies: surveyedCount
-                }], ... }
-
-            such as:
-            {"NSW1":[
-                "Temperate Australasia",
-                "Cape Howe",
-                "Green Cape SE",
-                150.05,
-                -37.26,
-                4,
-                {
-                    "1027":3,
-                    "3005":3,
-                    "3087":1,
-                    "791":4
-                }], ... }
-     */
-
     //10/24 todo currently only called from mapview->bottomsheet
             //would like it to be called during the normal incremental load for each site, then have results aggregated
-    public static List<CardDetails> loadSingleSite(SurveySite site, ReefLifeDataFragment.ReefLifeDataRetrievalCallback dataRetrievalCallback) throws JSONException {
+    public static List<CardDetails> loadSingleSite(SurveySite site, ReefLifeDataFragment.ReefLifeDataRetrievalCallback dataRetrievalCallback, final int CARDS_TO_LOAD) throws JSONException {
+        Log.d("jludden.reeflifesurvey"  , "InfoCardLoader loadSingleSite: "+site.getSiteName()+" attempting to load: "+CARDS_TO_LOAD+" fish cards");
+
         List<CardDetails> fishCards = new ArrayList<>(); //todo...
-        int CARDS_TO_LOAD = 5;
         int cards_loaded = 0;
         String species;
 
@@ -370,13 +382,14 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
         //add each species to the dictionary
         while (speciesList.hasNext()
                 && (cards_loaded++ < CARDS_TO_LOAD)) {
-            species = speciesList.next();
 
+            species = speciesList.next();
             CardDetails fishCard = new CardDetails(species);
             int numSightings = fullSpeciesJSON.getInt(species); //number of sightings of this fish in this survey site (may not be accurate due to datasource)
 
-            //Log.d("jludden.reeflifesurvey"  , "load single site. already );
             if(fishCards.contains(fishCard)) { //todo verify using overriden equals() func
+                Log.d("jludden.reeflifesurvey"  , "load single site - already have fish card loaded: "+fishCard.getId()+"-"+fishCard.commonNames);
+
                 int index = fishCards.indexOf(fishCard);
                 fishCards.get(index).setFoundInSites(site, numSightings);
             }
@@ -387,6 +400,39 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
             }
         }
         return fishCards;
+    }
+
+    /**
+     * takes the fishcard in, which really just has an id
+     *   jumps to the api_species json and maps out the fields for the species onto the fishCard
+     *   ASSUMES mFishData (the raw json from api_species)
+     * @param fishCard input card, which should be empty besides the ID
+     * @return the same fishCard, with details added (name, image url, etc.)
+     * Created 10/24
+     */
+    private static CardDetails parseSpeciesDetailsHelper(CardDetails fishCard, ReefLifeDataFragment.ReefLifeDataRetrievalCallback dataRetrievalCallback) throws JSONException{
+        JSONObject fishSpecies = dataRetrievalCallback.retrieveFishSpecies();
+        JSONArray basicData = fishSpecies.getJSONArray(fishCard.getId());
+        fishCard.cardName = basicData.getString(0);
+        fishCard.commonNames = basicData.getString(1);
+
+        //Parse out image URL
+        //todo can do this better. dont set imageurl, just use the first one of the list, etc.
+        String imageURL = basicData.getString(4);
+        if (imageURL.length() <= 10)  Log.d("jludden.reeflifesurvey"  , "parseSpeciesDetailsHelper no image found1 for card (image url too short): " + fishCard.getId());
+        else {
+            imageURL = imageURL.substring(2, imageURL.length() - 2); //remove brackets and quotes
+            imageURL = imageURL.replace("\\", ""); //remove weird backslashes
+            List<String> urls = LoaderUtils.parseURLs(imageURL);
+            if (urls.size() < 1)
+                Log.d("jludden.reeflifesurvey", "parseSpeciesDetailsHelper no image found for card (image url too short): " + fishCard.getId() + " original url string: "+basicData.getString(4));
+            else {
+    //            Log.d("jludden.reeflifesurvey", "parseSpeciesDetailsHelper url parsing for: " + fishCard.getId() + " full: " + imageURL + "\n #1: " + urls.get(0));
+                fishCard.imageURLs = urls;
+            }
+        }
+
+        return fishCard;
     }
 
     public JSONObject setupFishLocations(){
@@ -414,15 +460,18 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
            // String code = "NSW1"; //TODO
             //String[] codes = {"NSW1", "AH1", "AH2", "BALI1", "RAJA19", "FLORES4"} ; //TODO get these site names from the maps activity
 
-            if(SurveySiteList.SELECTED_SURVEY_SITES == null || SurveySiteList.SELECTED_SURVEY_SITES.size() <=0){
+          /*  if(SurveySiteList.SELECTED_SURVEY_SITES == null || SurveySiteList.SELECTED_SURVEY_SITES.size() <=0){
 //                throw new JSONException("InfoCardLoader.setupFishLocations() - no locations selected");
                 Log.e("jludden.reeflifesurvey" ,"ERROR InfoCardLoader.setupFishLocations() - no locations selected");
 
                 SurveySiteList.SELECTED_SURVEY_SITES.add(new SurveySite("FLORES4"));
-            }
+            }*/
 
             String selectedSites = "";
-            for( SurveySite selSite: SurveySiteList.SELECTED_SURVEY_SITES){
+            //for( SurveySite selSite: SurveySiteList.SELECTED_SURVEY_SITES){
+            for( SurveySite selSite:  mDataRetrievalCallback.retrieveSurveySiteList().getSelectedSitesAll()){
+                Log.d("jludden.reeflifesurvey"  , "InfoCardLoader loading site: "+selSite.getCode()+selSite.getID());
+
                 selectedSites = selectedSites + selSite.getCode() + selSite.getID() + ", ";
 
                 String code = selSite.getCode()+selSite.getID();
@@ -470,7 +519,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
                 result.put(code, speciesFound);
             }
 
-                        Log.d("jludden.reeflifesurvey"  , "InfoCardLoader setupFishLocations SELECTED SITES: " + selectedSites);
+            Log.d("jludden.reeflifesurvey"  , "InfoCardLoader setupFishLocations SELECTED SITES: " + selectedSites);
 
             return result;
 

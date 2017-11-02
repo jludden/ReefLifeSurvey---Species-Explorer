@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 
@@ -19,6 +20,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ToggleButton;
 
 import me.jludden.reeflifesurvey.model.SurveySiteList;
 import me.jludden.reeflifesurvey.R;
@@ -130,59 +133,75 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
                              Bundle savedInstanceState) {
 
         Log.d("jludden.reeflifesurvey"  ,"CardViewFragment View Created");
-        setTitleBar();
+
+
+
+
+
+
+
+
+
+
+
         View view = inflater.inflate(R.layout.card_view_fragment, container, false);
-        //view = view.findViewById(R.id.jason_cards); //todo
-        //Log.d("jludden.reeflifesurvey"  ,"CardViewFragment view instanceof recyclerview: "+(view instanceof RecyclerView));
 
-        // Set the adapter
-       // if (view instanceof RecyclerView) {
-            Log.d("jludden.reeflifesurvey"  ,"CardViewFragment view instanceof recyclerview!");
+        Log.d("jludden.reeflifesurvey"  ,"CardViewFragment view instanceof recyclerview!");
 
-            Context context = view.getContext();
-            mRecyclerView = (RecyclerView) view.findViewById(R.id.jason_cards);
-            mLayoutManager = new LinearLayoutManager(context);
-            mRecyclerView.setLayoutManager(mLayoutManager);
+        Context context = view.getContext();
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.jason_cards);
+        mLayoutManager = new LinearLayoutManager(context);
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
-            mViewAdapter = new CardViewAdapter(this, InfoCard.ITEMS, mRecyclerView, mListener); //todo reconcile infocard.items with the onloadfinished(arraylist<InfoCard.CardDetails>)
-            mRecyclerView.setAdapter(mViewAdapter);
+        mViewAdapter = new CardViewAdapter(this, InfoCard.ITEMS, mRecyclerView, mListener); //todo reconcile infocard.items with the onloadfinished(arraylist<InfoCard.CardDetails>)
+        mRecyclerView.setAdapter(mViewAdapter);
 
-            //Set OnScroll listener
-            mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
-                @Override
-                /**
-                 * Callback for when the card list is scrolled. If we are reaching the end of the list, load more cards
-                 * @param recyclerView The RecyclerView which scrolled.
-                 * @param dx The amount of horizontal scroll.
-                 * @param dy The amount of vertical scroll.
-                 */
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
+        //Set OnScroll listener
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            /**
+             * Callback for when the card list is scrolled. If we are reaching the end of the list, load more cards
+             * @param recyclerView The RecyclerView which scrolled.
+             * @param dx The amount of horizontal scroll.
+             * @param dy The amount of vertical scroll.
+             */
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
 
-                    int visibleItemCount = recyclerView.getChildCount();
-                    int totalItemCount = mLayoutManager.getItemCount();
-                    int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
-                    int previousTotal = 20; //todo
-                    int visibleThreshold = 3; //todo
-                    //Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onScrolled! "+visibleItemCount+" tot"+totalItemCount+" first: "+firstVisibleItem+" isloading:"+mIsLoading);
+                int visibleItemCount = recyclerView.getChildCount();
+                int totalItemCount = mLayoutManager.getItemCount();
+                int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
+                int previousTotal = 20; //todo
+                int visibleThreshold = 3; //todo
+                //Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onScrolled! "+visibleItemCount+" tot"+totalItemCount+" first: "+firstVisibleItem+" isloading:"+mIsLoading);
 
 
-                    if (mIsLoading) {
-                        if (totalItemCount > mPreviousTotalItemCount) {
-                            mIsLoading = false;
-                            mPreviousTotalItemCount = totalItemCount;
-                        }
-                    }
-                    if (!mIsLoading && (totalItemCount - visibleItemCount)
-                            <= (firstVisibleItem + visibleThreshold)) {
-                        onLoadMore();
-                        mIsLoading = true;
+                if (mIsLoading) {
+                    if (totalItemCount > mPreviousTotalItemCount) {
+                        mIsLoading = false;
+                        mPreviousTotalItemCount = totalItemCount;
                     }
                 }
+                if (!mIsLoading && (totalItemCount - visibleItemCount)
+                        <= (firstVisibleItem + visibleThreshold)) {
+                    onLoadMore(false);
+                    mIsLoading = true;
+                }
+            }
 
-            });
+        });
 
-       // }
+
+        //TODO update toolbar
+        setTitleBar(); //no longer works
+
+       /* AppBarLayout toolbar = (AppBarLayout) view.findViewById(R.id.app_bar);
+        LinearLayout toolbar_layout = (LinearLayout) view.findViewById(R.id.toolbar_layout);
+        ToggleButton siteButton = new ToggleButton(context);
+        toolbar_layout.addView(siteButton);*/
+
+        //        ((ToggleButton) findViewById(R.id.toolbar_button_loadAll)).setOnCheckedChangeListener(this);
+
 
         return view;
     }
@@ -194,11 +213,12 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         actionBar.setTitle(TITLE);
 
+        Log.d("jludden.reeflifesurvey"  ,"CardViewfragment SET TITLE BAR called TODO UPDATE");//todo
 
         String subtitle = "";
-        for(SurveySiteList.SurveySite site : SurveySiteList.SELECTED_SURVEY_SITES){
-            subtitle = subtitle + site.getSiteName();
-        }
+//        for(SurveySiteList.SurveySite site : SurveySiteList.SELECTED_SURVEY_SITES){
+//            subtitle = subtitle + site.getSiteName();
+//        }
 
         if(subtitle.length() > 0) actionBar.setSubtitle(subtitle);
     }
@@ -206,15 +226,20 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
     /**
      * Triggers the loader to load more data
       */
-    public void onLoadMore(){
+    public void onLoadMore(boolean forceReload){
         Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onLoadMore: loadall? "+CardViewSettings.LOAD_ALL);
 
-        if(mLoadedAll){
+        if(forceReload){ //survey sites changed, restart everything
+            getLoaderManager().restartLoader(LOADER_ID, null, this); //will call onCreateLoader again, with the loadAll parameter passed in
+            return;
+        }
+
+        if(mLoadedAll){ //everything is already loaded
             Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onLoadMore suppressed (everything already loaded)");
             return;
         }
 
-        if(CardViewSettings.LOAD_ALL){
+        if(CardViewSettings.LOAD_ALL){ //filters must have been applied, load all
             mLoadedAll = true;
             getLoaderManager().restartLoader(LOADER_ID, null, this); //will call onCreateLoader again, with the loadAll parameter passed in
         }
@@ -309,7 +334,6 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
     public void onFilterApplied(){
         Log.d("jludden.reeflifesurvey","apply filter Fragment");
 
-        //todo constraint could be in a bitarray or class of enums/booleans
         //constraint = CardViewSettings.FILTER_FAVORITES ? "F" : "";
 
        mViewAdapter.getFilter().filter(CardViewSettings.SEARCH_CONSTRAINT); //using standard filterable interface

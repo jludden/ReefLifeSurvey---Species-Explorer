@@ -33,6 +33,7 @@ import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -242,6 +243,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 if (mapFrag != null && !mapFrag.isVisible()) {
                     Log.d("jludden.reeflifesurvey"  , "Bottom Sheet TEST1 PASSED");
+                    mBottomSheetButton.setVisibility(View.VISIBLE);
                     launchUIFragment(mapFrag,MapViewFragment.TAG);
                 }
             }
@@ -384,6 +386,11 @@ public class MainActivity extends AppCompatActivity implements
 //            getSupportActionBar().setSubtitle(subtitle);
             AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
             toolbar.setExpanded(true,true);
+            addSiteLocationsToToolbar();
+
+
+
+
             mFAB.show();
         } else if (id == R.id.nav_gallery) {
             newFragment = getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
@@ -426,6 +433,33 @@ public class MainActivity extends AppCompatActivity implements
         drawer.closeDrawer(GravityCompat.START);
 
         return true;
+    }
+
+    /**
+     * Set the expandable toolbar buttons to include the site locations
+     * called when launching CardViewFragment
+     */
+    private void addSiteLocationsToToolbar() {
+        LinearLayout toolbar_layout = (LinearLayout) findViewById(R.id.toolbar_layout);
+        int offset=4;//TODO this is the number of buttons before the survey sites
+
+        //remove the previously added site buttons
+        int childCount = toolbar_layout.getChildCount()-offset;
+        if(childCount > 0) {
+            toolbar_layout.removeViews(offset, childCount);
+        }
+
+        int count = 0;
+        for(String siteCode : retrieveSurveySiteList().getSelectedSiteCodes()) {
+            ToggleButton siteButton = new ToggleButton(getBaseContext());
+            siteButton.setId(offset + count++);
+            siteButton.setTextOn(siteCode);
+            siteButton.setChecked(true); //default state true
+            siteButton.setTextOff("("+siteCode+")");
+            siteButton.setTag(siteCode); //store the site associated with this button
+            siteButton.setOnCheckedChangeListener(this);
+            toolbar_layout.addView(siteButton);
+        }
     }
 
     @Override
@@ -651,7 +685,7 @@ public class MainActivity extends AppCompatActivity implements
         //todo show a fish carousel
         try{
             //Load fish cards
-            List<InfoCard.CardDetails> fishCards = InfoCardLoader.loadSingleSite(siteInfo, this);
+            List<InfoCard.CardDetails> fishCards = InfoCardLoader.loadSingleSite(siteInfo, this, 5);
             Log.d("jludden.reeflifesurvey", "BottomSheet fishCards loaded: "+fishCards.size());
             if(fishCards.size() > 0 ) Log.d("jludden.reeflifesurvey", "BottomSheet fishCards loaded: "+fishCards.get(0).commonNames);
 
@@ -764,18 +798,29 @@ public class MainActivity extends AppCompatActivity implements
                     if(CardViewSettings.LOAD_ALL) viewFragment.onFilterApplied(); //already have everything loaded, just apply filters
                     else {
                         CardViewSettings.LOAD_ALL = true;
-                        viewFragment.onLoadMore();
+                        viewFragment.onLoadMore(false);
                     }
                 }
                 break;
             case(R.id.toolbar_button_loadAll):
                 CardViewSettings.LOAD_ALL = isChecked;
                 if (viewFragment != null && viewFragment.isVisible()) {
-                    viewFragment.onLoadMore();
+                    viewFragment.onLoadMore(false);
                 }
                 break;
-            default:
-                Log.d("jludden.reeflifesurvey","unhandled toggle button pressed: "+buttonView.getId());
+            default: //handle survey site location button pressed
+                Log.d("jludden.reeflifesurvey","unhandled toggle button (#"+buttonView.getId()+") pressed: "+buttonView.getText());
+                if(buttonView.getTag() != null) {
+                    //SurveySiteList.SurveySite site = (SurveySiteList.SurveySite) buttonView.getTag();
+                    String siteCode = (String) buttonView.getTag();
+                    Log.d("jludden.reeflifesurvey", "toggle button tag: " + siteCode + " is checked: " + buttonView.isChecked());
+                    if (buttonView.isChecked()) retrieveSurveySiteList().saveFavoriteSite(siteCode, getBaseContext()); //update saved sites in datafragment
+                    else retrieveSurveySiteList().removeFavoriteSite(siteCode, getBaseContext());
+                    if (viewFragment != null && viewFragment.isVisible()) { //reload card view fragment
+                        viewFragment.onLoadMore(true);
+                    }
+                }
+
         }
     }
 }

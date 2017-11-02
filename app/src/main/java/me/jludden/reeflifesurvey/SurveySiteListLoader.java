@@ -1,6 +1,8 @@
 package me.jludden.reeflifesurvey;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.OperationCanceledException;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
@@ -9,6 +11,12 @@ import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader;
 import me.jludden.reeflifesurvey.model.SurveySiteList;
 
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static me.jludden.reeflifesurvey.BuildConfig.DEBUG;
 
@@ -42,6 +50,7 @@ class SurveySiteListLoader extends AsyncTaskLoader<SurveySiteList> {
         //Add some coordinates for reef survey sites
         JSONObject surveySites = LoaderUtils.loadFishSurveySites(getContext());
         SurveySiteList siteList = LoaderUtils.parseSurveySites(surveySites);
+        siteList.loadFavoritedSites(getContext()); //Load Saved Sites
 
         return siteList;
     }
@@ -58,31 +67,5 @@ class SurveySiteListLoader extends AsyncTaskLoader<SurveySiteList> {
 //        }
     }
 
-
-/*
-    private JSONObject getCountryOutlineGeoJson(String country) throws IOException, JSONException {
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url("https://assets.thebasetrip.com/api/v2/countries/maps/argentina.geo.json")
-                .build();
-//        Request request = new Request.Builder()
-//                .url("https://thebasetrip.p.mashape.com/v2/countries/"+country) //?from=united-states
-//                .addHeader("X-Mashape-Key", "oyP1rS3JiPmshQbeM9K8EgPdpp2Qp1xVWyIjsnJE7V9aYuYK1u")
-//                .addHeader("Content-Type", "application/json")
-//                .addHeader("Accept", "application/json")
-//                .build();
-
-        Response response = client.newCall(request).execute();
-        String result = response.body().string();
-        Log.d("jludden.reeflifesurvey"  ,"SurveySiteListLoader Download response: "+result);
-
-
-        //parse out the coordinates
-        //    ew JSONObject(result)).getJSONObject("features").getJSONObject("geometry").getJSONArray("coordinates")
-        JSONObject jsonCoordinates =  (new JSONObject(result));
-        Log.d("jludden.reeflifesurvey"  ,"SurveySiteListLoader Download jsonCoordinates: "+jsonCoordinates.toString());
-
-        return jsonCoordinates;
-    }*/
 
 }

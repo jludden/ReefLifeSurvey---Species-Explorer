@@ -127,7 +127,8 @@ public class ReefLifeDataFragment extends Fragment implements LoaderManager.Load
      */
     @Override
     public void onLoadFinished(Loader<SurveySiteList> loader, SurveySiteList data) {
-        Log.d("jludden.reeflifesurvey"  ,"ReefLifeDataFragment onLoadFinished loaderid: "+loader.getId()+" data length: "+data.ITEMS.size()+" realm hashmap size: "+data.ITEM_MAP.size()+" simple realm list size: "+data.SITE_CODE_LIST.size());
+        //Log.d("jludden.reeflifesurvey"  ,"ReefLifeDataFragment onLoadFinished loaderid: "+loader.getId()+" data length: "+data.size()+" realm hashmap size: "+data.ITEM_MAP.size()+" simple realm list size: "+data.SITE_CODE_LIST.size());
+        Log.d("jludden.reeflifesurvey"  ,"ReefLifeDataFragment onLoadFinished loaderid: "+loader.getId()+" data length: "+data.size());
         if(data!=null) mSurveySites = data;
 
         //notify activity

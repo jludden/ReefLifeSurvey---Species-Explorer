@@ -1,13 +1,10 @@
 package me.jludden.reeflifesurvey.BrowseFish;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -22,10 +19,7 @@ import me.jludden.reeflifesurvey.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.security.AccessController.getContext;
-import static me.jludden.reeflifesurvey.MiscUtilFunctions.onFavoritesButtonClick;
-import static me.jludden.reeflifesurvey.MiscUtilFunctions.savePref;
-import static me.jludden.reeflifesurvey.MiscUtilFunctions.setUpFavoritesButton;
+import static me.jludden.reeflifesurvey.SharedPreferencesUtils.setUpFavoritesButton;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link InfoCard.CardDetails} and makes a call to the
@@ -327,9 +321,8 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                     //todo refactor this whole method
                     for(InfoCard.CardDetails card : mCardList){
-                        if(card.cardName.toLowerCase().contains(constraint)||
-                                card.commonNames.toLowerCase().contains(constraint)) continue;
-                        else removeList.add(card.getId());
+                        if(!card.cardName.toLowerCase().contains(constraint)&&
+                                !card.commonNames.toLowerCase().contains(constraint)) removeList.add(card.getId());
                     }
 
                     results.values = removeList;

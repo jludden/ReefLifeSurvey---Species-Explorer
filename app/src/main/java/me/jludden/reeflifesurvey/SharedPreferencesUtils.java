@@ -7,14 +7,21 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard;
 
 /**
  * Created by Jason on 10/29/2017.
+ *
+ * Mostly concerned with reading and writing to SharedPrefs
  */
 
-public class MiscUtilFunctions {
+public class SharedPreferencesUtils {
 
+    private static final String SAVED_SITES_KEY = "me.jludden.reeflifesurvey.SitePrefs";
 
     //set up the favorites button initial state and onclick listener
     public static void setUpFavoritesButton(final InfoCard.CardDetails cardDetails, final CheckBox mFavoriteBtn, final Activity activity){
@@ -73,4 +80,33 @@ public class MiscUtilFunctions {
         //long l = prefs.getLong(dateTimeKey, new Date().getTime());
     }
 
+    /**
+     * Loads the saved survey site combined codes from SharedPreferences
+     * @param context
+     * @return
+     */
+    public static Set<String> getSavedSites(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(
+                "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
+
+        Set<String> siteCodes = new HashSet<>();
+        siteCodes = prefs.getStringSet(SAVED_SITES_KEY,siteCodes); //unordered set of SurveySite combinedCodes
+
+        return siteCodes;
+    }
+
+    /**
+     * Save the list of favorited sites to SharedPreferences
+     * @param siteCodeList
+     * @param context
+     */
+    public static void updateSavedSites(List<String> siteCodeList, Context context) {
+       Log.d("jludden.reeflifesurvey"  , "updateSavedSites. Saving " + siteCodeList.size() + " sites");
+       SharedPreferences prefs = context.getSharedPreferences(
+                "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
+
+       Set<String> set = new HashSet<>(siteCodeList);
+       prefs.edit().putStringSet(SAVED_SITES_KEY, set).apply();
+
+    }
 }

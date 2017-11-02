@@ -12,8 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import me.jludden.reeflifesurvey.R;
-
 import me.jludden.reeflifesurvey.model.SurveySiteList;
 import me.jludden.reeflifesurvey.model.SurveySiteList.SurveySite;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -42,6 +40,30 @@ import java.util.ArrayList;
  * TODO
  *  10/23: refactor. map+surveysitelist model into new folder
  *      3 different colors for map icons: new, added, selected. DONT HARDCODE?
+ *          new - red marker? or maybe a custom icon
+ *          favorites - star
+ *          currently selected - adding a red marker to the currently selected location could be cool, or whatever
+ *
+ *  11/1:
+ *      Update UI. when just viewing, can have a minimized or no bottom sheet showing
+ *      when you click on a survey location, immediately show the data within the bottom sheet - no more marker menus
+ *      bottom sheet buttons:
+ *          have a favorites/unfavorites button within the bottom sheet (I think within the sheet)
+ *          have the FAB be a direct link to the browse fish for this survey site location!!!!
+ *          Maybe another button that links to a relevant reeflifesurvey.com website?
+ *          Maybe a share button?
+ *
+*       bottom sheet behavior:
+ *          collapses - (will popup when selecting a marker).
+ *              200-300dp, with name, 2/3 buttons + FAB, ecoregion, etc, survey sites
+ *          expanded -
+ *              full survey site list, Fish preview gallery, probably 70% of the screen (small map at the top for reference)
+ *          full-screen
+ *              More of expanded with no map showing
+ *
+ *      todo for today:
+ *          refactor favorited survey sites. Make sure they are 1. in the data frag 2. saved to user prefs
+ *
  *
  */
 
@@ -66,7 +88,7 @@ public class MapViewFragment extends Fragment
     private SurveySiteList mSurveySiteList;
     private ReefLifeDataFragment.ReefLifeDataRetrievalCallback mDataRetrievalCallback;
 
-    private MapViewFragmentInteractionListener mListener;
+    private MapViewFragmentInteractionListener mMapViewFragmentInteractionListener;
 
     public interface MapViewFragmentInteractionListener{
         void showBottomSheet(SurveySiteList.SurveySite siteInfo);
@@ -97,7 +119,7 @@ public class MapViewFragment extends Fragment
                     ReefLifeDataFragment.ReefLifeDataRetrievalCallback.class.getName();
         }
         if(context instanceof MapViewFragmentInteractionListener){
-            mListener = (MapViewFragmentInteractionListener) context;
+            mMapViewFragmentInteractionListener = (MapViewFragmentInteractionListener) context;
         } else {
             errMsg += "\n" + context.toString() + "must implement" +
                     MapViewFragmentInteractionListener.class.getName();
@@ -115,7 +137,7 @@ public class MapViewFragment extends Fragment
 
         MainActivity main = (MainActivity) getActivity();
         //mFAB = main.getFAB(); //TODO
-        mFAB = mListener.getFloatingActionButton();
+        mFAB = mMapViewFragmentInteractionListener.getFloatingActionButton();
        // mFAB = main.getFloatingActionButton();
 
         //make sure these are being cleaned up in onDestroy TODO
@@ -251,7 +273,7 @@ public class MapViewFragment extends Fragment
 
         //already showing info for a different marker - update bottom sheet contents
         if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED){
-            mListener.showBottomSheet((SurveySite) marker.getTag());
+            mMapViewFragmentInteractionListener.showBottomSheet((SurveySite) marker.getTag());
             //((MainActivity) getActivity()).showBottomSheet((SurveySite) marker.getTag());
         }
 
@@ -267,7 +289,7 @@ public class MapViewFragment extends Fragment
         Log.d("jludden.reeflifesurvey"  , "MapViewFragment onInfoWindowClick marker: "+ marker.toString());
         //Snackbar.make(mMapView, "clicked", Snackbar.LENGTH_SHORT).show();
         marker.hideInfoWindow();
-        mListener.showBottomSheet((SurveySite) marker.getTag());
+        mMapViewFragmentInteractionListener.showBottomSheet((SurveySite) marker.getTag());
         //((MainActivity) getActivity()).showBottomSheet((SurveySite) mSelectedMarker.getTag());
     }
 
@@ -291,7 +313,9 @@ public class MapViewFragment extends Fragment
                 //todo should this remove? how else to remove an icon
             } else {
                 mSelectedSiteList.add(mSelectedMarker); //todo save this to preferences
-                SurveySiteList.SELECTED_SURVEY_SITES.add((SurveySite) mSelectedMarker.getTag()); //todo why both
+                String siteCode = ((SurveySite) mSelectedMarker.getTag()).getCode();
+                mSurveySiteList.saveFavoriteSite(siteCode, getContext());
+                //mSurveySiteList.SELECTED_SURVEY_SITES.add((SurveySite) mSelectedMarker.getTag()); //todo why both REMOVE
                 mSelectedMarker.setIcon((BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 mSelectedMarker.hideInfoWindow();
                 mSelectedMarker = null;
@@ -339,11 +363,16 @@ public class MapViewFragment extends Fragment
     private void removeLastMarker(){
         Marker lastMark = mSelectedSiteList.remove(mSelectedSiteList.size()-1);
         lastMark.setIcon((BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-        SurveySiteList.SELECTED_SURVEY_SITES.remove(lastMark.getTag());
+        String siteCode = ((SurveySite) lastMark.getTag()).getCode();
+        mSurveySiteList.removeFavoriteSite(siteCode, getContext());
 
         //todo remove from preferences list
     }
 
+    /**
+     * CALLED FROM MAIN
+     * Let's the Map Fragment know that the data
+     */
     public void onDataFragmentLoadFinished() {
         if(mMap != null) { //make sure that onMapReady has already been called
             addSurveySites();

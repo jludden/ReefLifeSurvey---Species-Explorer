@@ -1,13 +1,20 @@
 package me.jludden.reeflifesurvey.model;
 
+import android.content.Context;
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import static me.jludden.reeflifesurvey.SharedPreferencesUtils.*;
 
 /**
  * Created by Jason on 8/20/2017.
@@ -16,36 +23,37 @@ import java.util.Map;
 public class SurveySiteList {
 
     /**
-     * An array of sample (model) items.
+     * Full List of Survey Sites
      */
-    public final List<SurveySite> ITEMS = new ArrayList<>();
+    private final List<SurveySite> SITE_LIST = new ArrayList<>();
 
     /**
      * A map of survey sites, by CODE. EMR1, 2, 3, etc should all map to "EMR",[1,2,3,...]
      * Multiple sites share the same realm & location but have different dive site names.
      * We can use this map to select all nearby dive sites
      */
-    public final Map<String, List<SurveySite>> ITEM_MAP = new HashMap<>();
+    private final Map<String, List<SurveySite>> CODE_MAP = new HashMap<>();
 
     //simple list of realms, one survey site per CODE
+    //used for building out the Map of markers, where we want to group survey sites in the same location
     public final List<SurveySite> SITE_CODE_LIST = new ArrayList<>();
 
     //Add a new survey site to all applicable collections
     //todo make private or something why is this a thing
     public void add(SurveySite site){
-        ITEMS.add(site);
+        SITE_LIST.add(site);
 
         String key = site.code;
-        if(ITEM_MAP.containsKey(key)){
-            ITEM_MAP.get(key).add(site);
+        if(CODE_MAP.containsKey(key)){
+            CODE_MAP.get(key).add(site);
         }
         else {
             List<SurveySite> newList = new ArrayList<>();
             newList.add(site);
-            ITEM_MAP.put(key, newList);
+            CODE_MAP.put(key, newList);
             SITE_CODE_LIST.add(site);
+       //     CODE_MAP.put(site.getCode(), site);
         }
-
     }
 
     //summarizes the number of sites with the same code and some of the site names
@@ -54,7 +62,7 @@ public class SurveySiteList {
     }
     //@param len number of survey sites, or -1 for no limit
     public String codeList(String code, int len){ //todo change len to charlen instead of numsites
-        List<SurveySite> list = ITEM_MAP.get(code);
+        List<SurveySite> list = CODE_MAP.get(code);
         if(list == null) return "Null - no sites";
 
         StringBuilder nameBuilder = new StringBuilder(list.size()+": ");
@@ -76,15 +84,89 @@ public class SurveySiteList {
 
     //the number of SurveySites in the collection
     public int size(){
-        return SITE_CODE_LIST.size();
+        return SITE_LIST.size();
     }
 
-    //#region STATIC
     //list of only selected survey sites
-    public static List<SurveySite> SELECTED_SURVEY_SITES = new ArrayList<>(); //todo should i really have static here and also a data fragment? can this be in data frag? can it be a list<ids>?
-    //public boolean selectSite(String code)
+    //but it should probably based on codes instead of sites, because we currently only allow selecting a full code with all sites included
+    //todo possibly want this to be a List<Codes> (then we can use CODE_MAP to resolve the list of locations)
+    private List<SurveySite> SELECTED_SURVEY_SITES = new ArrayList<>();
 
+    //returns the list of saved survey site codes
+    //EST1, EST2, EST3, etc. will only be returned once as EST
+    public List<String> getSelectedSiteCodes(){
+        //todo performance
+        Map<String, String> codeDict = new Hashtable<>();
+        for (SurveySite possiblyDupedSite:
+             SELECTED_SURVEY_SITES) {
+            codeDict.put(possiblyDupedSite.getCode(),"");
+        }
+        return new ArrayList<String>(codeDict.keySet());
+    }
 
+    //returns the list of saved survey sites
+    //EST1, EST2, EST3, etc. will all be returned as separate entries
+    public List<SurveySite> getSelectedSitesAll(){
+        return SELECTED_SURVEY_SITES;
+    }
+
+    /**
+     * Loads the stored survey site codes from SharedPreferences
+     * @param context
+     * @return
+     */
+    public void loadFavoritedSites(Context context) {
+        Set<String> savedSites = getSavedSites(context);
+        Log.d("jludden.reeflifesurvey"  ,"Loading Favorite Sites : "+savedSites.size());
+        StringBuilder sitesLoaded = new StringBuilder();
+
+        //convert the set of strings to a real SurveySiteList
+        for(String siteCode : savedSites){
+            if(CODE_MAP.containsKey(siteCode)){
+                sitesLoaded.append(siteCode);
+                SELECTED_SURVEY_SITES.addAll(CODE_MAP.get(siteCode));
+            }
+            else {
+                Log.e("jludden.reeflifesurvey"  ,"Loading Favorite Sites: unable to resolve favorited site key: "+siteCode);
+            }
+        }
+        Log.d("jludden.reeflifesurvey"  ,"Loading Favorite Sites. successfully loaded : "+sitesLoaded.toString());
+
+    }
+
+    /**
+     * NOTE THAT the SAVE and REMOVE really only save the code
+     *  saving EST1 saves "EST", and EST1, EST2, EST3, etc will all load
+     *  this is intended. we only have that level of granularity at this time
+     * @param siteCode
+     * @param context
+     */
+    public void saveFavoriteSite(String siteCode, Context context){
+        List<SurveySite> list = CODE_MAP.get(siteCode);
+        if(list == null) {
+            Log.e("jludden.reeflifesurvey"  ,"Saving favorite site - unable to resolve sites corresponding to code: "+siteCode);
+        }
+        else{
+            SELECTED_SURVEY_SITES.addAll(list);
+            updateSavedSites(getSelectedSiteCodes(),context);
+        }
+    }
+
+    public void removeFavoriteSite(String siteCode, Context context){
+        List<SurveySite> list = CODE_MAP.get(siteCode);
+        if(list == null) {
+            Log.e("jludden.reeflifesurvey"  ,"Removing favorite site - unable to resolve sites corresponding to code: "+siteCode);
+        }
+        else {
+            SELECTED_SURVEY_SITES.removeAll(list);
+            updateSavedSites(getSelectedSiteCodes(),context);
+        }
+    }
+
+    /**
+     * Class to represent a Survey Site location
+     *  Only weird thing is that there are
+     */
     public static class SurveySite {
         public SurveySite(String combinedCode) {
             String[] parts = combinedCode.trim().split("(?=\\d)", 2);
@@ -104,8 +186,6 @@ public class SurveySiteList {
         LatLng position;//double longitude;double latitude;
         int number_of_surveys;
         JSONObject speciesFound;
-
-
 
     /*
      String realm = site1.getString(0);

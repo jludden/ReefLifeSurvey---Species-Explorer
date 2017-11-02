@@ -15,7 +15,8 @@ Defines a layout for buttons, filters, and other goodies that exist in a horizon
         android:layout_height="match_parent"
         android:background="@color/colorPrimaryDark"
         android:orientation="horizontal"
-        android:visibility="visible">
+        android:visibility="visible"
+        android:id="@+id/toolbar_layout">
 
         <ImageView
             android:id="@+id/menu_icon"
@@ -42,7 +43,8 @@ Defines a layout for buttons, filters, and other goodies that exist in a horizon
             android:layout_height="match_parent"
             android:textOn="LOADALL"
             android:textOff="LOADALL" />
-        <ToggleButton
+
+   <!--     <ToggleButton
             android:id="@+id/toggleButton"
             android:layout_width="50dp"
             android:layout_height="match_parent"
@@ -68,7 +70,7 @@ Defines a layout for buttons, filters, and other goodies that exist in a horizon
             android:id="@+id/toggleButto5n"
             android:layout_width="50dp"
             android:layout_height="match_parent"
-            android:text="ToggleButton" />
+            android:text="ToggleButton" />-->
     </LinearLayout>
 
 </HorizontalScrollView>

@@ -22,9 +22,7 @@ import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.model.SurveySiteList;
 
-import static me.jludden.reeflifesurvey.MiscUtilFunctions.onFavoritesButtonClick;
-import static me.jludden.reeflifesurvey.MiscUtilFunctions.savePref;
-import static me.jludden.reeflifesurvey.MiscUtilFunctions.setUpFavoritesButton;
+import static me.jludden.reeflifesurvey.SharedPreferencesUtils.setUpFavoritesButton;
 
 /**
  * Created by Jason on 10/25/2017.
@@ -104,17 +102,22 @@ public class DetailsViewAdapter extends PagerAdapter {
 
             //add on page change listener if needed
 
-            textView.setText(newText);
-
-            //todo
             imageCarousel.stopAutoCycle();
-            for(String url : cardDetails.imageURLs) {
-                TextSliderView textSliderView = new TextSliderView(container.getContext());
-                textSliderView
-                        .image(url)
-                        .setScaleType(BaseSliderView.ScaleType.Fit);
-                imageCarousel.addSlider(textSliderView);
+            if(cardDetails.imageURLs == null){
+                Log.d("jludden.reeflifesurvey"  , "DetailsviewAdapter card details no images to load");
+                newText.concat("\n No Images Found");
+//                imageCarousel.setVisibility(View.INVISIBLE);
             }
+            else {
+                for (String url : cardDetails.imageURLs) {
+                    TextSliderView textSliderView = new TextSliderView(container.getContext());
+                    textSliderView
+                            .image(url)
+                            .setScaleType(BaseSliderView.ScaleType.Fit);
+                    imageCarousel.addSlider(textSliderView);
+                }
+            }
+            textView.setText(newText);
         }
 
         container.addView(viewLayout);
