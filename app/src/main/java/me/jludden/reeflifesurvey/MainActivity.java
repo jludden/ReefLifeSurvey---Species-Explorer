@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 Snackbar.make(v, "FAB2 Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                showBottomSheet(null);
+                expandBottomSheet(null);
                 hideFABmenu();
             }
         });
@@ -650,9 +650,30 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Show the bottom sheet
+     * Show the initial survey site location in just the top part of the bottom sheet
+     * @param siteInfo
      */
-    public void showBottomSheet(@Nullable SurveySiteList.SurveySite siteInfo) {
+    public void peekBottomSheet(SurveySiteList.SurveySite siteInfo) {
+        //Set up the bottom sheet
+        View bottomSheet = findViewById(R.id.bottom_sheet);
+        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        if(bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+
+        final TextView topText = (TextView) findViewById(R.id.bottom_sheet_top);
+        topText.setText(siteInfo.getEcoRegion());
+
+
+        //if added to favs, set the fab to remove
+
+        //show some info like num sites etc
+    }
+
+    /**
+     * Show the bottom sheet with full details about the survey site
+     */
+    public void expandBottomSheet(@Nullable SurveySiteList.SurveySite siteInfo) {
         //Set up the bottom sheet
         View bottomSheet = findViewById(R.id.bottom_sheet);
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
@@ -663,13 +684,21 @@ public class MainActivity extends AppCompatActivity implements
         final TextView bottomText = (TextView) findViewById(R.id.bottom_sheet_main_text);
         if (mSurveySiteList == null) mSurveySiteList = this.retrieveSurveySiteList();
         if ((bottomText == null) || (siteInfo == null) || (mSurveySiteList == null)) {
-            Log.e("jludden.reeflifesurvey", "MainActivity^showBottomSheet something null: " + (bottomText == null) + (siteInfo == null) + (mSurveySiteList == null));
-            throw new NullPointerException("MainActivity^showBottomSheet something null"); //todo error signature
+            Log.e("jludden.reeflifesurvey", "MainActivity^expandBottomSheet something null: " + (bottomText == null) + (siteInfo == null) + (mSurveySiteList == null));
+            throw new NullPointerException("MainActivity^expandBottomSheet something null"); //todo error signature
         }
 
         //set up text fields
         topText.setText(siteInfo.getEcoRegion());
-        bottomText.setText(mSurveySiteList.codeList(siteInfo.getCode(), -1)); //todo
+        StringBuilder details = new StringBuilder();
+        details.append("Code (ID) : "+siteInfo.getCode()+" ("+siteInfo.getID()+")");
+        details.append("\n SiteName "+siteInfo.getSiteName());
+        details.append("\n EcoRegion "+siteInfo.getEcoRegion());
+        details.append("\n Realm "+siteInfo.getRealm());
+        details.append("\n Position: "+siteInfo.getPosition());
+        details.append("\n Num Surveys "+siteInfo.getNumberOfSurveys());
+        details.append("\n" + mSurveySiteList.codeList(siteInfo.getCode(), -1));
+        bottomText.setText(details.toString()); //todo
         bottomText.setMovementMethod(new ScrollingMovementMethod());
         bottomText.scrollTo(0,0);
 

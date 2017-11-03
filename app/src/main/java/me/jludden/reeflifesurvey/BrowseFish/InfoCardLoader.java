@@ -71,6 +71,25 @@ import static me.jludden.reeflifesurvey.LoaderUtils.loadFishSurveySites;
      "791":4
      }], ... }
  *
+ *
+ *
+ * API format to fish species:
+ {
+    0: [
+        "Scientific Name",
+        "Common name, common name, common name",
+        "https://reeflifesurvey.com/species/###", --species key
+        #,                                        --
+        [
+            "https image1",
+            "https image2"
+        ]
+    ],
+    1: [
+        ...
+    ]
+ }
+ *
  */
 
 public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
@@ -276,6 +295,8 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
         //TODO can we just return mCardDict with species added, but no cards added yet
         if(mCardDict ==  null) {
             JSONObject speciesJSON = setupFishLocations();
+            if(speciesJSON.length()==0) return; //todo
+
             mCardDict = mergeFishSpecies(speciesJSON); //TODO don't think we are still using the dictionary aspect - convert to list?
 
             //sort the species by most common TODO performance could be improved, certainly
@@ -415,6 +436,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
         JSONArray basicData = fishSpecies.getJSONArray(fishCard.getId());
         fishCard.cardName = basicData.getString(0);
         fishCard.commonNames = basicData.getString(1);
+        fishCard.reefLifeSurveyURL = basicData.getString(2);
 
         //Parse out image URL
         //todo can do this better. dont set imageurl, just use the first one of the list, etc.

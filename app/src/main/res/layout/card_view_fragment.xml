@@ -1,49 +1,3 @@
-<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--android:orientation="vertical">-->
-
-    <!--<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"-->
-        <!--android:layout_width="250dp"-->
-        <!--android:layout_height="40dp"-->
-        <!--android:visibility="visible">-->
-
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:background="@color/colorPrimaryDark"-->
-            <!--android:orientation="horizontal"-->
-            <!--android:visibility="visible">-->
-
-            <!--<ImageView-->
-                <!--android:id="@+id/menu_icon"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:paddingTop="@dimen/nav_header_vertical_spacing"-->
-                <!--app:srcCompat="@android:drawable/sym_def_app_icon" />-->
-
-            <!--<ToggleButton-->
-                <!--android:id="@+id/toggleButton2"-->
-                <!--android:layout_width="50dp"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:text="ToggleButton" />-->
-
-            <!--<ToggleButton-->
-                <!--android:id="@+id/toggleButton3"-->
-                <!--android:layout_width="50dp"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:text="ToggleButton" />-->
-
-            <!--<ToggleButton-->
-                <!--android:id="@+id/toggleButton"-->
-                <!--android:layout_width="50dp"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:text="ToggleButton" />-->
-        <!--</LinearLayout>-->
-    <!--</HorizontalScrollView>-->
-
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -55,6 +9,7 @@
 
     tools:context="me.jludden.reeflifesurvey.MainActivity"
     >
+
     <!--app:layoutBehavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior">-->
 
     <!--    android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -77,6 +32,11 @@
         app:layoutManager="LinearLayoutManager"
         tools:context="me.jludden.reeflifesurvey.me.jludden.reeflifesurvey.BrowseFish.CardViewFragment"
         tools:listitem="@layout/card_view_item" />
+
+
+    <!-- Progress bar overlay; shown while loading -->
+    <include layout="@layout/progress_bar"/>
+
     </RelativeLayout>
 
 <!--</LinearLayout>-->

@@ -8,7 +8,7 @@ import android.util.Log;
 
 import me.jludden.reeflifesurvey.CountryList.model.CityInfo;
 import me.jludden.reeflifesurvey.model.SurveySiteList;
-import me.jludden.reeflifesurvey.MiscUtilFunctions;
+
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import static me.jludden.reeflifesurvey.MiscUtilFunctions.getPref;
+import static me.jludden.reeflifesurvey.SharedPreferencesUtils.getPref;
 
 /**
  * Helper class for providing sample cardName for user interfaces created by
@@ -95,6 +95,7 @@ public class InfoCard {
         public Dictionary<SurveySiteList.SurveySite, Integer> FoundInSites = new Hashtable<>();
         public boolean favorited = false;
         public List<String> imageURLs;
+        public String reefLifeSurveyURL;
 
         public CardDetails(String id) {
             this.id = id;
@@ -211,7 +212,7 @@ public class InfoCard {
         public String getPrimaryImageURL() {
             if(imageURLs == null || imageURLs.get(0) == null) {
                 Log.d("jludden.reeflifesurvey", "Card "+getId()+ "-"+cardName+" no primary URL found");
-                return "";
+                return "http://www.brendontyree.com/wp-content/uploads/2013/10/placeholder_image18.png"; //todo set up a placeholder image
             } else {
                 return imageURLs.get(0);
             }

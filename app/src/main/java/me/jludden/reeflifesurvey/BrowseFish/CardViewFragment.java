@@ -1,5 +1,7 @@
 package me.jludden.reeflifesurvey.BrowseFish;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -55,6 +57,7 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
     private CardViewAdapter mViewAdapter;
     private LinearLayoutManager mLayoutManager;
     private OnCardViewFragmentInteractionListener mListener;
+    private View mProgressBar;
 
     //some not great stuff to enable loading all or loading incrementally
     //private boolean mMoreToLoad = true;
@@ -134,16 +137,6 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
 
         Log.d("jludden.reeflifesurvey"  ,"CardViewFragment View Created");
 
-
-
-
-
-
-
-
-
-
-
         View view = inflater.inflate(R.layout.card_view_fragment, container, false);
 
         Log.d("jludden.reeflifesurvey"  ,"CardViewFragment view instanceof recyclerview!");
@@ -155,6 +148,8 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
 
         mViewAdapter = new CardViewAdapter(this, InfoCard.ITEMS, mRecyclerView, mListener); //todo reconcile infocard.items with the onloadfinished(arraylist<InfoCard.CardDetails>)
         mRecyclerView.setAdapter(mViewAdapter);
+
+        mProgressBar = view.findViewById(R.id.progress_overlay);
 
         //Set OnScroll listener
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
@@ -191,36 +186,7 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
 
         });
 
-
-        //TODO update toolbar
-        setTitleBar(); //no longer works
-
-       /* AppBarLayout toolbar = (AppBarLayout) view.findViewById(R.id.app_bar);
-        LinearLayout toolbar_layout = (LinearLayout) view.findViewById(R.id.toolbar_layout);
-        ToggleButton siteButton = new ToggleButton(context);
-        toolbar_layout.addView(siteButton);*/
-
-        //        ((ToggleButton) findViewById(R.id.toolbar_button_loadAll)).setOnCheckedChangeListener(this);
-
-
         return view;
-    }
-
-    //TODO this does not appear to work anymore
-    //consider         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-    private void setTitleBar() {
-
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        actionBar.setTitle(TITLE);
-
-        Log.d("jludden.reeflifesurvey"  ,"CardViewfragment SET TITLE BAR called TODO UPDATE");//todo
-
-        String subtitle = "";
-//        for(SurveySiteList.SurveySite site : SurveySiteList.SELECTED_SURVEY_SITES){
-//            subtitle = subtitle + site.getSiteName();
-//        }
-
-        if(subtitle.length() > 0) actionBar.setSubtitle(subtitle);
     }
 
     /**
@@ -230,6 +196,9 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
         Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onLoadMore: loadall? "+CardViewSettings.LOAD_ALL);
 
         if(forceReload){ //survey sites changed, restart everything
+            // Show progress overlay (with animation):
+            animateView(mProgressBar, View.VISIBLE, 0.4f, 200);
+
             getLoaderManager().restartLoader(LOADER_ID, null, this); //will call onCreateLoader again, with the loadAll parameter passed in
             return;
         }
@@ -244,6 +213,32 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
             getLoaderManager().restartLoader(LOADER_ID, null, this); //will call onCreateLoader again, with the loadAll parameter passed in
         }
         else getLoaderManager().getLoader(LOADER_ID).onContentChanged();
+    }
+
+    /**
+     * Thanks to Jonik
+     *  https://stackoverflow.com/questions/18021148/display-a-loading-overlay-on-android-screen
+     *  Todo this would go great in a utils class
+     * @param view         View to animate
+     * @param toVisibility Visibility at the end of animation
+     * @param toAlpha      Alpha at the end of animation
+     * @param duration     Animation duration in ms
+     */
+    public static void animateView(final View view, final int toVisibility, float toAlpha, int duration) {
+        boolean show = toVisibility == View.VISIBLE;
+        if (show) {
+            view.setAlpha(0);
+        }
+        view.setVisibility(View.VISIBLE);
+        view.animate()
+                .setDuration(duration)
+                .alpha(show ? toAlpha : 0)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        view.setVisibility(toVisibility);
+                    }
+                });
     }
 
     @Override
@@ -313,6 +308,9 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
 
         Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onLoadFinished loaderid: "+loader.getId()+" data length: "+data.size() + " adapter item count increased from "+iCountPrev+" to "+iCountAfter);
 
+
+        // Hide it (with animation):
+        animateView(mProgressBar, View.GONE, 0, 200);
 
         //try to pass data back to the main activity
         //edit - this can be done better by using a retained, headless fragment

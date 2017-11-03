@@ -61,8 +61,6 @@ import java.util.ArrayList;
  *          full-screen
  *              More of expanded with no map showing
  *
- *      todo for today:
- *          refactor favorited survey sites. Make sure they are 1. in the data frag 2. saved to user prefs
  *
  *
  */
@@ -71,6 +69,7 @@ public class MapViewFragment extends Fragment
         implements OnMapReadyCallback, GoogleMap.OnMapClickListener,
         GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener {
 
+    public static final float FAVORITED_SITE_COLOR = BitmapDescriptorFactory.HUE_AZURE;
     private MapViewFragment mapFragment; //todo just use fragment manager
     View rootView;
     private GoogleMap mMap;
@@ -91,7 +90,10 @@ public class MapViewFragment extends Fragment
     private MapViewFragmentInteractionListener mMapViewFragmentInteractionListener;
 
     public interface MapViewFragmentInteractionListener{
-        void showBottomSheet(SurveySiteList.SurveySite siteInfo);
+        void peekBottomSheet(SurveySite siteInfo);
+
+        void expandBottomSheet(SurveySite siteInfo);
+
         FloatingActionButton getFloatingActionButton(); //// TODO: 9/14/2017
         //i would rather, instead of getting the whole button, pass back to the activity the two different actions:
         //1. site selected , show summary, update fab icon (starred or unstarred)
@@ -266,6 +268,8 @@ public class MapViewFragment extends Fragment
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        //todo only use peekbottomsheet for this method. rest is junk
+
         Log.v("ludden.reeflifesurvey" , "MapViewFragment onMarkerClick marker: "+ marker.toString());
         mSelectedMarker = marker;
         //hideFABmenu();
@@ -273,8 +277,11 @@ public class MapViewFragment extends Fragment
 
         //already showing info for a different marker - update bottom sheet contents
         if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED){
-            mMapViewFragmentInteractionListener.showBottomSheet((SurveySite) marker.getTag());
-            //((MainActivity) getActivity()).showBottomSheet((SurveySite) marker.getTag());
+            mMapViewFragmentInteractionListener.expandBottomSheet((SurveySite) marker.getTag());
+            //((MainActivity) getActivity()).expandBottomSheet((SurveySite) marker.getTag());
+        }
+        else{
+            mMapViewFragmentInteractionListener.peekBottomSheet((SurveySite) marker.getTag());//todo only this
         }
 
         return false;
@@ -289,8 +296,8 @@ public class MapViewFragment extends Fragment
         Log.d("jludden.reeflifesurvey"  , "MapViewFragment onInfoWindowClick marker: "+ marker.toString());
         //Snackbar.make(mMapView, "clicked", Snackbar.LENGTH_SHORT).show();
         marker.hideInfoWindow();
-        mMapViewFragmentInteractionListener.showBottomSheet((SurveySite) marker.getTag());
-        //((MainActivity) getActivity()).showBottomSheet((SurveySite) mSelectedMarker.getTag());
+        mMapViewFragmentInteractionListener.expandBottomSheet((SurveySite) marker.getTag());
+        //((MainActivity) getActivity()).expandBottomSheet((SurveySite) mSelectedMarker.getTag());
     }
 
     /**
@@ -316,7 +323,7 @@ public class MapViewFragment extends Fragment
                 String siteCode = ((SurveySite) mSelectedMarker.getTag()).getCode();
                 mSurveySiteList.saveFavoriteSite(siteCode, getContext());
                 //mSurveySiteList.SELECTED_SURVEY_SITES.add((SurveySite) mSelectedMarker.getTag()); //todo why both REMOVE
-                mSelectedMarker.setIcon((BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                mSelectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(FAVORITED_SITE_COLOR));
                 mSelectedMarker.hideInfoWindow();
                 mSelectedMarker = null;
                 mFAB.setImageResource(R.drawable.ic_add_white);
@@ -407,10 +414,15 @@ public class MapViewFragment extends Fragment
             //mMap.addMarker(new MarkerOptions().position(pos).title(name));
             Marker newMarker = mMap.addMarker(new MarkerOptions()
                     .position(pos)
-                    .title(ecoRegion)
-                    .snippet(summary)
+                    .title(site.getCode())
+                    //.title(ecoRegion)
+                    //.snippet(summary)
             );
             newMarker.setTag(site); //associate marker with an actual site object
+
+            if(mSurveySiteList.getSelectedSiteCodes().contains(site.getCode())) { //already favorited so set the color!
+                newMarker.setIcon(BitmapDescriptorFactory.defaultMarker(FAVORITED_SITE_COLOR));
+            }
         }
 
         //addUnnecessaryMapStuff();

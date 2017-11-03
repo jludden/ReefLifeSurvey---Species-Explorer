@@ -80,11 +80,11 @@ public class DetailsViewAdapter extends PagerAdapter {
                 .load(cardDetails.imageURL)
                 .into(imageView);*/
 
-            String newText =
+            StringBuilder newText = new StringBuilder(
                     cardDetails.cardName + "\n" +
                     cardDetails.commonNames + "\n" +
                     "Num sightings " + cardDetails.numSightings + "\n" +
-                    "Found in "+cardDetails.FoundInSites.size()+" sites" + "\n";
+                    "Found in "+cardDetails.FoundInSites.size()+" sites" + "\n");
 
             Enumeration<SurveySiteList.SurveySite> siteKeys = cardDetails.FoundInSites.keys();
             SurveySiteList.SurveySite site;
@@ -92,7 +92,7 @@ public class DetailsViewAdapter extends PagerAdapter {
                 site = siteKeys.nextElement();
 
                 int numSightings = cardDetails.FoundInSites.get(site);
-                newText = newText.concat("\n" + site.getSiteName() + "\t" + numSightings);
+                newText.append("\n" + site.getSiteName() + "\t" + numSightings);
 
             }
 
@@ -105,7 +105,7 @@ public class DetailsViewAdapter extends PagerAdapter {
             imageCarousel.stopAutoCycle();
             if(cardDetails.imageURLs == null){
                 Log.d("jludden.reeflifesurvey"  , "DetailsviewAdapter card details no images to load");
-                newText.concat("\n No Images Found");
+                newText.append("\n No Images Found");
 //                imageCarousel.setVisibility(View.INVISIBLE);
             }
             else {
@@ -117,7 +117,10 @@ public class DetailsViewAdapter extends PagerAdapter {
                     imageCarousel.addSlider(textSliderView);
                 }
             }
-            textView.setText(newText);
+
+            newText.append("\n").append("SPECIES PAGE URL: ").append(cardDetails.reefLifeSurveyURL);
+
+            textView.setText(newText.toString());
         }
 
         container.addView(viewLayout);

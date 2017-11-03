@@ -107,10 +107,11 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
     //    Log.d("jludden.reeflifesurvey"  , "CardViewAdapter onBindVH: "+ mCardList.size()+ "size-> pos"+ position);
 
-
         if(holder instanceof HeaderViewHolder) {
             final HeaderViewHolder vhHeader = (HeaderViewHolder) holder;
-//            vhHeader.mContentView.setText("Hello this is a header set from OnBindViewHolder TODO"); //todo
+          /*  if(getItemCount() <= 1) {
+                vhHeader.mContentView.setText("No items loaded");
+            }*/
         }
         //todo clean this mess up
         else if(holder instanceof FishCardViewHolder) {
@@ -272,7 +273,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     @Override
-    public int getItemCount() { return mCardList.size() - mHiddenList.size() +1; } //adding 1 for the header
+    public int getItemCount() { return mCardList.size() - mHiddenList.size() + 1; } //adding 1 for the header
     //public int getItemCount() { return mCardList.size() +1; } //adding 1 for the header
 
     @Override
