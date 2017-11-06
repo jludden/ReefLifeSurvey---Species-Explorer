@@ -373,7 +373,10 @@ public class MainActivity extends AppCompatActivity implements
 //            case R.id
 //        }
 
-        if (id == R.id.nav_camera) {   // Handle the camera action
+        if (id == R.id.nav_home){
+            launchNewFragment(IntroViewPagerFragment.class);
+        }
+        else if (id == R.id.nav_card_view) {   // Handle the camera action
             //newFragment = new CardViewFragment();
             newFragment = CardViewFragment.newInstance(CardViewFragment.CardType.Fish, "");
             tag = CardViewFragment.TAG;
@@ -387,7 +390,9 @@ public class MainActivity extends AppCompatActivity implements
             addSiteLocationsToToolbar();
 
             mFAB.show();
-        } else if (id == R.id.nav_gallery) {
+            launchUIFragment(newFragment, tag);
+
+        } else if (id == R.id.nav_map_view) {
             newFragment = getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
             if (newFragment == null) {
                 newFragment = MapViewFragment.newInstance();
@@ -402,14 +407,20 @@ public class MainActivity extends AppCompatActivity implements
             toolbar.setExpanded(false,true);
             //  SupportMapFragment mapFragment = (SupportMapFragment) newFragment;
             // mapFragment.getMapAsync(this);
-        } else if (id == R.id.nav_slideshow) {
+            launchUIFragment(newFragment, tag);
+
+        } else if (id == R.id.nav_send) {
             newFragment = CardViewFragment.newInstance(CardViewFragment.CardType.Countries, "");
             tag = "CountryFragment"; //TODO refactor these tags. They should be public static final vars on fragment classes
             mFAB.hide();
+            launchUIFragment(newFragment, tag);
+
         } else {
             newFragment = new CountryListFragment();
             tag = "CountryListFragment"; //TODO refactor these tags. They should be public static final vars on fragment classes
             mFAB.hide();
+            launchUIFragment(newFragment, tag);
+
         }
 //
 //        } else if (id == R.id.nav_slideshow) {
@@ -422,7 +433,6 @@ public class MainActivity extends AppCompatActivity implements
 //
 //        }
 
-        launchUIFragment(newFragment, tag);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -430,8 +440,46 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
+    /**
+     * public method to launch a new fragment
+     * @param fragmentClass
+     */
+    public void launchNewFragment(Class fragmentClass){
+        if(fragmentClass == IntroViewPagerFragment.class){
+            String tag = IntroViewPagerFragment.TAG;
+            Fragment newFragment = getSupportFragmentManager().findFragmentByTag(tag);
+            if(newFragment == null) {
+                newFragment = IntroViewPagerFragment.newInstance();
+            }
+            mFAB.hide();
+            hideFABmenu();
+            mBottomSheetButton.setVisibility(View.GONE);
+            AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
+            toolbar.setExpanded(false,true);
+            launchUIFragment(newFragment, tag);
+        }
+        else if(fragmentClass == CardViewFragment.class){
+            launchNewCardViewFragment("");
+        }
+        else if(fragmentClass == MapViewFragment.class){
+            String tag = MapViewFragment.TAG;
+            Fragment newFragment = getSupportFragmentManager().findFragmentByTag(tag);
+            if (newFragment == null) {
+                newFragment = MapViewFragment.newInstance();
+            }
 
-    public void launchNewCardViewFragment(@Nullable String code) {
+            //hide a bunch of shit
+            mFAB.hide();
+            hideFABmenu();
+            mBottomSheetButton.setVisibility(View.VISIBLE);
+            AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
+            toolbar.setExpanded(false,true);
+            launchUIFragment(newFragment, tag);
+        }
+    }
+
+    //special method to launch this fragment because we are passing in a parameter
+    private void launchNewCardViewFragment(@Nullable String code) {
         Fragment cardViewFrag = CardViewFragment.newInstance(CardViewFragment.CardType.Fish, code);
         launchUIFragment(cardViewFrag, CardViewFragment.TAG);
     }

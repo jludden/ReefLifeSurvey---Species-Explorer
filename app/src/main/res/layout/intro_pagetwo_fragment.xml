@@ -58,13 +58,12 @@
         android:layout_height="match_parent"
         android:layout_weight="1" >
 
-        <Button
-            android:id="@+id/button5"
-            style="@style/Widget.AppCompat.Button"
+        <me.jludden.reeflifesurvey.Intro.TextImageButton
+            android:id="@+id/button_launch_map_view"
             android:layout_width="match_parent"
-            android:layout_height="109dp"
+            android:layout_height="match_parent"
             android:layout_weight="1.0"
-            android:background="@drawable/ic_map_action"
+            android:textColor="@android:color/white"
             android:text="Survey Sites" />
 
         <Button
@@ -72,6 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/holo_blue_light"
+            android:textColor="@android:color/white"
             android:layout_weight="1.0"
             android:text="Button" />
 
@@ -80,6 +80,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/holo_red_light"
+            android:textColor="@android:color/white"
             android:layout_weight="1.0"
             android:text="Button" />
     </LinearLayout>
@@ -95,6 +96,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/holo_blue_light"
+            android:textColor="@android:color/white"
             android:layout_weight="1.0"
             android:text="Button" />
 
@@ -106,7 +108,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1.0"
             android:textColor="@android:color/white"
-            android:text="Favorite Sites" />
+            android:text="Favorites" />
 
 
     </LinearLayout>

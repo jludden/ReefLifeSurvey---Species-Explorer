@@ -3,21 +3,21 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Browse Fish" />
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_menu_send"
+            android:title="Home" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_map_view"
+            android:icon="@drawable/ic_map_action"
+            android:title="Survey Sites" />
+        <item
+            android:id="@+id/nav_card_view"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Map" />
+            android:title="Browse Species" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_quiz"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Country List" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="Species Quiz" />
     </group>
 
     <item android:title="Communicate">
@@ -30,6 +30,10 @@
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_send"
                 android:title="Send" />
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@drawable/ic_open_in_browser"
+                android:title="About" />
         </menu>
     </item>
 

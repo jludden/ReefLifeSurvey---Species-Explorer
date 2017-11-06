@@ -11,9 +11,9 @@ import me.jludden.reeflifesurvey.MapViewFragment;
  * Created by Jason on 11/4/2017.
  */
 
-public class IntroViewAdapter extends FragmentStatePagerAdapter {
+public class IntroViewPagerAdapter extends FragmentStatePagerAdapter {
 
-    public IntroViewAdapter(FragmentManager fragmentManager) {
+    public IntroViewPagerAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);
     }
 
@@ -28,6 +28,7 @@ public class IntroViewAdapter extends FragmentStatePagerAdapter {
                 return CardViewFragment.newInstance(
                         CardViewFragment.CardType.Fish, "");
             case 3:
+                //TODO can the third page be the Favorited sites + favorited species page?
                 //once it gets to map, impossible to page back
                 return MapViewFragment.newInstance();
             default:

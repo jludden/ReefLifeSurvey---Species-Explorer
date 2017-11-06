@@ -29,7 +29,7 @@ public class IntroViewPagerFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.intro_viewpager_fragment, container, false);
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.intro_view_pager);
-        viewPager.setAdapter(new IntroViewAdapter(getChildFragmentManager()));
+        viewPager.setAdapter(new IntroViewPagerAdapter(getChildFragmentManager()));
 
         return view;
     }
