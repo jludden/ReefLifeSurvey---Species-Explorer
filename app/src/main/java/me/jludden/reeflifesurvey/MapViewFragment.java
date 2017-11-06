@@ -1,16 +1,22 @@
 package me.jludden.reeflifesurvey;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.support.annotation.ColorRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Interpolator;
 
 import me.jludden.reeflifesurvey.model.SurveySiteList;
 import me.jludden.reeflifesurvey.model.SurveySiteList.SurveySite;
@@ -19,7 +25,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 //import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -411,18 +419,28 @@ public class MapViewFragment extends Fragment
             //String name = site.getSiteName(); //just the name of one site...
             String summary = mSurveySiteList.codeSummary(site.getCode());
 
+            float color = BitmapDescriptorFactory.HUE_RED; //todo make it a final field
+            if(mSurveySiteList.getSelectedSiteCodes().contains(site.getCode())) { //already favorited so set the color!
+                color = FAVORITED_SITE_COLOR;
+            }
+
             //mMap.addMarker(new MarkerOptions().position(pos).title(name));
+           // Marker newMarker = addMarker(pos, color, false); //drop the marker in with an animation. maybe we have too many for this approach
+
             Marker newMarker = mMap.addMarker(new MarkerOptions()
                     .position(pos)
                     .title(site.getCode())
+                    .icon(BitmapDescriptorFactory.defaultMarker(color))
                     //.title(ecoRegion)
                     //.snippet(summary)
             );
+            newMarker.setTitle(site.getCode());
             newMarker.setTag(site); //associate marker with an actual site object
 
-            if(mSurveySiteList.getSelectedSiteCodes().contains(site.getCode())) { //already favorited so set the color!
+
+           /* if(mSurveySiteList.getSelectedSiteCodes().contains(site.getCode())) { //already favorited so set the color!
                 newMarker.setIcon(BitmapDescriptorFactory.defaultMarker(FAVORITED_SITE_COLOR));
-            }
+            }*/
         }
 
         //addUnnecessaryMapStuff();
@@ -480,80 +498,54 @@ public class MapViewFragment extends Fragment
         Log.d("jludden.reeflifesurvey"  , "MapViewFragment onsaveinstancestate pos: "+ mMap.getCameraPosition().target);
     }
 
-    //todo delete
-    private void addUnnecessaryMapStuff(){
-        // mViewAdapter.updateItems(data);
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    /**
+     * Thanks to piruin
+     * https://gist.github.com/piruin/94dc141e7736851b002c
+     * @param position
+     * @param color
+     * @param draggable
+     * @return
+     */
+    protected Marker addMarker(LatLng position, float color, boolean draggable) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.draggable(draggable);
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(color));
+        markerOptions.position(position);
+        Marker pinnedMarker = mMap.addMarker(markerOptions);
+        startDropMarkerAnimation(pinnedMarker);
+        return pinnedMarker;
+    }
 
-        //polygon stuff
-        /*
-                // mPolygonOptions = new PolygonOptions();
-//            mPolygonOptions.add(latLng);
-//            mPolygonOptions.strokeColor(Color.BLACK);
-//            mPolygonOptions.fillColor(Color.TRANSPARENT);
-//            mPolygon = mMap.addPolygon(mPolygonOptions);
-         */
-
-        //geoJSON drawing
-        //JSONObject geoJsonData = new JSONObject();
-        //GeoJsonLayer layer = new GeoJsonLayer(mMap, geoJsonData);
-        //GeoJsonLayer layer = new GeoJsonLayer(mMap, data.get(0));
-        //layer.addLayerToMap();
-
-        try {
-            GeoJsonLayer layer ;
-
-            String jsonString = "{\n" +
-                    "  \"type\": \"FeatureCollection\",\n" +
-                    "  \"features\": [\n" +
-                    "    {\n" +
-                    "      \"type\": \"Feature\",\n" +
-                    "      \"properties\": {},\n" +
-                    "      \"geometry\": {\n" +
-                    "        \"type\": \"Polygon\",\n" +
-                    "        \"coordinates\": [\n" +
-                    "          [\n" +
-                    "            [\n" +
-                    "              109.1162109375,\n" +
-                    "              -2.8991526985043006\n" +
-                    "            ],\n" +
-                    "            [\n" +
-                    "              125.2880859375,\n" +
-                    "              -2.8991526985043006\n" +
-                    "            ],\n" +
-                    "            [\n" +
-                    "              125.2880859375,\n" +
-                    "              8.363692651835823\n" +
-                    "            ],\n" +
-                    "            [\n" +
-                    "              109.1162109375,\n" +
-                    "              8.363692651835823\n" +
-                    "            ],\n" +
-                    "            [\n" +
-                    "              109.1162109375,\n" +
-                    "              -2.8991526985043006\n" +
-                    "            ]\n" +
-                    "          ]\n" +
-                    "        ]\n" +
-                    "      }\n" +
-                    "    }\n" +
-                    "  ]\n" +
-                    "}";
-
-            JSONObject jsonObj = new JSONObject(jsonString);
-            //Log.d("jludden.reeflifesurvey"  ,"MapViewFragment jsonObj: "+jsonObj.toString());
-
-            //jsonObj = data.get(0);
-
-            layer = new GeoJsonLayer(mMap, jsonObj); //.getJSONObject("features")
-            layer.addLayerToMap();
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    /**
+     * Thanks to piruin
+     * https://gist.github.com/piruin/94dc141e7736851b002c
+     * @param marker
+     */
+    private void startDropMarkerAnimation(final Marker marker) {
+        final LatLng target = marker.getPosition();
+        final Handler handler = new Handler();
+        final long start = SystemClock.uptimeMillis();
+        Projection proj = mMap.getProjection();
+        Point targetPoint = proj.toScreenLocation(target);
+        final long duration = (long) (200 + (targetPoint.y * 0.6));
+        Point startPoint = proj.toScreenLocation(marker.getPosition());
+        startPoint.y = 0;
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final Interpolator interpolator = new LinearOutSlowInInterpolator();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                long elapsed = SystemClock.uptimeMillis() - start;
+                float t = interpolator.getInterpolation((float) elapsed / duration);
+                double lng = t * target.longitude + (1 - t) * startLatLng.longitude;
+                double lat = t * target.latitude + (1 - t) * startLatLng.latitude;
+                marker.setPosition(new LatLng(lat, lng));
+                if (t < 1.0) {
+                    // Post again 16ms later == 60 frames per second
+                    handler.postDelayed(this, 16);
+                }
+            }
+        });
     }
 
 }

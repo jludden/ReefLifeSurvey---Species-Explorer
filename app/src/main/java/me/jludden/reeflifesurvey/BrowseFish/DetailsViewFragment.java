@@ -44,11 +44,13 @@ public class DetailsViewFragment extends Fragment {
     public static DetailsViewFragment newInstance(InfoCard.CardDetails cardDetails, String param2) {
         DetailsViewFragment fragment = new DetailsViewFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_CARD,cardDetails);
+        args.putParcelable(ARG_CARD, cardDetails);
         //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
+
+    //todo considering another newInstance() where we just pass in a fish species id and it generates the CardDetails object?
 
     @Override
     public void onAttach(Context context){

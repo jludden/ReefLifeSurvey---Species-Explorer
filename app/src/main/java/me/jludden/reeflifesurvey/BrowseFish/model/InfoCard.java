@@ -119,6 +119,12 @@ public class InfoCard {
             return this.favorited;
         }
 
+        public void setFoundInSites(String siteID, int sightingsCount) {
+            //todo
+            // /SurveySiteList.SurveySite site =
+            //setFoundInSites(site, sightingsCount);
+        }
+
         public void setFoundInSites(SurveySiteList.SurveySite site, int sightingsCount){
             int prevCount = FoundInSites.get(site) != null ? FoundInSites.get(site) : 0;
             FoundInSites.put(site, prevCount+sightingsCount);

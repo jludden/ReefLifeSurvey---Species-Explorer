@@ -22,20 +22,40 @@
         android:text="top textview"
         android:textSize="30sp" />
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:text="Aus"/>
+        android:orientation="horizontal"
+        android:background="@color/colorAccent"
+        android:weightSum="300"
+        >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        android:text="3 dive sites"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="100"
+            android:layout_height="20dp"
+            android:gravity="center"
+            android:text="Aus"
+            />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        android:text="ToWebby"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="100"
+            android:layout_height="20dp"
+            android:text="3 dive sites"
+            android:gravity="center"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="100"
+            android:layout_height="20dp"
+            android:text="ToWebby"
+            android:gravity="center"
+            />
+
+    </LinearLayout>
+
 
     <com.daimajia.slider.library.SliderLayout
         android:id="@+id/site_preview_carousel"

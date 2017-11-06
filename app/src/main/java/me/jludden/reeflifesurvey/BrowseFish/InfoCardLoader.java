@@ -2,6 +2,7 @@ package me.jludden.reeflifesurvey.BrowseFish;
 
 import android.content.Context;
 import android.os.OperationCanceledException;
+import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
@@ -95,6 +96,8 @@ import static me.jludden.reeflifesurvey.LoaderUtils.loadFishSurveySites;
 public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
 
     private List<CardDetails> mData; //final, sorted list of fish cards TODO why not just InfoCard, which is already a card list
+    private String mPassedInSurveySiteCode = "";//optional passed in parameter. otherwise load favorite sites
+
     private CardViewFragment.CardType mCardType;
     private final static boolean DOWNLOAD_FISH_SPECIES_FROM_GITHUB = false;
     //private static JSONObject mFishData;    //json object from api_species.json
@@ -105,8 +108,9 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
     private final int NUM_LOAD_PER_ITER = 20; //load 20 cards per iteration
 
 
-    public InfoCardLoader(Context context, CardViewFragment.CardType cardType) {
+    public InfoCardLoader(Context context, CardViewFragment.CardType cardType, @Nullable String siteCode) {
         super(context);
+        mPassedInSurveySiteCode = siteCode;
         mCardType = cardType;
         if(DEBUG) Log.d("jludden.reeflifesurvey"  , "CardInfoLoader Created. Card Type to load: " + cardType);
 
@@ -295,9 +299,9 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
         //TODO can we just return mCardDict with species added, but no cards added yet
         if(mCardDict ==  null) {
             JSONObject speciesJSON = setupFishLocations();
-            if(speciesJSON.length()==0) return; //todo
+            if(speciesJSON.length()==0) return; //todo quit better
 
-            mCardDict = mergeFishSpecies(speciesJSON); //TODO don't think we are still using the dictionary aspect - convert to list?
+            mCardDict = mergeFishSpecies(speciesJSON);
 
             //sort the species by most common TODO performance could be improved, certainly
             //CardDetails[] fishArray =  (CardDetails[]) mCardDict.values().toArray(CardDetails.type());
@@ -330,8 +334,101 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
         }
     }
 
-    //10/24 -
-    //
+    /**
+     * Filters the site json object to just the sites relevant to this load
+     * and aggregates them in a new JSON object
+     * also, parses out all the irrelevant site info so we are left with just the species found
+     * @return
+     */
+    private JSONObject setupFishLocations(){
+        try {
+            JSONObject result = new JSONObject(); //resulting jsonobject aggregated out of separate site jsons
+            JSONObject surveySites = loadFishSurveySites(getContext()); //full sitejson from the file
+
+            List<SurveySite> siteList;
+            if(mPassedInSurveySiteCode.equals("")){
+                siteList = mDataRetrievalCallback.retrieveSurveySiteList().getSelectedSitesAll();
+                Log.d("jludden.reeflifesurvey"  , "InfoCardLoader loading favorite survey sites");
+            } else {
+                siteList = mDataRetrievalCallback.retrieveSurveySiteList().getSitesForCode(mPassedInSurveySiteCode);
+                Log.d("jludden.reeflifesurvey"  , "InfoCardLoader loading passed in survey site");
+            }
+
+            String selectedSites = "";
+            for( SurveySite selSite: siteList){
+                Log.d("jludden.reeflifesurvey"  , "InfoCardLoader loading site: "+selSite.getCode()+selSite.getID());
+
+                selectedSites = selectedSites + selSite.getCode() + selSite.getID() + ", ";
+
+                String siteID = selSite.getCode()+selSite.getID();
+//            }
+//
+//            String[] codes = {"FLORES1", "FLORES2", "FLORES2", "FLORES4", "FLORES5"} ; //TODO get these site names from the maps activity
+//
+//
+//            int count = 0;
+//            int MAX_NUM_EL = 4000; //max appears to be 3025 in the survey sites json file
+//            String prevCode = "";
+//
+//            //TODO loop through JSON
+//            //Iterator<String> keys = surveySites.keys();
+//           // while(keys.hasNext() && count < MAX_NUM_EL) {
+//            for( String code : codes){
+                // if(count > 1) break; //todo
+                //  code = keys.next();
+
+                JSONArray site1 = surveySites.getJSONArray(siteID); // new JSONArray("NSW1");
+
+
+            /*
+            {code: [
+                realm,
+                ecoregion,
+                name,
+                longitude,
+                latitude,
+                ?,
+                {
+                    numSurveys: speciesCounts
+                }], ... }
+             */
+                String realm = site1.getString(0);
+                String ecoRegion = site1.getString(1);
+                String name = site1.getString(2);
+                double longitude = site1.getDouble(3);
+                double latitude = site1.getDouble(4);
+                String idkwhat = site1.getString(5);
+                JSONObject speciesFound = site1.getJSONObject(6);
+                //Log.d("jludden.reeflifesurvey"  , "getFishInCards setupFishLocations site1 stuff: " + realm + ecoRegion + longitude + latitude + speciesFound.toString());
+
+                result.accumulate(siteID, speciesFound);
+                result.put(siteID, speciesFound);
+            }
+
+            Log.d("jludden.reeflifesurvey"  , "InfoCardLoader setupFishLocations SELECTED SITES: " + selectedSites);
+
+            return result;
+
+            //parse the fish species
+            /*
+            String fishSpecies;
+            Iterator<String> keys = speciesFound.keys();
+            while(keys.hasNext()){
+                fishSpecies = keys.next();
+                Log.d("jludden.reeflifesurvey"  , "getFishInCards setupFishLocations key: "+fishSpecies);
+                int fishCount = (int) speciesFound.get(fishSpecies);
+                Log.d("jludden.reeflifesurvey"  , "getFishInCards setupFishLocations val: "+fishCount);
+            }
+           */
+
+//        } catch (IOException e) {
+//            Log.d("jludden.reeflifesurvey"  , "setupFishLocations ioexception: " + e.toString());
+        } catch (JSONException e){
+            Log.d("jludden.reeflifesurvey"  , "setupFishLocations JSONException: " + e.toString());
+
+        }
+        return null;
+    }
 
     //merge fish species from json to the dictionary keys. then we will add the cards to the dictionary in getfishcards
     //todo shouldn't we be switching to using the SurveySiteList object, instead of raw json
@@ -352,7 +449,8 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
             JSONObject site;
             while(sitesList.hasNext() && siteCount < MAX_NUM_SITE_EL) {
 
-                site = siteJSON.getJSONObject(sitesList.next()); // loop through sites
+                String siteID = sitesList.next();
+                site = siteJSON.getJSONObject(siteID); // loop through sites
 
                 String species; //TODO
                 int numSightings;
@@ -377,6 +475,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
 
                     //Add the number of times the fish was seen per site
                     cardDetails.numSightings += numSightings;
+                    cardDetails.setFoundInSites(siteID, numSightings);
                 }
             }
 
@@ -388,6 +487,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
         return null;
     }
 
+    //11/4 todo shouldn't this really be loading all sites for a code?
     //10/24 todo currently only called from mapview->bottomsheet
             //would like it to be called during the normal incremental load for each site, then have results aggregated
     public static List<CardDetails> loadSingleSite(SurveySite site, ReefLifeDataFragment.ReefLifeDataRetrievalCallback dataRetrievalCallback, final int CARDS_TO_LOAD) throws JSONException {
@@ -455,115 +555,6 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
         }
 
         return fishCard;
-    }
-
-    public JSONObject setupFishLocations(){
-        try {
-            JSONObject result = new JSONObject();
-
-            /*
-            //Log.d("jludden.reeflifesurvey"  , "setupFishLocations no flag found for card: " + i);
-            String surveys = loadStringFromDisk(R.raw.api_site_surveys); //TODO this can cause out of memory crash
-            Log.d("jludden.reeflifesurvey"  , "getFishInCards setupFishLocations: " + surveys.substring(0, 894));
-            //surveys = surveys.substring(0, 894) + "}]}"; //todo trying to do a portion first
-            //Log.d("jludden.reeflifesurvey"  , "getFishInCards setupFishLocations2: " + surveys);
-
-            //parse the json:
-            //            String code = basicData.getString(0);
-            JSONObject surveySites = new JSONObject(surveys);
-            */
-            JSONObject surveySites = loadFishSurveySites(getContext());
-
-            // String code = "NSW1"; //TODO (looping through them already in mapviewloader)
-            //JSONArray site1 = json.getJSONArray(code); // new JSONArray("NSW1");
-            //Log.d("jludden.reeflifesurvey"  , "getFishInCards setupFishLocations site1: " + site1.toString());
-
-
-           // String code = "NSW1"; //TODO
-            //String[] codes = {"NSW1", "AH1", "AH2", "BALI1", "RAJA19", "FLORES4"} ; //TODO get these site names from the maps activity
-
-          /*  if(SurveySiteList.SELECTED_SURVEY_SITES == null || SurveySiteList.SELECTED_SURVEY_SITES.size() <=0){
-//                throw new JSONException("InfoCardLoader.setupFishLocations() - no locations selected");
-                Log.e("jludden.reeflifesurvey" ,"ERROR InfoCardLoader.setupFishLocations() - no locations selected");
-
-                SurveySiteList.SELECTED_SURVEY_SITES.add(new SurveySite("FLORES4"));
-            }*/
-
-            String selectedSites = "";
-            //for( SurveySite selSite: SurveySiteList.SELECTED_SURVEY_SITES){
-            for( SurveySite selSite:  mDataRetrievalCallback.retrieveSurveySiteList().getSelectedSitesAll()){
-                Log.d("jludden.reeflifesurvey"  , "InfoCardLoader loading site: "+selSite.getCode()+selSite.getID());
-
-                selectedSites = selectedSites + selSite.getCode() + selSite.getID() + ", ";
-
-                String code = selSite.getCode()+selSite.getID();
-//            }
-//
-//            String[] codes = {"FLORES1", "FLORES2", "FLORES2", "FLORES4", "FLORES5"} ; //TODO get these site names from the maps activity
-//
-//
-//            int count = 0;
-//            int MAX_NUM_EL = 4000; //max appears to be 3025 in the survey sites json file
-//            String prevCode = "";
-//
-//            //TODO loop through JSON
-//            //Iterator<String> keys = surveySites.keys();
-//           // while(keys.hasNext() && count < MAX_NUM_EL) {
-//            for( String code : codes){
-               // if(count > 1) break; //todo
-              //  code = keys.next();
-
-                JSONArray site1 = surveySites.getJSONArray(code); // new JSONArray("NSW1");
-
-
-            /*
-            {code: [
-                realm,
-                ecoregion,
-                name,
-                longitude,
-                latitude,
-                ?,
-                {
-                    numSurveys: speciesCounts
-                }], ... }
-             */
-                String realm = site1.getString(0);
-                String ecoRegion = site1.getString(1);
-                String name = site1.getString(2);
-                double longitude = site1.getDouble(3);
-                double latitude = site1.getDouble(4);
-                String idkwhat = site1.getString(5);
-                JSONObject speciesFound = site1.getJSONObject(6);
-                //Log.d("jludden.reeflifesurvey"  , "getFishInCards setupFishLocations site1 stuff: " + realm + ecoRegion + longitude + latitude + speciesFound.toString());
-
-                result.accumulate(code, speciesFound);
-                result.put(code, speciesFound);
-            }
-
-            Log.d("jludden.reeflifesurvey"  , "InfoCardLoader setupFishLocations SELECTED SITES: " + selectedSites);
-
-            return result;
-
-            //parse the fish species
-            /*
-            String fishSpecies;
-            Iterator<String> keys = speciesFound.keys();
-            while(keys.hasNext()){
-                fishSpecies = keys.next();
-                Log.d("jludden.reeflifesurvey"  , "getFishInCards setupFishLocations key: "+fishSpecies);
-                int fishCount = (int) speciesFound.get(fishSpecies);
-                Log.d("jludden.reeflifesurvey"  , "getFishInCards setupFishLocations val: "+fishCount);
-            }
-           */
-
-//        } catch (IOException e) {
-//            Log.d("jludden.reeflifesurvey"  , "setupFishLocations ioexception: " + e.toString());
-        } catch (JSONException e){
-            Log.d("jludden.reeflifesurvey"  , "setupFishLocations JSONException: " + e.toString());
-
-        }
-        return null;
     }
 
     /**

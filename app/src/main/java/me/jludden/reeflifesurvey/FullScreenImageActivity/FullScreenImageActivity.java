@@ -176,7 +176,7 @@ public class FullScreenImageActivity extends FragmentActivity
     @Override
     public Loader<List<InfoCard.CardDetails>> onCreateLoader(int id, Bundle args) {
         Log.d("jludden.reeflifesurvey"  , "FullScreenImageActivity OnCreateLoader");
-        return new InfoCardLoader(this, CardViewFragment.CardType.Fish);
+        return new InfoCardLoader(this, CardViewFragment.CardType.Fish, "");
     }
 
     @Override

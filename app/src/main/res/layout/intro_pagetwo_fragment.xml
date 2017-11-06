@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Consider a tablelayout or grid layout, or just nested linear layouts whatever-->
+
+<!--<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TableRow>
+        <com.daimajia.slider.library.SliderLayout
+            android:id="@+id/intro_image_carousel"
+
+            />
+    </TableRow>
+
+    <TableRow>
+        <ImageView
+            android:src="@drawable/ic_menu_camera"/>
+
+        <ImageView
+            android:src="@drawable/ic_menu_camera"/>
+
+        <Button />
+    </TableRow>
+
+    <TableRow>
+        <Button />
+        <Button />
+        <ImageView
+            android:src="@drawable/ic_menu_camera"/>
+    </TableRow>
+
+</TableLayout>-->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/row1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+        <com.daimajia.slider.library.SliderLayout
+            android:id="@+id/intro_image_carousel"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/row3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+        <Button
+            android:id="@+id/button5"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="match_parent"
+            android:layout_height="109dp"
+            android:layout_weight="1.0"
+            android:background="@drawable/ic_map_action"
+            android:text="Survey Sites" />
+
+        <Button
+            android:id="@+id/button6"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_blue_light"
+            android:layout_weight="1.0"
+            android:text="Button" />
+
+        <Button
+            android:id="@+id/button7"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_red_light"
+            android:layout_weight="1.0"
+            android:text="Button" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/row2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+        <me.jludden.reeflifesurvey.Intro.TextImageButton
+            android:id="@+id/button3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_blue_light"
+            android:layout_weight="1.0"
+            android:text="Button" />
+
+        <!--<me.jludden.reeflifesurvey.Intro.IntroPageTwoFragment.MyButton-->
+
+        <me.jludden.reeflifesurvey.Intro.TextImageButton
+            android:id="@+id/button_launch_favorite_sites"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.0"
+            android:textColor="@android:color/white"
+            android:text="Favorite Sites" />
+
+
+    </LinearLayout>
+
+</LinearLayout>

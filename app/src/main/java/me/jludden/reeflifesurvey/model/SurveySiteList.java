@@ -82,6 +82,11 @@ public class SurveySiteList {
         return nameBuilder.toString();
     }
 
+    //get the list of survey sites corresponding to this code
+    public List<SurveySite> getSitesForCode(String code){
+        return CODE_MAP.get(code);
+    }
+
     //the number of SurveySites in the collection
     public int size(){
         return SITE_LIST.size();

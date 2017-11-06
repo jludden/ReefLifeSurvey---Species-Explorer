@@ -4,28 +4,20 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ToggleButton;
 
-import me.jludden.reeflifesurvey.model.SurveySiteList;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard;
 import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard.CardDetails;
@@ -43,8 +35,8 @@ import java.util.List;
 public class CardViewFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<CardDetails>> {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String TYPE_TO_LOAD = "param1";
+    private static final String OPT_SURVEY_SITE = "param2";
     public static final String TAG = "FishCardView";
     public static final String TITLE = "Browse Fish";
     private static final int LOADER_ID = 0;
@@ -68,6 +60,7 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
     private int mPreviousTotalItemCount = 0;
 //    private boolean mFilterFavorites = false;
     private boolean mLoadedAll = false;
+    private String mPassedInSurveySiteCode = "";//optional passed in parameter. otherwise load favorite sites
 
 
     public enum CardType{
@@ -99,15 +92,19 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
      * this fragment using the provided parameters.
      *
      * @param typeToLoad Parameter 1.
-     * @param param2 Parameter 2.
+     * @param siteCode Parameter 2. OPTIONAL.
+     *                 if null, will load favorited sites
+     *                 if non-null, will load all sites matching this code
      * @return A new instance of fragment CardViewFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static CardViewFragment newInstance(CardType typeToLoad, String param2) {
+    public static CardViewFragment newInstance(CardType typeToLoad, @Nullable String siteCode) {
         CardViewFragment fragment = new CardViewFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_PARAM1, typeToLoad.ordinal());
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(TYPE_TO_LOAD, typeToLoad.ordinal());
+        args.putString(OPT_SURVEY_SITE, siteCode);
+//        args.putParcelable(ARG_CARD, cardDetails);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -116,8 +113,8 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mCardType = CardType.values()[getArguments().getInt(ARG_PARAM1, 0)]; //wow why is getting an enum from an int so difficult
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mCardType = CardType.values()[getArguments().getInt(TYPE_TO_LOAD, 0)]; //wow why is getting an enum from an int so difficult
+            mPassedInSurveySiteCode = getArguments().getString(OPT_SURVEY_SITE);
         }
 
         Log.d("jludden.reeflifesurvey"  ,"CardViewFragment Created. Card type: "+mCardType);
@@ -280,7 +277,7 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public Loader<List<CardDetails>> onCreateLoader(int id, Bundle args) {
         Log.d("jludden.reeflifesurvey"  ,"CardViewFragment OnCreateLoader");
-        return new InfoCardLoader(getActivity(), mCardType);
+        return new InfoCardLoader(getActivity(), mCardType, mPassedInSurveySiteCode);
     }
 
     /**
