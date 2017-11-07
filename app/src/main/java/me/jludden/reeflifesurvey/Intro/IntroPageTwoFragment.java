@@ -1,33 +1,23 @@
 package me.jludden.reeflifesurvey.Intro;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatButton;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
 
 import com.daimajia.slider.library.Indicators.PagerIndicator;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
-import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
-import java.util.Map;
 
 import me.jludden.reeflifesurvey.BrowseFish.CardViewFragment;
+import me.jludden.reeflifesurvey.InterfaceComponents.TextImageButton;
 import me.jludden.reeflifesurvey.MainActivity;
 import me.jludden.reeflifesurvey.MapViewFragment;
 import me.jludden.reeflifesurvey.R;
@@ -39,13 +29,12 @@ import me.jludden.reeflifesurvey.R;
  *  one or more imagecarousel
  *  links to other fragments
  *
- * Best of / Random Images
- * Surveysite map
+ * Best of / Random * Surveysite map
+ Images
  * Favorite Sites
  * ReefLifeSurvey.com
- *
+ * Best of Species (sharks, cool fish) + THEIR FAVORITED FISH IMAGES
  * Quiz Mode!
- * Best of Species (sharks, cool fish)
  *
  * Random Site?
  * Favorite fish?
@@ -56,6 +45,7 @@ import me.jludden.reeflifesurvey.R;
 public class IntroPageTwoFragment extends Fragment {
 
     private Picasso Picasso;
+    SliderLayout mImageCarousel;
 
     public static IntroPageTwoFragment newInstance() {
 
@@ -74,9 +64,9 @@ public class IntroPageTwoFragment extends Fragment {
         View viewLayout = inflater.inflate(R.layout.intro_pagetwo_fragment, container, false);
         //viewLayout.setRotation(90);
 
-        SliderLayout imageCarousel = (SliderLayout) viewLayout.findViewById(R.id.intro_image_carousel);
-        imageCarousel.setIndicatorVisibility(PagerIndicator.IndicatorVisibility.Invisible);
-        imageCarousel.setDuration(5000);
+        mImageCarousel = (SliderLayout) viewLayout.findViewById(R.id.intro_image_carousel);
+        mImageCarousel.setIndicatorVisibility(PagerIndicator.IndicatorVisibility.Invisible);
+        mImageCarousel.setDuration(5000);
 
         Log.d("jludden.reeflifesurvey", "IntroPageOneFragment loaded");
 
@@ -97,7 +87,7 @@ public class IntroPageTwoFragment extends Fragment {
             sliderView
                     .image(url)
                     .setScaleType(BaseSliderView.ScaleType.Fit);
-            imageCarousel.addSlider(sliderView);
+            mImageCarousel.addSlider(sliderView);
         }
 
 
@@ -125,9 +115,28 @@ public class IntroPageTwoFragment extends Fragment {
             }
         });
 
-
+        TextImageButton launchWebsite = (TextImageButton) viewLayout.findViewById(R.id.button_launch_website);
+        launchWebsite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = getString(R.string.website_launch_url);
+                if (url.startsWith("http://") || url.startsWith("https://")) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(intent);
+                }
+            }
+        });
 
 
         return viewLayout;
+    }
+
+    @Override
+    public void onStop() { //todo restart image sliders when power on
+        if(mImageCarousel != null) {
+            mImageCarousel.removeAllSliders();
+            mImageCarousel.stopAutoCycle();
+        }
+        super.onStop();
     }
 }

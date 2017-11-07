@@ -147,15 +147,15 @@ public class IntroPageOneFragment extends Fragment {
 */
 
 
-        /*SliderLayout imageCarousel = (SliderLayout) viewLayout.findViewById(R.id.intro_fullscreen_carousel);
-        //imageCarousel.setRotationY();
-        imageCarousel.stopAutoCycle();
+        /*SliderLayout mImageCarousel = (SliderLayout) viewLayout.findViewById(R.id.intro_fullscreen_carousel);
+        //mImageCarousel.setRotationY();
+        mImageCarousel.stopAutoCycle();
         for (String url : urls) {
             TextSliderView textSliderView = new TextSliderView(container.getContext());
             textSliderView
                     .image(url)
                     .setScaleType(BaseSliderView.ScaleType.Fit);
-            imageCarousel.addSlider(textSliderView);
+            mImageCarousel.addSlider(textSliderView);
         }*/
 
 

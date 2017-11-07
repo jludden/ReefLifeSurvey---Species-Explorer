@@ -12,7 +12,7 @@
 
     <!--    app:layout_behavior="EnhancedBottomSheetBehavior">-->
 
-    <me.jludden.reeflifesurvey.AutoResizeTextView
+    <me.jludden.reeflifesurvey.InterfaceComponents.AutoResizeTextView
         android:id="@+id/bottom_sheet_top"
         android:layout_width="match_parent"
         android:layout_height="70dp"

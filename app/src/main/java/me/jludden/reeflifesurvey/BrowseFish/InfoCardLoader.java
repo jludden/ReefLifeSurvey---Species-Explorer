@@ -465,7 +465,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
                     CardDetails cardDetails;
 
                     if(speciesDictionary.containsKey(species)){ //check if already added from previously surveyed site
-                        Log.d("jludden.reeflifesurvey"  , "getFishInCards mergeFishSpecies overwriting fish : " + species);
+                      //  Log.d("jludden.reeflifesurvey"  , "getFishInCards mergeFishSpecies overwriting fish : " + species);
                         cardDetails = speciesDictionary.get(species);
                     }
                     else {

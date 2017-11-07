@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -69,7 +70,7 @@ public class DetailsViewAdapter extends PagerAdapter {
         TextView textView = (TextView) viewLayout.findViewById(R.id.details_text);
         SliderLayout imageCarousel = (SliderLayout) viewLayout.findViewById(R.id.details_image_carousel);
         final CheckBox favoriteBtn = (CheckBox) viewLayout.findViewById(R.id.favorite_btn); //star to favorite the fish
-        final Button linkBtn = (Button) viewLayout.findViewById(R.id.link_btn);
+        final ImageButton linkBtn = (ImageButton) viewLayout.findViewById(R.id.link_btn);
 
         Log.d("jludden.reeflifesurvey"  , "DetailsviewAdapter instantiateItem mData empty:"+mData.isEmpty());
 
@@ -147,10 +148,19 @@ public class DetailsViewAdapter extends PagerAdapter {
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        container.removeView((LinearLayout) object);
+        LinearLayout linearLayout = (LinearLayout) object;
+
+        SliderLayout imageCarousel = (SliderLayout) linearLayout.findViewById(R.id.details_image_carousel);
+        if(imageCarousel != null) {
+            imageCarousel.removeAllSliders();
+            imageCarousel.stopAutoCycle();
+        }
 
         // todo glide clear
         // InfoCard.CardDetails cardDetails = mData.get(position);
+
+        container.removeView(linearLayout);
+
     }
 
     /**

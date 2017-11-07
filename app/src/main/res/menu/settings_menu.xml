@@ -11,5 +11,6 @@
             android:title="@string/del_favorite_species"/>
         <item android:id="@+id/settings_opt_about"
             android:icon="@drawable/ic_menu_share"
-            android:title="@string/about_app" />
+            android:title="About App" />
+            <!--android:title="@string/about_app" />-->
 </menu>

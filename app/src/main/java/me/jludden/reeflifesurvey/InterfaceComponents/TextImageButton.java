@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.Intro;
+package me.jludden.reeflifesurvey.InterfaceComponents;
 
 import android.content.Context;
 import android.graphics.Bitmap;

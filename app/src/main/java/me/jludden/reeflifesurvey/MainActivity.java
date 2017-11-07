@@ -37,6 +37,7 @@ import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -404,10 +405,14 @@ public class MainActivity extends AppCompatActivity implements
             hideFABmenu();
             mBottomSheetButton.setVisibility(View.VISIBLE);
             AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
-            toolbar.setExpanded(false,true);
+            toolbar.setExpanded(false, true);
             //  SupportMapFragment mapFragment = (SupportMapFragment) newFragment;
             // mapFragment.getMapAsync(this);
             launchUIFragment(newFragment, tag);
+
+        } else if ( id == R.id.nav_about) {
+            //todo create dialog box or floating context menu
+            return true;
 
         } else if (id == R.id.nav_send) {
             newFragment = CardViewFragment.newInstance(CardViewFragment.CardType.Countries, "");
@@ -861,9 +866,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     //todo move to bottomsheet class
+    //todo restart image sliders when power on
     @Override
     protected void onStop() {
         if(mBottomSheetImageCarousel != null) {
+            mBottomSheetImageCarousel.removeAllSliders();
             mBottomSheetImageCarousel.stopAutoCycle(); //prevent a memory leak
         }
         super.onStop();

@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey;
+package me.jludden.reeflifesurvey.InterfaceComponents;
 
 /**
  *               DO WHAT YOU WANT TO PUBLIC LICENSE
