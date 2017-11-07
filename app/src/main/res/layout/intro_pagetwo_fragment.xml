@@ -1,116 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--Consider a tablelayout or grid layout, or just nested linear layouts whatever-->
 
-<!--<TableLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <TableRow>
-        <com.daimajia.slider.library.SliderLayout
-            android:id="@+id/intro_image_carousel"
-
-            />
-    </TableRow>
-
-    <TableRow>
-        <ImageView
-            android:src="@drawable/ic_menu_camera"/>
-
-        <ImageView
-            android:src="@drawable/ic_menu_camera"/>
-
-        <Button />
-    </TableRow>
-
-    <TableRow>
-        <Button />
-        <Button />
-        <ImageView
-            android:src="@drawable/ic_menu_camera"/>
-    </TableRow>
-
-</TableLayout>-->
-
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:weightSum="300"
     android:orientation="vertical" >
 
     <LinearLayout
         android:id="@+id/row1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1" >
+        android:layout_weight="160">
 
         <com.daimajia.slider.library.SliderLayout
             android:id="@+id/intro_image_carousel"
             android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            />
+            android:layout_width="match_parent" />
+
     </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/row2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1" >
+        android:orientation="horizontal"
+        android:layout_weight="140"
+        >
 
-        <me.jludden.reeflifesurvey.InterfaceComponents.TextImageButton
-            android:id="@+id/button_launch_map_view"
+        <com.daimajia.slider.library.SliderLayout
+            android:id="@+id/intro_image_carousel_TWO"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_weight="0.7"
+            />
+
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1.0"
-            android:textColor="@android:color/white"
-            android:text="Survey Sites" />
+            android:orientation="vertical"
+            android:layout_weight="1"
+            >
 
-        <!--<me.jludden.reeflifesurvey.Intro.IntroPageTwoFragment.MyButton-->
 
-        <me.jludden.reeflifesurvey.InterfaceComponents.TextImageButton
-            android:id="@+id/button_launch_favorite_sites"
+            <me.jludden.reeflifesurvey.InterfaceComponents.TextImageButton
+                android:id="@+id/button_launch_map_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColor="@android:color/white"
+                android:text="Survey Sites" />
+
+            <me.jludden.reeflifesurvey.InterfaceComponents.TextImageButton
+                android:id="@+id/button_launch_favorite_sites"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColor="@android:color/white"
+                android:text="Favorites" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1.0"
-            android:textColor="@android:color/white"
-            android:text="Favorites" />
+            android:orientation="vertical"
+            android:layout_weight="1.2"
+            >
 
-    </LinearLayout>
+            <me.jludden.reeflifesurvey.InterfaceComponents.TextImageButton
+                android:id="@+id/button_launch_popular"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.0"
+                android:textColor="@android:color/white"
+                android:background="@android:color/holo_blue_light"
+                android:text="Popular" />
 
-    <LinearLayout
-        android:id="@+id/row3"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1" >
-
-        <me.jludden.reeflifesurvey.InterfaceComponents.TextImageButton
-            android:id="@+id/button_launch_popular"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1.0"
-            android:textColor="@android:color/white"
-            android:background="@android:color/holo_blue_light"
-            android:text="Popular" />
-
-        <Button
-            android:id="@+id/button_launch_quiz_activity"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/holo_red_light"
-            android:textColor="@android:color/white"
-            android:layout_weight="1.0"
-            android:text="Quiz" />
+            <Button
+                android:id="@+id/button_launch_quiz_activity"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/holo_red_light"
+                android:textColor="@android:color/white"
+                android:layout_weight="1.0"
+                android:text="Quiz" />
 
 
-        <me.jludden.reeflifesurvey.InterfaceComponents.TextImageButton
-            android:id="@+id/button_launch_website"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1.0"
-            android:textColor="@android:color/white"
-            android:background="@android:color/holo_blue_light"
-            android:text="ReefLifeSurvey.com" />
+            <me.jludden.reeflifesurvey.InterfaceComponents.TextImageButton
+                android:id="@+id/button_launch_website"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.0"
+                android:textColor="@android:color/white"
+                android:background="@android:color/holo_blue_light"
+                android:text="Web" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 

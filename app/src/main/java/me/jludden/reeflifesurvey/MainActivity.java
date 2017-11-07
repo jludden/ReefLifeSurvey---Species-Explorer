@@ -263,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements
 //        mapFragment.getMapAsync(this);
 
         //start the IntroViewPagerFragment
-        //hideClutter();
+        hideClutter();
         launchUIFragment(new IntroViewPagerFragment(), IntroViewPagerFragment.TAG);
     }
 
@@ -866,7 +866,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     //todo move to bottomsheet class
-    //todo restart image sliders when power on
+    //todo restart image sliders when power on (onResume, see IntroPageTwoFragment)
     @Override
     protected void onStop() {
         if(mBottomSheetImageCarousel != null) {
@@ -972,17 +972,19 @@ public class MainActivity extends AppCompatActivity implements
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-        //trying everything to get this bar to hide
-        getSupportActionBar().hide();
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setVisibility(View.GONE);
-
-
         AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
         toolbar.setExpanded(false,true);
+
+        //todo stuff below works, but I think i want to keep the toolbar for now
+
+        //trying everything to get this bar to hide
+        //getSupportActionBar().hide();
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        //collapsingToolbar.setVisibility(View.GONE);
+
         //toolbar.setVisibility(View.GONE);
 
-        View mDecorView;
+        /*View mDecorView;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mDecorView = getWindow().getDecorView();
             mDecorView.setSystemUiVisibility(
@@ -990,13 +992,10 @@ public class MainActivity extends AppCompatActivity implements
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
             );
-        }
-                /*                                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-
+        }*/
+               /* | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 * | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-                *
-                                    | View.SYSTEM_UI_FLAG_IMMERSIVE
-                *
-                * */
+                * | View.SYSTEM_UI_FLAG_IMMERSIVE
+                */
     }
 }

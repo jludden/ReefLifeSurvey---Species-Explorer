@@ -150,6 +150,7 @@ public class DetailsViewAdapter extends PagerAdapter {
     public void destroyItem(ViewGroup container, int position, Object object) {
         LinearLayout linearLayout = (LinearLayout) object;
 
+        //todo possibly need to do this when power off as well (onStop in fragment?)
         SliderLayout imageCarousel = (SliderLayout) linearLayout.findViewById(R.id.details_image_carousel);
         if(imageCarousel != null) {
             imageCarousel.removeAllSliders();
