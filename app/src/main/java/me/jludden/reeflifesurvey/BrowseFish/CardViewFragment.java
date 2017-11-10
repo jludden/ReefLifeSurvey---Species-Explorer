@@ -80,7 +80,7 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
      */
     public interface OnCardViewFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFishDetailsRequested(InfoCard.CardDetails cardDetails);
+        void onFishDetailsRequested(InfoCard.CardDetails cardDetails, View sharedElement);
     }
 
     public CardViewFragment() {

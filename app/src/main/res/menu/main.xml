@@ -2,14 +2,34 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!--instead of using the standard search widget, im launching an activity-->
     <item android:id="@+id/action_search"
         android:title="@string/action_search"
-        app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="ifRoom"/>
+        android:icon="@drawable/ic_search_24dp"
+        app:showAsAction="always"/>
 
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+    <!--<item android:id="@+id/action_search"-->
+        <!--android:title="@string/action_search"-->
+        <!--app:actionViewClass="android.support.v7.widget.SearchView"-->
+        <!--app:showAsAction="ifRoom"/>-->
+
+    <item android:id="@+id/settings_opt_hide_menus"
+        android:icon="@drawable/ic_fab_fullscreen"
+        app:showAsAction="never"
+        android:title="Hide clutter"/>
+
+    <item android:id="@+id/settings_opt_del_favorite_sites"
+        android:icon="@drawable/ic_menu_camera"
+        app:showAsAction="never"
+        android:title="@string/del_favorite_sites"/>
+
+    <item android:id="@+id/settings_opt_del_favorite_species"
+        android:icon="@drawable/ic_menu_camera"
+        app:showAsAction="never"
+        android:title="@string/del_favorite_species"/>
+
+    <item android:id="@+id/settings_opt_about"
+        android:icon="@drawable/ic_menu_share"
+        app:showAsAction="never"
+        android:title="About App" />
 </menu>

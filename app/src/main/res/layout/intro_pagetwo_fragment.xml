@@ -52,7 +52,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:textColor="@android:color/white"
-                android:text="Survey Sites" />
+                android:text="Sites" />
 
             <me.jludden.reeflifesurvey.InterfaceComponents.TextImageButton
                 android:id="@+id/button_launch_favorite_sites"
@@ -77,7 +77,7 @@
                 android:layout_weight="1.0"
                 android:textColor="@android:color/white"
                 android:background="@android:color/holo_blue_light"
-                android:text="Popular" />
+                android:text="More" />
 
             <Button
                 android:id="@+id/button_launch_quiz_activity"

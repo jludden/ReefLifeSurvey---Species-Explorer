@@ -42,9 +42,6 @@ import java.util.ArrayList;
 /**
  * Created by Jason on 5/15/2017.
  *
- * 9/1 going from
- * com.getbase.floatingactionbutton to toan.android.floatingactionmenu
- *
  * TODO
  *  10/23: refactor. map+surveysitelist model into new folder
  *      3 different colors for map icons: new, added, selected. DONT HARDCODE?
@@ -69,15 +66,16 @@ import java.util.ArrayList;
  *          full-screen
  *              More of expanded with no map showing
  *
- *
- *
  */
 
 public class MapViewFragment extends Fragment
-        implements OnMapReadyCallback, GoogleMap.OnMapClickListener,
-        GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener {
+        implements OnMapReadyCallback,
+            GoogleMap.OnMapClickListener,
+            GoogleMap.OnMarkerClickListener {
 
-    public static final float FAVORITED_SITE_COLOR = BitmapDescriptorFactory.HUE_AZURE;
+    private static final float FAVORITED_SITE_COLOR = BitmapDescriptorFactory.HUE_AZURE;
+    private static final float NORMAL_SITE_COLOR = BitmapDescriptorFactory.HUE_RED;
+
     private MapViewFragment mapFragment; //todo just use fragment manager
     View rootView;
     private GoogleMap mMap;
@@ -239,8 +237,7 @@ public class MapViewFragment extends Fragment
 
         mMap.setOnMapClickListener(this);
         mMap.setOnMarkerClickListener(this);
-        mMap.setOnInfoWindowClickListener(this);
-//        mSelectedSiteList = new ArrayList<>();
+        //mMap.setOnInfoWindowClickListener(this);
 
 
         //todo set map settings
@@ -265,7 +262,9 @@ public class MapViewFragment extends Fragment
     public void onMapClick(LatLng latLng) {
         Log.v("ludden.reeflifesurvey" , "MapViewFragment onMapClick latlng: "+latLng.toString());
 
-        //if()
+        if(mSelectedMarker != null) {
+            mSelectedMarker.setIcon((BitmapDescriptorFactory.defaultMarker(NORMAL_SITE_COLOR)));
+        }
         mSelectedMarker = null;
         mFAB.setImageResource(R.drawable.ic_add_white);
         //todo delete ic_add_location_black_24dp, ic_add_loc_2,
@@ -278,8 +277,13 @@ public class MapViewFragment extends Fragment
     public boolean onMarkerClick(Marker marker) {
         //todo only use peekbottomsheet for this method. rest is junk
 
+        if(mSelectedMarker != null) {
+            mSelectedMarker.setIcon((BitmapDescriptorFactory.defaultMarker(NORMAL_SITE_COLOR)));
+        }
+
         Log.v("ludden.reeflifesurvey" , "MapViewFragment onMarkerClick marker: "+ marker.toString());
         mSelectedMarker = marker;
+        mSelectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
         //hideFABmenu();
         mFAB.setImageResource(R.drawable.ic_fab_add_loc); //todo animate and change? //todo would a favorites star be a better icon?
 
@@ -292,21 +296,26 @@ public class MapViewFragment extends Fragment
             mMapViewFragmentInteractionListener.peekBottomSheet((SurveySite) marker.getTag());//todo only this
         }
 
-        return false;
+        //todo want to center the map, but it doesnt work so well
+        //if the bottom sheet is hiding most of the map.
+        //could do some math and look at where the bottom sheet is at to find a better center spot
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(marker.getPosition())); //center map on marker
+        return true; //will not show the default infowindow
     }
 
+    // 11/10/17 will no longer show the default window and will just use the bottom sheet
     /**
      * Launch the activities bottom sheet for additional site info
      * @param marker
      */
-    @Override
+    /*@Override
     public void onInfoWindowClick(Marker marker) {
         Log.d("jludden.reeflifesurvey"  , "MapViewFragment onInfoWindowClick marker: "+ marker.toString());
         //Snackbar.make(mMapView, "clicked", Snackbar.LENGTH_SHORT).show();
         marker.hideInfoWindow();
         mMapViewFragmentInteractionListener.expandBottomSheet((SurveySite) marker.getTag());
         //((MainActivity) getActivity()).expandBottomSheet((SurveySite) mSelectedMarker.getTag());
-    }
+    }*/
 
     /**
      * Called when the floating action button is pressed
@@ -377,7 +386,7 @@ public class MapViewFragment extends Fragment
      */
     private void removeLastMarker(){
         Marker lastMark = mSelectedSiteList.remove(mSelectedSiteList.size()-1);
-        lastMark.setIcon((BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+        lastMark.setIcon((BitmapDescriptorFactory.defaultMarker(NORMAL_SITE_COLOR)));
         String siteCode = ((SurveySite) lastMark.getTag()).getCode();
         mSurveySiteList.removeFavoriteSite(siteCode, getContext());
 

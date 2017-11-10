@@ -20,9 +20,9 @@ public class IntroViewPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         switch (position) {
-            case 0:
-                return IntroPageOneFragment.newInstance();
             case 1:
+                return IntroPageOneFragment.newInstance();
+            case 0:
                 return IntroPageTwoFragment.newInstance();
             case 2:
                 return CardViewFragment.newInstance(

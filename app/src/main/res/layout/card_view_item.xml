@@ -30,6 +30,8 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:scaleType="fitXY" />
+        <!--            android:transitionName="@string/transition_launch_details"-->
+        <!--transition name set in code instead, because it must be unique on a screen-->
 
         <TextView
             android:id="@+id/overlay_text"

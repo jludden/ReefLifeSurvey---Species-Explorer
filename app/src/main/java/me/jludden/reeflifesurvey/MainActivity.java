@@ -3,9 +3,9 @@ package me.jludden.reeflifesurvey;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,9 +16,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.SearchView;
+import android.support.v4.view.ViewCompat;
 import android.text.method.ScrollingMovementMethod;
+import android.transition.ChangeBounds;
+import android.transition.ChangeImageTransform;
+import android.transition.ChangeTransform;
+import android.transition.Fade;
+import android.transition.TransitionSet;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -27,7 +31,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,8 +39,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -55,6 +56,9 @@ import me.jludden.reeflifesurvey.CountryList.CountryListFragment;
 import me.jludden.reeflifesurvey.Intro.IntroViewPagerFragment;
 import me.jludden.reeflifesurvey.model.DummyContent;
 import me.jludden.reeflifesurvey.model.SurveySiteList;
+import me.jludden.reeflifesurvey.transitions.CircularReveal;
+import me.jludden.reeflifesurvey.Intro.HomeFragment;
+import me.jludden.reeflifesurvey.transitions.StartAnimatable;
 
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
@@ -77,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements
         CardViewFragment.OnCardViewFragmentInteractionListener,
         MapViewFragment.MapViewFragmentInteractionListener,
         ReefLifeDataFragment.ReefLifeDataRetrievalCallback,
-        ReefLifeDataFragment.ReefLifeDataUpdateCallback, PopupMenu.OnMenuItemClickListener {
+        ReefLifeDataFragment.ReefLifeDataUpdateCallback {
 
 
     private GoogleMap mMap;
@@ -88,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements
     private ReefLifeDataFragment mDataFragment;
     private SurveySiteList mSurveySiteList;
     private SliderLayout mBottomSheetImageCarousel;
+
+    private static final int SEARCH_ACTIVITY_RETURN_CODE = 0;
 
     //   private FloatingActionsMenu mFabMenu;
 
@@ -262,9 +268,14 @@ public class MainActivity extends AppCompatActivity implements
 //                R.id.fragment_map));
 //        mapFragment.getMapAsync(this);
 
-        //start the IntroViewPagerFragment
+
+        //start the home fragment
         hideClutter();
-        launchUIFragment(new IntroViewPagerFragment(), IntroViewPagerFragment.TAG);
+        // Old, disgusting home fragment
+        // launchUIFragment(new IntroViewPagerFragment(), IntroViewPagerFragment.TAG);
+
+
+        launchUIFragment(new HomeFragment(), HomeFragment.TAG);
     }
 
     @Override
@@ -285,10 +296,17 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onPause(){
+        Log.d("jludden.reeflifesurvey","MainActivity onPause");
+        if(mBottomSheetImageCarousel != null) { //todo dont do this in onstop and onpause, probably
+            mBottomSheetImageCarousel.removeAllSliders();
+            mBottomSheetImageCarousel.stopAutoCycle(); //prevent a memory leak
+        }
+
         super.onPause();
         if(isFinishing()){ getSupportFragmentManager().beginTransaction()
                 .remove(mDataFragment).commit();
         }
+
     }
 
     @Override
@@ -299,9 +317,10 @@ public class MainActivity extends AppCompatActivity implements
 //        settings_item.getac
 
 
-        final MenuItem search_item = menu.findItem(R.id.action_search);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(search_item);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        // TODO: 11/9/2017 instead launch a new activity
+        //final MenuItem search_item = menu.findItem(R.id.action_search);
+        //final SearchView searchView = (SearchView) MenuItemCompat.getActionView(search_item);
+        /*  searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchView.clearFocus();
@@ -326,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 if(!hasFocus) hideKeyboard(v);
             }
-        });
+        });*/
         return true;
     }
 
@@ -341,18 +360,37 @@ public class MainActivity extends AppCompatActivity implements
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        Log.d("jludden.reeflifesurvey"  , "menu item selected: " + id);
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            PopupMenu popup = new PopupMenu(this, findViewById(R.id.collapsing_toolbar));
-            popup.setOnMenuItemClickListener(this);
-            MenuInflater inflater = popup.getMenuInflater();
-            inflater.inflate(R.menu.settings_menu, popup.getMenu());
-            popup.show();
-            return true;
+
+        switch (id) {
+            // TODO: 11/9/2017 catch the search clicked item here
+            case R.id.action_search: //Inspiration and implementation from the Plaid App
+                View searchMenuView = findViewById(R.id.action_search);
+                Bundle options = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    options = ActivityOptions.makeSceneTransitionAnimation(this, searchMenuView,
+                            getString(R.string.transition_search_back)).toBundle();
+                }
+//                startActivity(new Intent(this, SearchActivity.class), options);
+                Log.d("jludden.reeflifesurvey","STARTING SEARCH ACTIVITY");
+
+                startActivityForResult(new Intent(this, SearchActivity.class), SEARCH_ACTIVITY_RETURN_CODE, options);
+                return true;
+            case R.id.settings_opt_hide_menus:
+                hideClutter();
+                return true;
+
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == SEARCH_ACTIVITY_RETURN_CODE){
+            Log.d("jludden.reeflifesurvey","main activity onactivity result FROM SEARCH ACTIVITY");
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -711,32 +749,42 @@ public class MainActivity extends AppCompatActivity implements
     public void peekBottomSheet(final SurveySiteList.SurveySite siteInfo) {
         //Set up the bottom sheet
         View bottomSheet = findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        final BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         if(bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
 
         final TextView topText = (TextView) findViewById(R.id.bottom_sheet_top);
-        topText.setText(siteInfo.getEcoRegion());
+        topText.setText(siteInfo.getEcoRegion()); //todo THIS IS NOT ENOUGH
         topText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //todo state_expanded or whole fullscreen view?
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
-                Log.d("jludden.reeflifesurvey"  , "Bottom Sheet Top TextView clicked.. hidden?: "+v.isShown());
+            }
+        });
+
+        final TextView launch_species = (TextView) findViewById(R.id.bottom_sheet_launch_species);
+        launch_species.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("jludden.reeflifesurvey", "Bottom Sheet Top TextView clicked.. hidden?: " + v.isShown());
                 //todo refactor this
                 //if the detailsviewfragment is showing, and they click the top of bottom sheet,
                 //navigate them back to the mapview
                 MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
                 if (mapFrag != null && !mapFrag.isVisible()) {
-                    Log.d("jludden.reeflifesurvey"  , "Bottom Sheet TEST1 PASSED");
+                    Log.d("jludden.reeflifesurvey", "Bottom Sheet TEST1 PASSED");
                     mBottomSheetButton.setVisibility(View.VISIBLE);
-                    launchUIFragment(mapFrag,MapViewFragment.TAG);
-                }
-                else if(mapFrag != null){ //launch browse fish details for this site
+                    launch_species.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_view_in_list, 0, 0, 0);
+                    launchUIFragment(mapFrag, MapViewFragment.TAG);
+                } else if (mapFrag != null) { //launch browse fish details for this site
                     //AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
                     //toolbar.setExpanded(true,true);
                     //addSiteLocationsToToolbar();
                     mFAB.show();
+                    launch_species.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_survey_site_icon_todo, 0, 0, 0);
                     launchNewCardViewFragment(siteInfo.getCode());
                 }
             }
@@ -744,6 +792,25 @@ public class MainActivity extends AppCompatActivity implements
         //if added to favs, set the fab to remove
 
         //show some info like num sites etc
+
+
+        final TextView bottomText = (TextView) findViewById(R.id.bottom_sheet_main_text);
+        if (mSurveySiteList == null) mSurveySiteList = this.retrieveSurveySiteList();
+
+        StringBuilder details = new StringBuilder();
+        details.append("Code (ID) : "+siteInfo.getCode()+" ("+siteInfo.getID()+")");
+        details.append("\n SiteName "+siteInfo.getSiteName());
+        details.append("\n EcoRegion "+siteInfo.getEcoRegion());
+        details.append("\n Realm "+siteInfo.getRealm());
+        details.append("\n Position: "+siteInfo.getPosition());
+        details.append("\n Num Surveys "+siteInfo.getNumberOfSurveys());
+        details.append("\n" + mSurveySiteList.codeList(siteInfo.getCode(), -1));
+        bottomText.setText(details.toString()); //todo
+        bottomText.setMovementMethod(new ScrollingMovementMethod());
+        bottomText.scrollTo(0,0);
+
+        //set up image carousel
+        createImageCarousel(siteInfo);
     }
 
     /**
@@ -813,7 +880,7 @@ public class MainActivity extends AppCompatActivity implements
     //creates a TextSliderView (a fish preview image, with description and onclick listener) that can be added to a SliderLayout (an image carousel of fish previews)
     private TextSliderView createCarouselEntry(final InfoCard.CardDetails card){
         String name = card.cardName;
-        TextSliderView textSliderView = new TextSliderView(this);
+        final TextSliderView textSliderView = new TextSliderView(this);
         textSliderView
                 .description(name)
                 .image(card.getPrimaryImageURL())
@@ -821,7 +888,7 @@ public class MainActivity extends AppCompatActivity implements
                 .setOnSliderClickListener(new BaseSliderView.OnSliderClickListener() {
                     @Override
                     public void onSliderClick(BaseSliderView slider) {
-                        onFishDetailsRequested(card);
+                        onFishDetailsRequested(card, textSliderView.getView());
                     }
                 });
         return textSliderView;
@@ -837,13 +904,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Called from CardViewFragmen
+     * Called from CardViewFragment
      * And from Carousel Entries
-     * t to launch a details mode for the fish card
+     * to launch a details mode for the fish card
      * @param cardDetails
+     * @param sharedElement view to animate transition
      */
     @Override
-    public void onFishDetailsRequested(InfoCard.CardDetails cardDetails) {
+    public void onFishDetailsRequested(InfoCard.CardDetails cardDetails, View sharedElement) {
         Log.d("jludden.reeflifesurvey", "MainActivity onFishDetailsRequested: "+cardDetails.toString());
 
         //hide a bunch of shit todo probably want at least a fab or a bottom bar, cant decide
@@ -859,10 +927,39 @@ public class MainActivity extends AppCompatActivity implements
         }
 
 
+
+
+
+        //set up animation
+        String transitionName = getString(R.string.transition_launch_details);
+        ViewCompat.setTransitionName(sharedElement, transitionName);
+
+
         Fragment newFragment = DetailsViewFragment.newInstance(cardDetails, "whatever");
         String tag = DetailsViewFragment.TAG;
 
-        launchUIFragment(newFragment, tag);
+        newFragment.setSharedElementEnterTransition(new TransitionSet() {
+            {
+                setOrdering(ORDERING_TOGETHER);
+             //   addTransition(new ChangeBounds()).
+                addTransition(new ChangeTransform()).
+                addTransition(new ChangeImageTransform());
+            }
+        });
+        newFragment.setEnterTransition(new Fade());
+        newFragment.setExitTransition(new Fade());
+        newFragment.setSharedElementReturnTransition(new CircularReveal());
+
+
+        //launchUIFragment(newFragment, tag);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager
+                .beginTransaction()
+                .addSharedElement(sharedElement, transitionName)
+                .replace(R.id.content_frame, newFragment, tag)
+                .addToBackStack(null)
+                .commit();
     }
 
     //todo move to bottomsheet class
@@ -876,18 +973,23 @@ public class MainActivity extends AppCompatActivity implements
         super.onStop();
     }
 
+
+
+
     /**
+     * 11/9/17 No longer using default searchview widget
+     *
      * Override the default dispatchTouchEvent to hide the keyboard from the search box, if it is up
      * todo there is another touch listener in this class that handles hiding the fab menu. reconcile?
      * @param ev motion event passed on to super
      * @return result from super.dispatch
      */
-    @Override
+  /*  @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         SearchView searchView = (SearchView) findViewById(R.id.action_search);
         searchView.clearFocus();
         return super.dispatchTouchEvent(ev);
-    }
+    }*/
 
     /**
      * Called when the checked state of a compound button has changed.
@@ -931,36 +1033,6 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
         }
-    }
-
-    /**
-     * Called by selecting an item in the settings popup menu
-     *
-     * This method will be invoked when a menu item is clicked if the item
-     * itself did not already handle the event.
-     *
-     * @param item the menu item that was clicked
-     * @return {@code true} if the event was handled, {@code false}
-     * otherwise
-     *
-     * todo implement options
-     */
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        switch(item.getItemId()){
-            case(R.id.settings_opt_hide_menus):
-                hideClutter();
-                return true;
-            case(R.id.settings_opt_del_favorite_sites):
-                return true;
-            case(R.id.settings_opt_del_favorite_species):
-                return true;
-            case(R.id.settings_opt_about):
-                //todo
-                return true;
-        }
-
-        return false;
     }
 
     // jump to full screen mode yeeaah

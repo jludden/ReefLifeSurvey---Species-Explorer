@@ -1,5 +1,6 @@
 package me.jludden.reeflifesurvey.BrowseFish;
 
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -141,7 +142,10 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 @Override
                 public void onClick(View v) {
                     Log.d("jludden.reeflifesurvey", "Card onClick - Launching new fragment");
-                    mListener.onFishDetailsRequested(mCardList.get(realPosition));
+
+
+
+                    mListener.onFishDetailsRequested(mCardList.get(realPosition),vhItem.mImageView);
                 }
             });
 

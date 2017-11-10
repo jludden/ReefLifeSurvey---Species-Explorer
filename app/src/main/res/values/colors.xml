@@ -15,4 +15,7 @@
     <color name="pink_pressed">#ec407a</color>
     <color name="blue_semi_transparent">#805677fc</color>
     <color name="blue_semi_transparent_pressed">#80738ffe</color>
+    <color name="scrim">#99323232</color>
+    <color name="background_dark">#ff333333</color>
+    <color name="text_primary_light">#ffffffff</color>
 </resources>

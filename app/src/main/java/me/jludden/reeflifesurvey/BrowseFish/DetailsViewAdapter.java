@@ -10,15 +10,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
+import com.daimajia.easing.linear.Linear;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
+import com.squareup.picasso.Picasso;
 
 import java.util.Enumeration;
 import java.util.List;
@@ -66,9 +69,9 @@ public class DetailsViewAdapter extends PagerAdapter {
 
         final View viewLayout = inflater.inflate(R.layout.details_view_pager_item, container, false);
 
-       // ImageView imageView = (ImageView) viewLayout.findViewById(R.id.details_image_main);
+        final ImageView imageView = (ImageView) viewLayout.findViewById(R.id.details_image_main);
         TextView textView = (TextView) viewLayout.findViewById(R.id.details_text);
-        SliderLayout imageCarousel = (SliderLayout) viewLayout.findViewById(R.id.details_image_carousel);
+      //  SliderLayout imageCarousel = (SliderLayout) viewLayout.findViewById(R.id.details_image_carousel);
         final CheckBox favoriteBtn = (CheckBox) viewLayout.findViewById(R.id.favorite_btn); //star to favorite the fish
         final ImageButton linkBtn = (ImageButton) viewLayout.findViewById(R.id.link_btn);
 
@@ -90,7 +93,8 @@ public class DetailsViewAdapter extends PagerAdapter {
                     cardDetails.cardName + "\n" +
                             cardDetails.commonNames + "\n" +
                             "Num sightings " + cardDetails.numSightings + "\n" +
-                            "Found in " + cardDetails.FoundInSites.size() + " sites" + "\n");
+                            "Found in " + cardDetails.FoundInSites.size() + " sites" + "\n" +
+                            "Number images: " + cardDetails.imageURLs.size() + "\n");
 
             Enumeration<SurveySiteList.SurveySite> siteKeys = cardDetails.FoundInSites.keys();
             SurveySiteList.SurveySite site;
@@ -108,7 +112,13 @@ public class DetailsViewAdapter extends PagerAdapter {
 
             //add on page change listener if needed
 
-            imageCarousel.stopAutoCycle();
+            if(cardDetails.imageURLs != null && cardDetails.imageURLs.size() >= 1) {
+                Glide.with(mDetailsViewFragment)
+                        .load( cardDetails.imageURLs.get(0))
+                        .into(imageView);
+            }
+
+          /*  imageCarousel.stopAutoCycle();
             if (cardDetails.imageURLs == null) {
                 Log.d("jludden.reeflifesurvey", "DetailsviewAdapter card details no images to load");
                 newText.append("\n No Images Found");
@@ -121,7 +131,39 @@ public class DetailsViewAdapter extends PagerAdapter {
                             .setScaleType(BaseSliderView.ScaleType.Fit);
                     imageCarousel.addSlider(sliderView);
                 }
+            }*/
+
+            LinearLayout additionalImages = (LinearLayout) viewLayout.findViewById(R.id.details_additional_images);
+            if (cardDetails.imageURLs == null) {
+                Log.d("jludden.reeflifesurvey", "DetailsviewAdapter card details no images to load");
+                newText.append("\n No Images Found");
+//                imageCarousel.setVisibility(View.INVISIBLE);
+            } else {
+                for (String url : cardDetails.imageURLs) {
+                    ImageView iv = new ImageView(mDetailsViewFragment.getContext());
+                    iv.setLayoutParams(new LinearLayout.LayoutParams(250,250));
+                    final String newMainURL = url;
+
+                    //todo really shouldnt make a new one for each item
+                    iv.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Picasso.with(mDetailsViewFragment.getContext())
+                                    .load(newMainURL)
+                                    .placeholder(imageView.getDrawable()) //placeholder = current image, to minimize gap
+                                    .into(imageView);
+                        }
+                    });
+
+                    Picasso.with(mDetailsViewFragment.getContext())
+                            .load(url)
+                            .placeholder(R.drawable.ic_menu_camera)
+                            .into(iv);
+                    iv.setPadding(0, 0, 0, 5);
+                    additionalImages.addView(iv);
+                }
             }
+
 
             newText.append("\n").append("SPECIES PAGE URL: ").append(cardDetails.reefLifeSurveyURL);
 
@@ -151,11 +193,11 @@ public class DetailsViewAdapter extends PagerAdapter {
         LinearLayout linearLayout = (LinearLayout) object;
 
         //todo possibly need to do this when power off as well (onStop in fragment?)
-        SliderLayout imageCarousel = (SliderLayout) linearLayout.findViewById(R.id.details_image_carousel);
+        /*SliderLayout imageCarousel = (SliderLayout) linearLayout.findViewById(R.id.details_image_carousel);
         if(imageCarousel != null) {
             imageCarousel.removeAllSliders();
             imageCarousel.stopAutoCycle();
-        }
+        }*/
 
         // todo glide clear
         // InfoCard.CardDetails cardDetails = mData.get(position);
@@ -171,5 +213,6 @@ public class DetailsViewAdapter extends PagerAdapter {
     public int getCount() {
         return mData.size();
     }
+
 
 }

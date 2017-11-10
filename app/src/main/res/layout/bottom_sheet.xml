@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bottom_sheet"
     android:layout_width="match_parent"
-    android:layout_height="350dp"
+    android:layout_height="450dp"
     android:background="@android:color/darker_gray"
     android:orientation="vertical"
     app:behavior_hideable="true"
@@ -31,11 +31,13 @@
         >
 
         <TextView
+            android:id="@+id/bottom_sheet_launch_species"
             android:layout_width="0dp"
             android:layout_weight="100"
             android:layout_height="20dp"
             android:gravity="center"
-            android:text="Aus"
+            android:text="Species Browse"
+            android:drawableLeft="@drawable/ic_view_in_list"
             />
 
         <TextView
@@ -47,11 +49,13 @@
             />
 
         <TextView
+            android:id="@+id/bottom_sheet_favorite"
             android:layout_width="0dp"
             android:layout_weight="100"
             android:layout_height="20dp"
-            android:text="ToWebby"
+            android:text="Favorite"
             android:gravity="center"
+            android:drawableLeft="@drawable/ic_favorite_heart_outline"
             />
 
     </LinearLayout>

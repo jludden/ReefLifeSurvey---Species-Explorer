@@ -37,6 +37,7 @@ import me.jludden.reeflifesurvey.R;
  * Best of Species (sharks, cool fish) + THEIR FAVORITED FISH IMAGES
  * Quiz Mode!
  *
+ * Latest tweet from https://twitter.com/reeflifesurvey ?
  * Random Site?
  * Favorite fish?
  * All Fish?

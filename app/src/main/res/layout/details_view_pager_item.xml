@@ -5,17 +5,33 @@
     android:layout_height="match_parent">
 
 
-    <!--<ImageView
+    <ImageView
         android:id="@+id/details_image_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_menu_camera" />-->
+        android:transitionName="@string/transition_launch_details"
+        app:srcCompat="@drawable/ic_menu_camera"
+        android:contentDescription="image of the fish" />
 
+<!--
     <com.daimajia.slider.library.SliderLayout
         android:id="@+id/details_image_carousel"
         android:layout_width="match_parent"
-        android:layout_height="300dp" />
+        android:layout_height="300dp"
+        android:transitionName="transition_search_back"/>
+-->
 
+    <!--linear layout or grid layout (TODO) to show additional images-->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/details_additional_images"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <!--row of buttons beneath the main image-->
     <LinearLayout
