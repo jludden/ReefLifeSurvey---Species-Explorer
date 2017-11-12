@@ -18,7 +18,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewCompat;
 import android.text.method.ScrollingMovementMethod;
-import android.transition.ChangeBounds;
 import android.transition.ChangeImageTransform;
 import android.transition.ChangeTransform;
 import android.transition.Fade;
@@ -54,11 +53,11 @@ import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard;
 import me.jludden.reeflifesurvey.CountryList.CountryListFragment;
 
 import me.jludden.reeflifesurvey.Intro.IntroViewPagerFragment;
+import me.jludden.reeflifesurvey.SearchActivity.SearchActivity;
 import me.jludden.reeflifesurvey.model.DummyContent;
 import me.jludden.reeflifesurvey.model.SurveySiteList;
 import me.jludden.reeflifesurvey.transitions.CircularReveal;
 import me.jludden.reeflifesurvey.Intro.HomeFragment;
-import me.jludden.reeflifesurvey.transitions.StartAnimatable;
 
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;

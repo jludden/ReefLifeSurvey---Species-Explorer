@@ -82,12 +82,19 @@
     </FrameLayout>
 
     <FrameLayout
-        android:id="@+id/results_container"
+        android:id="@+id/search_results_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="?android:actionBarSize"
         android:background="@color/background_dark"
-        android:elevation="@dimen/z_app_bar">
+        android:elevation="@dimen/z_app_bar"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        >
+
+        <!--<TextView-->
+            <!--android:id="@+id/temporary_search_results"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content" />-->
 
        <!-- <ProgressBar
             android:id="@android:id/empty"

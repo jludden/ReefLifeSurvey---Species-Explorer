@@ -27,7 +27,7 @@
         android:duration="600"
         android:interpolator="@android:interpolator/fast_out_linear_in">
         <targets>
-            <target android:targetId="@id/results_container" />
+            <target android:targetId="@id/search_results_container" />
         </targets>
     </transition>
 
