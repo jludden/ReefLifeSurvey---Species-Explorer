@@ -12,9 +12,13 @@ class SearchContract {
 
         fun setProgressIndicator(active: Boolean)
 
-        fun showSearchResults(results: List<SearchResult>)
+        fun addSearchResult(result: SearchResult)
 
-        fun showSearchError()
+        fun clearSearchResults()
+
+     // fun showSearchResults(results: List<SearchResult>)
+
+     // fun showSearchError()
     }
 
     interface Presenter : BasePresenter {

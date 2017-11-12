@@ -7,9 +7,8 @@ data class SearchResult constructor(
         val name: String,
         val type: Enum<SearchResultType>,
         val description: String = "",
-        val imageURL: String?
+        val imageURL: String? = null
 ){
-
 
 
 }

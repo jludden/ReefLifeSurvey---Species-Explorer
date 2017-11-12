@@ -29,20 +29,9 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        //todo
-        searchback.setOnClickListener(
-                {
-                    searchback.setBackground(null)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        finishAfterTransition()
-                    } else{
-                        finish()
-                    }
-                })
-
         //Create View
         val searchFragment = supportFragmentManager.findFragmentById(R.id.search_results_container)
-            as SearchFragment? ?: SearchFragment().newInstance()
+                as SearchFragment? ?: SearchFragment().newInstance()
 
         supportFragmentManager
                 .beginTransaction()
@@ -54,6 +43,36 @@ class SearchActivity : AppCompatActivity() {
                 DataRepository.getInstance(applicationContext),
                 searchFragment
         )
+
+
+        //todo im still handlling on stuff here when it should be in view/presenter
+        searchback.setOnClickListener(
+                {
+                    searchback.setBackground(null)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        finishAfterTransition()
+                    } else{
+                        finish()
+                    }
+                })
+
+
+        var searchViewListener: SearchView.OnQueryTextListener = object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                searchPresenter.onQueryTextSubmit(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                searchPresenter.onQueryTextChange(newText)
+                return true
+            }
+        }
+
+        search_view.setOnQueryTextListener(searchViewListener)
+
+
 
     }
 

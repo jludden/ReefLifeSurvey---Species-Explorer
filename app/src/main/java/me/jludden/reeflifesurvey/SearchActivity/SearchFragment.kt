@@ -23,13 +23,15 @@ import me.jludden.reeflifesurvey.R
  * Created by Jason on 11/12/2017.
  */
 class SearchFragment : Fragment(), SearchContract.View {
+
     override var isActive: Boolean = false
         get() = isAdded
 
     override lateinit var presenter: SearchContract.Presenter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.activity_search_results_fragment, container, false)
+        val root = inflater.inflate(R.layout.activity_search_results_fragment, container, false)
+        return root
     }
 
     override fun onResume() {
@@ -41,7 +43,7 @@ class SearchFragment : Fragment(), SearchContract.View {
         return SearchFragment();
     }
 
-
+    //todo not used yet
     internal var searchViewListener: SearchView.OnQueryTextListener = object : SearchView.OnQueryTextListener{
         /**
          * Called when the user submits the query. This could be due to a key press on the
@@ -79,15 +81,21 @@ class SearchFragment : Fragment(), SearchContract.View {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun showSearchResults(results: List<SearchResult>) {
+    override fun addSearchResult(result: SearchResult) {
+        Log.d("jludden.reeflifesurvey","searchfragment addSearchResult ")
 
-        Log.d("jludden.reeflifesurvey","searchfragment showsearchresults")
-        search_results_text.text = "hello searc results called"
 
+        val curText = search_results_text.text
+        val newResult = result.name + "_" + result.description
+
+        val newText = "$curText \n $newResult"
+
+        search_results_text.text = newText
     }
 
-    override fun showSearchError() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    //todo
+    override fun clearSearchResults() {
+        search_results_text.text = ""
     }
 
     companion object {
