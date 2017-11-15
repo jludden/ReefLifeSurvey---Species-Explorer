@@ -1,22 +1,13 @@
 package me.jludden.reeflifesurvey;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.OperationCanceledException;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
-import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader;
-import me.jludden.reeflifesurvey.model.SurveySiteList;
+import me.jludden.reeflifesurvey.Data.SurveySiteList;
 
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static me.jludden.reeflifesurvey.BuildConfig.DEBUG;
 

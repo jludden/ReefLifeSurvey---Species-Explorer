@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.model;
+package me.jludden.reeflifesurvey.Data;
 
 import java.util.ArrayList;
 import java.util.HashMap;

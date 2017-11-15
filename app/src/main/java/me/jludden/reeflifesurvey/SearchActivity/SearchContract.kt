@@ -1,6 +1,6 @@
 package me.jludden.reeflifesurvey.SearchActivity
 
-import me.jludden.reeflifesurvey.model.SearchResult
+import me.jludden.reeflifesurvey.Data.SearchResult
 
 /**
  * Created by Jason on 11/12/2017.
@@ -16,9 +16,7 @@ class SearchContract {
 
         fun clearSearchResults()
 
-     // fun showSearchResults(results: List<SearchResult>)
-
-     // fun showSearchError()
+        fun launchResultDetails(searchResult: SearchResult)
     }
 
     interface Presenter : BasePresenter {
@@ -26,6 +24,8 @@ class SearchContract {
         fun onQueryTextChange(query: String?)
 
         fun onQueryTextSubmit(query: String?)
+
+        fun onItemClicked(searchResult: SearchResult)
 
     }
 }

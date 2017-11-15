@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import me.jludden.reeflifesurvey.model.DummyContent;
+import me.jludden.reeflifesurvey.Data.DummyContent;
 import me.jludden.reeflifesurvey.R;
 
 import java.util.List;

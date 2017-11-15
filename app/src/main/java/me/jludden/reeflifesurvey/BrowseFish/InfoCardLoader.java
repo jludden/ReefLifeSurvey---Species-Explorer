@@ -7,11 +7,11 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 
-import me.jludden.reeflifesurvey.model.InfoCard.CardDetails;
+import me.jludden.reeflifesurvey.Data.InfoCard.CardDetails;
 import me.jludden.reeflifesurvey.LoaderUtils;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.ReefLifeDataFragment;
-import me.jludden.reeflifesurvey.model.SurveySiteList.SurveySite;
+import me.jludden.reeflifesurvey.Data.SurveySiteList.SurveySite;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

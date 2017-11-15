@@ -10,7 +10,7 @@ import android.util.Log;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.target.Target;
-import me.jludden.reeflifesurvey.model.SurveySiteList;
+import me.jludden.reeflifesurvey.Data.SurveySiteList;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;

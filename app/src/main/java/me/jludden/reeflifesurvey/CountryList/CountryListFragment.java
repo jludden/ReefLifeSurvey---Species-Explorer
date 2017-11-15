@@ -17,7 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import me.jludden.reeflifesurvey.model.DummyContent;
+import me.jludden.reeflifesurvey.Data.DummyContent;
 import me.jludden.reeflifesurvey.R;
 
 import java.util.List;

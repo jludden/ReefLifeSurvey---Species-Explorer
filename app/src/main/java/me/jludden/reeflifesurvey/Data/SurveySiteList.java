@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.model;
+package me.jludden.reeflifesurvey.Data;
 
 import android.content.Context;
 import android.util.Log;
@@ -294,7 +294,7 @@ public class SurveySiteList {
                 description = "realm: "+realm;
             }
 
-            return new SearchResult(name, SearchResultType.SurveySiteLocation, description, "");
+            return new SearchResult(name, description, SearchResultType.SurveySiteLocation, code+id);
         }
     }
 }

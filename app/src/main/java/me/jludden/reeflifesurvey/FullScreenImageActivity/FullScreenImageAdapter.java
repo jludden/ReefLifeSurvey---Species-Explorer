@@ -25,7 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import me.jludden.reeflifesurvey.model.InfoCard;
+import me.jludden.reeflifesurvey.Data.InfoCard;
 import me.jludden.reeflifesurvey.R;
 
 

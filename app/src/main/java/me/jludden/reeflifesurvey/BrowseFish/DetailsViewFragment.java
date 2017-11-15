@@ -13,7 +13,10 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.jludden.reeflifesurvey.model.InfoCard;
+import me.jludden.reeflifesurvey.Data.DataRepository;
+import me.jludden.reeflifesurvey.Data.InfoCard;
+import me.jludden.reeflifesurvey.Data.SearchResult;
+import me.jludden.reeflifesurvey.Data.SearchResultType;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.ReefLifeDataFragment;
 
@@ -48,6 +51,20 @@ public class DetailsViewFragment extends Fragment {
         //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public static DetailsViewFragment newInstance(SearchResult searchResult) {
+        InfoCard.CardDetails card;
+        if(searchResult.getType() == SearchResultType.FishSpecies){
+            card = new InfoCard.CardDetails("");//DataRepository.
+
+        }
+        else {
+
+
+            card = new InfoCard.CardDetails("");//DataRepository.
+        }
+        return newInstance(card, "");
     }
 
     //todo considering another newInstance() where we just pass in a fish species id and it generates the CardDetails object?

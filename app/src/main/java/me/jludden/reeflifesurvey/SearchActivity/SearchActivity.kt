@@ -4,8 +4,6 @@ import android.app.Activity
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.text.TextUtils
-import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.SearchView
 import io.reactivex.Observable
@@ -16,7 +14,7 @@ import me.jludden.reeflifesurvey.R
 import java.util.concurrent.TimeUnit
 
 import kotlinx.android.synthetic.main.activity_search.*
-import me.jludden.reeflifesurvey.model.DataRepository
+import me.jludden.reeflifesurvey.Data.DataRepository
 
 
 /**
@@ -31,7 +29,7 @@ class SearchActivity : AppCompatActivity() {
 
         //Create View
         val searchFragment = supportFragmentManager.findFragmentById(R.id.search_results_container)
-                as SearchFragment? ?: SearchFragment().newInstance()
+                as SearchFragment? ?: SearchFragment.newInstance()
 
         supportFragmentManager
                 .beginTransaction()

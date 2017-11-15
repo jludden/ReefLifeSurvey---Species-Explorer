@@ -1,6 +1,5 @@
 package me.jludden.reeflifesurvey;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,7 +13,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-import me.jludden.reeflifesurvey.model.SurveySiteList;
+import me.jludden.reeflifesurvey.Data.SurveySiteList;
 
 /**
  * Created by Jason on 8/28/2017.

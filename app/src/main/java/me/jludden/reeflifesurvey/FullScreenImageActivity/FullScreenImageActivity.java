@@ -19,10 +19,10 @@ import org.json.JSONObject;
 
 import me.jludden.reeflifesurvey.BrowseFish.CardViewFragment;
 import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader;
-import me.jludden.reeflifesurvey.model.InfoCard;
+import me.jludden.reeflifesurvey.Data.InfoCard;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.ReefLifeDataFragment;
-import me.jludden.reeflifesurvey.model.SurveySiteList;
+import me.jludden.reeflifesurvey.Data.SurveySiteList;
 
 import java.util.List;
 

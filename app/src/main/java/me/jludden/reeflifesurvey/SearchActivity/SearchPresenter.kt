@@ -1,8 +1,7 @@
 package me.jludden.reeflifesurvey.SearchActivity
 
 import io.reactivex.Observable
-import me.jludden.reeflifesurvey.model.*
-import me.jludden.reeflifesurvey.model.SurveySiteList.*
+import me.jludden.reeflifesurvey.Data.*
 
 /**
  * Created by Jason on 11/12/2017.
@@ -70,6 +69,10 @@ class SearchPresenter(
         resultsObservable
                 .subscribe({ res -> searchView.addSearchResult(res) })
     */
+    }
+
+    override fun onItemClicked(searchResult: SearchResult) {
+        searchView.launchResultDetails(searchResult)
     }
 
 }

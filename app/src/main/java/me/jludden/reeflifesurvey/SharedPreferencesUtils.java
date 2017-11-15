@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import me.jludden.reeflifesurvey.model.InfoCard;
+import me.jludden.reeflifesurvey.Data.InfoCard;
 
 /**
  * Created by Jason on 10/29/2017.

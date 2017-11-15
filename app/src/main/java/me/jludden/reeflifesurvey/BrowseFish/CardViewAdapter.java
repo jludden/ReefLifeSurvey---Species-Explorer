@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
-import me.jludden.reeflifesurvey.model.InfoCard;
+import me.jludden.reeflifesurvey.Data.InfoCard;
 import me.jludden.reeflifesurvey.BuildConfig;
 import me.jludden.reeflifesurvey.R;
 import java.util.ArrayList;
@@ -63,9 +63,10 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     /**
      *Called when RecyclerView needs a new ViewHolder of the given view type
      * todo - can add additional view types, such as map cards, etc.
-     * @param parent
-     * @param viewType
-     * @return
+     * @param parent The ViewGroup into which the new View will be added after it is bound to
+     * an adapter position.
+     * @param viewType The view type of the new View.
+     * @return A new ViewHolder that holds a View of the given view type.
      */
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

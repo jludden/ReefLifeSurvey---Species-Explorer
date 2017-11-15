@@ -1,9 +1,8 @@
-package me.jludden.reeflifesurvey.model
+package me.jludden.reeflifesurvey.Data
 
 import android.content.Context
 import android.util.Log
 import io.reactivex.Observable
-import io.reactivex.internal.operators.observable.ObservableError
 import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader.parseSpeciesDetailsHelperTwo
 import me.jludden.reeflifesurvey.LoaderUtils
 import me.jludden.reeflifesurvey.R

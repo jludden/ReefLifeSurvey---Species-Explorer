@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.model;
+package me.jludden.reeflifesurvey.Data;
 
 import android.graphics.Bitmap;
 import android.util.Pair;

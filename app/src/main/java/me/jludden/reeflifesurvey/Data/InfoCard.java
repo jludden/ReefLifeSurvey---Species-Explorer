@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.model;
+package me.jludden.reeflifesurvey.Data;
 
 import android.app.Activity;
 import android.os.Parcel;
@@ -233,7 +233,7 @@ public class InfoCard {
         @NotNull
         @Override
         public SearchResult createResult(@NotNull String query) {
-            return new SearchResult(cardName, SearchResultType.FishSpecies, commonNames, getPrimaryImageURL());
+            return new SearchResult(cardName, commonNames, getPrimaryImageURL(), SearchResultType.FishSpecies, getId());
         }
     }
 }

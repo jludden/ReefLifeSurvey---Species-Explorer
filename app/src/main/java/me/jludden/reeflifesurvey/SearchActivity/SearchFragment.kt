@@ -2,35 +2,52 @@ package me.jludden.reeflifesurvey.SearchActivity
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.text.TextUtils
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.RecyclerView.ViewHolder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SearchView
-import io.reactivex.Observable
-import io.reactivex.ObservableOnSubscribe
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_search.*
-import me.jludden.reeflifesurvey.model.SearchResult
-import java.util.concurrent.TimeUnit
-import kotlinx.android.synthetic.main.activity_search_results_fragment.*
+import android.widget.ImageView
+import com.bumptech.glide.Glide
+import me.jludden.reeflifesurvey.Data.SearchResult
+import kotlinx.android.synthetic.main.activity_search_results_item.view.*
+import me.jludden.reeflifesurvey.BrowseFish.DetailsViewFragment
 import me.jludden.reeflifesurvey.R
 
 
 /**
  * Created by Jason on 11/12/2017.
+ *
+ * SearchFragment Class
+ *  implements the View portion of the SearchContract MVP architecture
  */
 class SearchFragment : Fragment(), SearchContract.View {
+    companion object {
+        const val TAG: String = "SearchResultsFragment"
+        fun newInstance() = SearchFragment()
+    }
 
+    override lateinit var presenter: SearchContract.Presenter
     override var isActive: Boolean = false
         get() = isAdded
 
-    override lateinit var presenter: SearchContract.Presenter
+    lateinit var recyclerView: RecyclerView
+    lateinit var viewAdapter: SearchResultsAdapter
+    internal var itemListener: SearchResultItemListener = object : SearchResultItemListener {
+        override fun onItemClicked(item: SearchResult) {
+            presenter.onItemClicked(item)
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.activity_search_results_fragment, container, false)
+        recyclerView = root.findViewById(R.id.search_results_cards) as RecyclerView
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        viewAdapter = SearchResultsAdapter(ArrayList(), itemListener)
+        recyclerView.adapter = viewAdapter
+
         return root
     }
 
@@ -39,67 +56,105 @@ class SearchFragment : Fragment(), SearchContract.View {
         presenter.start()
     }
 
-    fun newInstance(): SearchFragment {
-        return SearchFragment();
-    }
-
-    //todo not used yet
-    internal var searchViewListener: SearchView.OnQueryTextListener = object : SearchView.OnQueryTextListener{
-        /**
-         * Called when the user submits the query. This could be due to a key press on the
-         * keyboard or due to pressing a submit button.
-         * The listener can override the standard behavior by returning true
-         * to indicate that it has handled the submit request. Otherwise return false to
-         * let the SearchView handle the submission by launching any associated intent.
-         *
-         * @param query the query text that is to be submitted
-         *
-         * @return true if the query has been handled by the listener, false to let the
-         * SearchView perform the default action.
-         */
-        override fun onQueryTextSubmit(query: String?): Boolean {
-            presenter.onQueryTextSubmit(query)
-            return true
-        }
-
-        /**
-         * Called when the query text is changed by the user.
-         *
-         * @param newText the new content of the query text field.
-         *
-         * @return false if the SearchView should perform the default action of showing any
-         * suggestions if available, true if the action was handled by the listener.
-         */
-        override fun onQueryTextChange(newText: String?): Boolean {
-            presenter.onQueryTextChange(newText)
-            return true
-        }
-
-    }
-
+    //TODO animateView when loading/clear data (see cardviewfragment.animateView)
     override fun setProgressIndicator(active: Boolean) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    //
     override fun addSearchResult(result: SearchResult) {
-        Log.d("jludden.reeflifesurvey","searchfragment addSearchResult ")
-
-
-        val curText = search_results_text.text
+        //val curText = search_results_text.text
         val newResult = result.name + "_" + result.description
+        //val newText = "$curText \n $newResult"
+        //search_results_text.text = newText
+        Log.d("jludden.reeflifesurvey", "searchfragment addSearchResult "+newResult)
 
-        val newText = "$curText \n $newResult"
-
-        search_results_text.text = newText
+        viewAdapter.updateItems(element = result)
     }
 
     //todo
     override fun clearSearchResults() {
-        search_results_text.text = ""
+        viewAdapter.updateItems(list = ArrayList())
     }
 
-    companion object {
-       const val TAG: String = "SearchResultsFragment"
+    override fun launchResultDetails(searchResult: SearchResult) {
+        Log.d("jludden.reeflifesurvey", "searchfragment launchResultDetails CALLED")
+
+   /*     (activity as SearchActivity).supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.search_results_container, DetailsViewFragment.newInstance(searchResult), DetailsViewFragment.TAG)
+                .commit()*/
     }
 
+
+    /**
+     * SearchResultsAdapter class
+     *
+     * Some cool extension functions courtesy of
+     * https://antonioleiva.com/extension-functions-kotlin/
+     */
+    class SearchResultsAdapter(
+            initialList: MutableList<SearchResult>, private val itemListener: SearchResultItemListener)
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+        private var resultsList: MutableList<SearchResult> = initialList
+        fun updateItems(element: SearchResult? = null, list: MutableList<SearchResult>? = null){
+            if(list!=null) resultsList = list
+            if(element!=null) resultsList.add(element)
+            notifyDataSetChanged()
+        }
+
+        fun ViewGroup.inflate(layoutRes: Int): View {
+            return LayoutInflater.from(context).inflate(layoutRes, this, false)
+        }
+
+        override fun getItemCount() = resultsList.size
+
+        /**
+         * Called when RecyclerView needs a new [ViewHolder] of the given type to represent
+         * an item.
+         *
+         * @param parent The ViewGroup into which the new View will be added after it is bound to
+         * an adapter position.
+         * @param viewType The view type of the new View.
+         * @return A new ViewHolder that holds a View of the given view type.
+         */
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)
+                = SearchResultsViewHolder(parent.inflate(R.layout.activity_search_results_item))
+
+
+        /**
+         * Called by RecyclerView to display the data at the specified position. This method should
+         * update the contents of the [ViewHolder.itemView] to reflect the item at the given
+         * position.
+         *
+         * @param holder The ViewHolder which should be updated to represent the contents of the
+         * item at the given position in the data set.
+         * @param position The position of the item within the adapter's data set.
+         */
+        override fun onBindViewHolder(holder: ViewHolder, position: Int)
+                = (holder as SearchResultsViewHolder).bind(resultsList.get(position), itemListener)
+    }
+
+    /**
+     * ViewHolder class
+     */
+    class SearchResultsViewHolder(itemView: View) : ViewHolder(itemView) {
+        fun bind(item: SearchResult, listener: SearchResultItemListener)
+                = with(itemView) {
+            results_card_image.loadURL(item.imageURL)
+            results_card_name.text = item.name
+            results_card_description.text = item.description
+            setOnClickListener({ listener.onItemClicked(item) })
+        }
+
+        fun ImageView.loadURL(url: String) {
+            //Picasso.with(context).load(url).into(this)
+            Glide.with(context).load(url).into(this)
+        }
+    }
+
+    interface SearchResultItemListener {
+        fun onItemClicked(item: SearchResult)
+    }
 }

@@ -49,13 +49,13 @@ import me.jludden.reeflifesurvey.BrowseFish.CardViewFragment.CardViewSettings;
 import me.jludden.reeflifesurvey.BrowseFish.DetailsViewFragment;
 import me.jludden.reeflifesurvey.FullScreenImageActivity.FullScreenImageActivity;
 import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader;
-import me.jludden.reeflifesurvey.model.InfoCard;
+import me.jludden.reeflifesurvey.Data.InfoCard;
 import me.jludden.reeflifesurvey.CountryList.CountryListFragment;
 
 import me.jludden.reeflifesurvey.Intro.IntroViewPagerFragment;
 import me.jludden.reeflifesurvey.SearchActivity.SearchActivity;
-import me.jludden.reeflifesurvey.model.DummyContent;
-import me.jludden.reeflifesurvey.model.SurveySiteList;
+import me.jludden.reeflifesurvey.Data.DummyContent;
+import me.jludden.reeflifesurvey.Data.SurveySiteList;
 import me.jludden.reeflifesurvey.transitions.CircularReveal;
 import me.jludden.reeflifesurvey.Intro.HomeFragment;
 

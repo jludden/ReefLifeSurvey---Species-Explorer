@@ -20,9 +20,9 @@ import com.squareup.picasso.Picasso;
 import java.util.Enumeration;
 import java.util.List;
 
-import me.jludden.reeflifesurvey.model.InfoCard;
+import me.jludden.reeflifesurvey.Data.InfoCard;
 import me.jludden.reeflifesurvey.R;
-import me.jludden.reeflifesurvey.model.SurveySiteList;
+import me.jludden.reeflifesurvey.Data.SurveySiteList;
 
 import static me.jludden.reeflifesurvey.SharedPreferencesUtils.setUpFavoritesButton;
 

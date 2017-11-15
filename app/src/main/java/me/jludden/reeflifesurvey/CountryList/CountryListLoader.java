@@ -6,7 +6,7 @@ import android.support.v4.content.Loader;
 import android.os.OperationCanceledException;
 import android.util.Log;
 
-import me.jludden.reeflifesurvey.model.DummyContent;
+import me.jludden.reeflifesurvey.Data.DummyContent;
 
 import org.json.JSONArray;
 import org.json.JSONException;
