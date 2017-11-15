@@ -49,7 +49,7 @@ import me.jludden.reeflifesurvey.BrowseFish.CardViewFragment.CardViewSettings;
 import me.jludden.reeflifesurvey.BrowseFish.DetailsViewFragment;
 import me.jludden.reeflifesurvey.FullScreenImageActivity.FullScreenImageActivity;
 import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader;
-import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard;
+import me.jludden.reeflifesurvey.model.InfoCard;
 import me.jludden.reeflifesurvey.CountryList.CountryListFragment;
 
 import me.jludden.reeflifesurvey.Intro.IntroViewPagerFragment;

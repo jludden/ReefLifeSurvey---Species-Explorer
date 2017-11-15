@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.BrowseFish.model;
+package me.jludden.reeflifesurvey.model;
 
 import android.app.Activity;
 import android.os.Parcel;
@@ -6,8 +6,9 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import org.jetbrains.annotations.NotNull;
+
 import me.jludden.reeflifesurvey.CountryList.model.CityInfo;
-import me.jludden.reeflifesurvey.model.SurveySiteList;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -84,7 +85,7 @@ public class InfoCard {
      * With that in mind, try not to save any images or drawables here.
      * Those can be loaded and garbage collected by the view adapter
      */
-    public static class CardDetails implements Parcelable, Comparable{
+    public static class CardDetails implements Parcelable, Comparable, SearchResultable{
         public final String id;
         public String cardName;
         public String language;// = "Indonesian"; //todo remove defaults
@@ -222,6 +223,17 @@ public class InfoCard {
             } else {
                 return imageURLs.get(0);
             }
+        }
+
+        @Override
+        public boolean matchesQuery(@NotNull String query) {
+            return cardName.toLowerCase().contains(query) || commonNames.toLowerCase().contains(query);
+        }
+
+        @NotNull
+        @Override
+        public SearchResult createResult(@NotNull String query) {
+            return new SearchResult(cardName, SearchResultType.FishSpecies, commonNames, getPrimaryImageURL());
         }
     }
 }

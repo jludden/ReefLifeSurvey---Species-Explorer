@@ -46,18 +46,18 @@ class SearchActivity : AppCompatActivity() {
 
 
         //todo im still handlling on stuff here when it should be in view/presenter
-        searchback.setOnClickListener(
-                {
-                    searchback.setBackground(null)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        finishAfterTransition()
-                    } else{
-                        finish()
-                    }
-                })
+        searchback.setOnClickListener()
+        {
+            searchback.setBackground(null)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                finishAfterTransition()
+            } else{
+                finish()
+            }
+        }
 
 
-        var searchViewListener: SearchView.OnQueryTextListener = object : SearchView.OnQueryTextListener {
+        /*var searchViewListener: SearchView.OnQueryTextListener = object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
                 searchPresenter.onQueryTextSubmit(query)
@@ -70,9 +70,27 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        search_view.setOnQueryTextListener(searchViewListener)
+        search_view.setOnQueryTextListener(searchViewListener)*/
 
 
+        Observable
+                .create(ObservableOnSubscribe<String> { subscriber ->
+                   search_view.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                       override fun onQueryTextSubmit(query: String): Boolean {
+                           searchPresenter.onQueryTextSubmit(query)
+                           return true;
+                       }
+
+                       override fun onQueryTextChange(query: String): Boolean {
+                           subscriber.onNext(query)
+                           return true
+                       }
+                   })
+                })
+                .debounce(1000, TimeUnit.MILLISECONDS )
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ query -> searchPresenter.onQueryTextChange(query)})
 
     }
 

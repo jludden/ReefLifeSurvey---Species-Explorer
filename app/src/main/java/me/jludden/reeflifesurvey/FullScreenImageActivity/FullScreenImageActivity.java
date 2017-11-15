@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 import me.jludden.reeflifesurvey.BrowseFish.CardViewFragment;
 import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader;
-import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard;
+import me.jludden.reeflifesurvey.model.InfoCard;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.ReefLifeDataFragment;
 import me.jludden.reeflifesurvey.model.SurveySiteList;

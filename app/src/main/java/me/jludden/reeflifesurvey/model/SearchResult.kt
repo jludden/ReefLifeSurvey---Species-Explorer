@@ -8,9 +8,11 @@ data class SearchResult constructor(
         val type: Enum<SearchResultType>,
         val description: String = "",
         val imageURL: String? = null
-){
+)
 
-
+interface SearchResultable {
+    fun matchesQuery(query: String): Boolean
+    fun createResult(query: String): SearchResult
 }
 
 enum class SearchResultType {

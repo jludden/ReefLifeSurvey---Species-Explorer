@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -16,18 +15,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
-import com.daimajia.easing.linear.Linear;
-import com.daimajia.slider.library.SliderLayout;
-import com.daimajia.slider.library.SliderTypes.BaseSliderView;
-import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
-import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.squareup.picasso.Picasso;
 
 import java.util.Enumeration;
 import java.util.List;
 
-import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard;
-import me.jludden.reeflifesurvey.MainActivity;
+import me.jludden.reeflifesurvey.model.InfoCard;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.model.SurveySiteList;
 

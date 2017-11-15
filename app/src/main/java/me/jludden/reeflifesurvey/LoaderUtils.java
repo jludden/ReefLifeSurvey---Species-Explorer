@@ -88,6 +88,10 @@ public class LoaderUtils {
     public static String loadStringFromDisk(@RawRes int id, Context context) throws IOException {
         InputStream is =
                 context.getResources().openRawResource(id);
+        return loadStringFromDiskHelper(is);
+    }
+
+    public static String loadStringFromDiskHelper(InputStream is) throws IOException {
         Writer writer = new StringWriter();
         char[] buffer = new char[1024];
         try {

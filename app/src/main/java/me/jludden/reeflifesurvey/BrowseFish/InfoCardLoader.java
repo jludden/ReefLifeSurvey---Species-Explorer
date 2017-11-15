@@ -7,11 +7,10 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 
-import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard.CardDetails;
+import me.jludden.reeflifesurvey.model.InfoCard.CardDetails;
 import me.jludden.reeflifesurvey.LoaderUtils;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.ReefLifeDataFragment;
-import me.jludden.reeflifesurvey.model.SurveySiteList;
 import me.jludden.reeflifesurvey.model.SurveySiteList.SurveySite;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -531,9 +530,13 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
      * @return the same fishCard, with details added (name, image url, etc.)
      * Created 10/24
      */
-    private static CardDetails parseSpeciesDetailsHelper(CardDetails fishCard, ReefLifeDataFragment.ReefLifeDataRetrievalCallback dataRetrievalCallback) throws JSONException{
+    private static CardDetails parseSpeciesDetailsHelper(CardDetails fishCard, ReefLifeDataFragment.ReefLifeDataRetrievalCallback dataRetrievalCallback) throws JSONException {
         JSONObject fishSpecies = dataRetrievalCallback.retrieveFishSpecies();
         JSONArray basicData = fishSpecies.getJSONArray(fishCard.getId());
+        return parseSpeciesDetailsHelperTwo(fishCard, basicData);
+    }
+
+    public static CardDetails parseSpeciesDetailsHelperTwo(CardDetails fishCard, JSONArray basicData) throws JSONException {
         fishCard.cardName = basicData.getString(0);
         fishCard.commonNames = basicData.getString(1);
         fishCard.reefLifeSurveyURL = basicData.getString(2);

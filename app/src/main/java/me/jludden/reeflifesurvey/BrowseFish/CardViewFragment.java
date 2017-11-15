@@ -19,8 +19,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import me.jludden.reeflifesurvey.R;
-import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard;
-import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard.CardDetails;
+import me.jludden.reeflifesurvey.model.InfoCard;
+import me.jludden.reeflifesurvey.model.InfoCard.CardDetails;
 
 import java.util.List;
 

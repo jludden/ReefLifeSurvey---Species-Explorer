@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard;
+import me.jludden.reeflifesurvey.model.InfoCard;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.ReefLifeDataFragment;
 

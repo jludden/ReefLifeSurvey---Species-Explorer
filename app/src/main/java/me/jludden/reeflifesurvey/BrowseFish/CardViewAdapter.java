@@ -1,6 +1,5 @@
 package me.jludden.reeflifesurvey.BrowseFish;
 
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +13,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
-import me.jludden.reeflifesurvey.BrowseFish.model.InfoCard;
+import me.jludden.reeflifesurvey.model.InfoCard;
 import me.jludden.reeflifesurvey.BuildConfig;
 import me.jludden.reeflifesurvey.R;
 import java.util.ArrayList;

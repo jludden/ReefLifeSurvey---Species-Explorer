@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -172,7 +173,7 @@ public class SurveySiteList {
      * Class to represent a Survey Site location
      *  Only weird thing is that there are
      */
-    public static class SurveySite {
+    public static class SurveySite implements SearchResultable {
         public SurveySite(String combinedCode) {
             String[] parts = combinedCode.trim().split("(?=\\d)", 2);
             //Log.d("jludden.reeflifesurvey"  , "surveysite codes:" + combinedCode);
@@ -263,5 +264,37 @@ public class SurveySiteList {
             this.speciesFound = speciesFound;
         }
 
+        @Override
+        public boolean matchesQuery(@NotNull String query) {
+            String textToSearch =
+                    siteName +
+                    code +
+                    ecoRegion +
+                    realm;
+
+            return textToSearch.toLowerCase().contains(query);
+        }
+
+        @NotNull
+        @Override
+        public SearchResult createResult(@NotNull String query) {
+            String name = ecoRegion+"["+code+"]";
+
+            String description = "";
+            if(siteName.toLowerCase().contains(query)){
+                description = "name: "+siteName;
+            }
+            if(code.toLowerCase().contains(query)){
+                description = "code: "+code;
+            }
+            if(ecoRegion.toLowerCase().contains(query)){
+                description = "ecoRegion: "+ecoRegion;
+            }
+            if(realm.toLowerCase().contains(query)){
+                description = "realm: "+realm;
+            }
+
+            return new SearchResult(name, SearchResultType.SurveySiteLocation, description, "");
+        }
     }
 }
