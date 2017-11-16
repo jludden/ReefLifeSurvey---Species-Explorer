@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.squareup.picasso.Picasso
 import me.jludden.reeflifesurvey.Data.SearchResult
 import kotlinx.android.synthetic.main.activity_search_results_item.view.*
 import me.jludden.reeflifesurvey.BrowseFish.DetailsViewFragment
@@ -67,7 +68,7 @@ class SearchFragment : Fragment(), SearchContract.View {
         val newResult = result.name + "_" + result.description
         //val newText = "$curText \n $newResult"
         //search_results_text.text = newText
-        Log.d("jludden.reeflifesurvey", "searchfragment addSearchResult "+newResult)
+        Log.d(TAG, "searchfragment addSearchResult "+newResult)
 
         viewAdapter.updateItems(element = result)
     }
@@ -78,14 +79,13 @@ class SearchFragment : Fragment(), SearchContract.View {
     }
 
     override fun launchResultDetails(searchResult: SearchResult) {
-        Log.d("jludden.reeflifesurvey", "searchfragment launchResultDetails CALLED")
+        Log.d(TAG, "searchfragment launchResultDetails CALLED")
 
-   /*     (activity as SearchActivity).supportFragmentManager
+        (activity as SearchActivity).supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.search_results_container, DetailsViewFragment.newInstance(searchResult), DetailsViewFragment.TAG)
-                .commit()*/
+                .commit()
     }
-
 
     /**
      * SearchResultsAdapter class
@@ -149,8 +149,8 @@ class SearchFragment : Fragment(), SearchContract.View {
         }
 
         fun ImageView.loadURL(url: String) {
-            //Picasso.with(context).load(url).into(this)
-            Glide.with(context).load(url).into(this)
+            Picasso.with(context).load(url).into(this)
+            //Glide.with(context).load(url).into(this)
         }
     }
 

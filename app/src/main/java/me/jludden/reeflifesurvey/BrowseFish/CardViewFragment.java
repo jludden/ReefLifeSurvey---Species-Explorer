@@ -327,7 +327,7 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
      *
      */
     public void onFilterApplied(){
-        Log.d("jludden.reeflifesurvey","apply filter Fragment");
+        Log.d(TAG,"apply filter Fragment");
 
         //constraint = CardViewSettings.FILTER_FAVORITES ? "F" : "";
 

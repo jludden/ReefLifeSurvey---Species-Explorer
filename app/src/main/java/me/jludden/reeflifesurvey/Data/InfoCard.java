@@ -86,6 +86,7 @@ public class InfoCard {
      * Those can be loaded and garbage collected by the view adapter
      */
     public static class CardDetails implements Parcelable, Comparable, SearchResultable{
+        private static final String TAG = "InfoCard.CardDetails";
         public final String id;
         public String cardName;
         public String language;// = "Indonesian"; //todo remove defaults
@@ -218,7 +219,7 @@ public class InfoCard {
 
         public String getPrimaryImageURL() {
             if(imageURLs == null || imageURLs.get(0) == null) {
-                Log.d("jludden.reeflifesurvey", "Card "+getId()+ "-"+cardName+" no primary URL found");
+                Log.d(TAG, "Card "+getId()+ "-"+cardName+" no primary URL found");
                 return "http://www.brendontyree.com/wp-content/uploads/2013/10/placeholder_image18.png"; //todo set up a placeholder image
             } else {
                 return imageURLs.get(0);

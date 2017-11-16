@@ -19,6 +19,7 @@ import me.jludden.reeflifesurvey.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import static me.jludden.reeflifesurvey.BrowseFish.CardViewFragment.TAG;
 import static me.jludden.reeflifesurvey.SharedPreferencesUtils.setUpFavoritesButton;
 
 /**
@@ -121,7 +122,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             final int realPosition = getDataSourcePosition(position);
 
             if (vhItem.mContentView == null || (mCardList.size() <= realPosition)) {
-                Log.d("jludden.reeflifesurvey", "CardViewAdapter onBindView vhItem somethings null. cardlistsize:  " + mCardList.size());
+                Log.d(TAG, "CardViewAdapter onBindView vhItem somethings null. cardlistsize:  " + mCardList.size());
                 return;
             }
 
@@ -141,7 +142,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             vhItem.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("jludden.reeflifesurvey", "Card onClick - Launching new fragment");
+                    Log.d(TAG, "Card onClick - Launching new fragment");
 
 
 
@@ -169,7 +170,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * @param AdapterPos
      */
     private void hideCard(int AdapterPos) {
-        //Log.d("jludden.reeflifesurvey","hide card called for pos: "+AdapterPos);
+        //Log.d(TAG,"hide card called for pos: "+AdapterPos);
         int realPosition = getDataSourcePosition(AdapterPos);
         mHiddenList.add(mCardList.get(realPosition).getId());
 
@@ -185,7 +186,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     //todo some type of filter interface? or bitmap?
     //hides cards from the adapter
     public void applyFilter() {
-        Log.d("jludden.reeflifesurvey","apply filter Adapter. getItemCount: "+getItemCount()+" cardlistsize: "+mCardList.size());
+        Log.d(TAG,"apply filter Adapter. getItemCount: "+getItemCount()+" cardlistsize: "+mCardList.size());
 
         int realPosition;
         InfoCard.CardDetails cardDetails;
@@ -300,7 +301,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      */
     @Override
     public Filter getFilter() {
-        Log.d("jludden.reeflifesurvey","CardViewAdapter getFilter()");
+        Log.d(TAG,"CardViewAdapter getFilter()");
 
         return new Filter() {
             /**
@@ -313,7 +314,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
              */
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
-                Log.d("jludden.reeflifesurvey","CardViewAdapter getFilter() - background thread performFiltering(). constraint: "+constraint+" filterFAV: "+ CardViewFragment.CardViewSettings.FILTER_FAVORITES);
+                Log.d(TAG,"CardViewAdapter getFilter() - background thread performFiltering(). constraint: "+constraint+" filterFAV: "+ CardViewFragment.CardViewSettings.FILTER_FAVORITES);
 
                 if(constraint == "" || constraint.length() <= 0){ //restore the original list
                     //results.values = mCardList;
@@ -346,8 +347,8 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
              */
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                Log.d("jludden.reeflifesurvey","CardViewAdapter getFilter() - publishResults() constraint: "+constraint+" filterFAV: "+ CardViewFragment.CardViewSettings.FILTER_FAVORITES);
-//                Log.d("jludden.reeflifesurvey","CardViewAdapter getFilter() - publishResults(): "+results.count+" constraint: "+constraint);
+                Log.d(TAG,"CardViewAdapter getFilter() - publishResults() constraint: "+constraint+" filterFAV: "+ CardViewFragment.CardViewSettings.FILTER_FAVORITES);
+//                Log.d(TAG,"CardViewAdapter getFilter() - publishResults(): "+results.count+" constraint: "+constraint);
 
                 if((!CardViewFragment.CardViewSettings.FILTER_FAVORITES)&&(constraint == "" || constraint.length() <= 0)) { //restore the original list
                     mHiddenList = new ArrayList<>();
@@ -431,7 +432,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * @param data
      */
     public void updateItems(List<InfoCard.CardDetails> data){
-        Log.d("jludden.reeflifesurvey" , "cardview adapter update items");
+        Log.d(TAG, "cardview adapter update items");
 
         mCardList = data;
         this.mHiddenList = new ArrayList<>();

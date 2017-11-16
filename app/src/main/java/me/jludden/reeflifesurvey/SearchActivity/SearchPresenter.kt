@@ -32,43 +32,21 @@ class SearchPresenter(
     }
 
     private fun doSearch(query: String) {
-
-       // dataRepository.getFishSpeciesObservable(searchView.)
-
+        //merge fish species and survey sites, filter by query string, then take a max of 15 results
         val matchesQuery: Observable<SearchResultable> =
                 Observable.concat(
                     dataRepository.getFishSpeciesObservable(),
                     dataRepository.getSurveySitesObservable())
-                .filter({result -> result.matchesQuery(query)})
+                .filter({ result -> result.matchesQuery(query) })
                 .take(15)
 
+        //map the resulting species/sites to SearchResults
         val resultsObservable: Observable<SearchResult> = matchesQuery
-                .map({ species -> species.createResult(query) })
+                .map({ res -> res.createResult(query) })
 
         resultsObservable
                 .subscribe({ res -> searchView.addSearchResult(res) })
 
-    /*  val fishMatchQuery: Observable<InfoCard.CardDetails> = dataRepository.getFishSpeciesObservable()
-                .filter({ species -> species.matchesQuery(query)})
-                .take(15)
-
-        val resultsObservable: Observable<SearchResult> = fishMatchQuery
-                .map({ species -> species.createResult(query) })
-
-        resultsObservable
-                .subscribe({ res -> searchView.addSearchResult(res) })
-    */
-
-    /*    val sitesMatchingQuery: Observable<SurveySite> = dataRepository.getSurveySitesObservable()
-                .filter({ site -> siteMatchesQuery(site, query) })
-                .take(15)
-
-        val resultsObservable: Observable<SearchResult> = sitesMatchingQuery
-                .map({ site -> newSearchResult(site, query) }) //change the type from SurveySite to SearchResult
-
-        resultsObservable
-                .subscribe({ res -> searchView.addSearchResult(res) })
-    */
     }
 
     override fun onItemClicked(searchResult: SearchResult) {

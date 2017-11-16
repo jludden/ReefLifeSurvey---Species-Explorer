@@ -62,7 +62,6 @@ public class IntroPageOneFragment extends Fragment {
         };
         int num = 8;
 
-        Log.d("jludden.reeflifesurvey", "IntroPageOneFragment loaded");
         //todo update titlebar
         final View viewLayout = inflater.inflate(R.layout.intro_pageone_fragment, container, false);
         final ImageView imageView= (ImageView) viewLayout.findViewById(R.id.intro_fullscreen_image);
@@ -94,7 +93,7 @@ public class IntroPageOneFragment extends Fragment {
                // .resize(0,height)
                 .into(imageView);
 
-        final String imageURL = urls[num];
+        final String  imageURL = urls[num];
         final int imageDelay = 30000;
 
         final Handler handler = new Handler();

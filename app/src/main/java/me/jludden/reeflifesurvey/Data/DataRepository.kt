@@ -6,7 +6,10 @@ import io.reactivex.Observable
 import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader.parseSpeciesDetailsHelperTwo
 import me.jludden.reeflifesurvey.LoaderUtils
 import me.jludden.reeflifesurvey.R
+import me.jludden.reeflifesurvey.Data.InfoCard.CardDetails
 import org.json.JSONObject
+import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Created by Jason on 11/11/2017.
@@ -23,7 +26,7 @@ class DataRepository private constructor(context: Context) {
     //private var speciesJSON : JSONObject
     //private val fishSpecies : Observable<InfoCard.CardDetails>
   //  private val fishStringStream : Observable<String>
-    private val speciesCardList : List<InfoCard.CardDetails>
+    private val speciesCards: HashMap<String, CardDetails> //todo possibly sorted list better
 
     init {
 
@@ -37,7 +40,7 @@ class DataRepository private constructor(context: Context) {
        // fishSpecies = loadFromDisk(R.raw.api_species, context)
    //     fishStringStream = loadFromDisk(R.raw.api_species, context)
 
-        speciesCardList = loadFromDiskSync(R.raw.api_species, context)
+        speciesCards = loadFromDiskSync(R.raw.api_species, context)
     }
 
     //use Observable.from to emit items one at a time from a iterable
@@ -51,31 +54,32 @@ class DataRepository private constructor(context: Context) {
     //
     //consider wrapping this in an async call (separate rxjava-async module):
     //https://github.com/ReactiveX/RxJava/wiki/Async-Operators
-    fun getFishSpeciesObservable(): Observable<InfoCard.CardDetails> {
-        return Observable.fromIterable(speciesCardList)
+    fun getFishSpeciesObservable(): Observable<CardDetails> {
+//        val cardDict :HashMap<String, CardDetails> = HashMap()
+        return Observable.fromIterable(speciesCards.values)
     }
 
     //NOT asynchronously load the data but oh well at least its already on disk right todo delete and do it better
-    fun loadFromDiskSync(resID: Int, context: Context): List<InfoCard.CardDetails> {
+    fun loadFromDiskSync(resID: Int, context: Context): HashMap<String, CardDetails> {
         val speciesJSON = JSONObject(LoaderUtils.loadStringFromDisk(R.raw.api_species, context))
         val iter = speciesJSON.keys()
 
-        val speciesCardList = ArrayList<InfoCard.CardDetails>()
+        val species = HashMap<String, CardDetails>()
 
         while (iter.hasNext()){
             val curKey = iter.next()
             val speciesData = speciesJSON.getJSONArray(curKey)
 
-            val cardDetails = InfoCard.CardDetails(curKey)
-            speciesCardList.add(parseSpeciesDetailsHelperTwo(cardDetails, speciesData))
+            val cardDetails = CardDetails(curKey)
+            species.put(curKey, parseSpeciesDetailsHelperTwo(cardDetails, speciesData))
         }
-        Log.d("jludden.reeflifesurvey", "loaded fish species: "+speciesCardList.size)
+        Log.d("DataRepository", "loaded fish species: "+species.size)
 
-        return speciesCardList
+        return species
     }
 
     /*
-    fun getFishSpeciesObservable(context: Context): Observable<InfoCard.CardDetails> {
+    fun getFishSpeciesObservable(context: Context): Observable<CardDetails> {
 
         fishStringStream
                 .map { str -> JSONObject(str)}
@@ -133,7 +137,7 @@ class DataRepository private constructor(context: Context) {
 
                 }
                 .map<JSONArray>{ key -> speciesJSON.getJSONArray(key) }
-                .map<InfoCard.CardDetails>{ speciesData -> parseSpeciesDetailsHelperTwo(InfoCard.CardDetails("1"), speciesData)}*/
+                .map<CardDetails>{ speciesData -> parseSpeciesDetailsHelperTwo(CardDetails("1"), speciesData)}*/
     }
         */
 
@@ -147,12 +151,23 @@ class DataRepository private constructor(context: Context) {
         fun onFishSpeciesJSONLoaded(speciesJSON: JSONObject)
     }
 
+    interface LoadFishCardCallBack {
+        fun onFishCardLoaded(card: CardDetails)
+        fun onDataNotAvailable()
+    }
+
     fun getSurveySites(callback: LoadSurveySitesCallBack) {
         callback.onSurveySitesLoaded(siteList)
     }
 
     fun getFishSpeciesJSON(callback: LoadFishSpeciesJSONCallBack) {
         //callback.onFishSpeciesJSONLoaded()
+    }
+
+    fun getFishCard(id: String, callback: LoadFishCardCallBack){
+        val card: CardDetails? = speciesCards.get(id)
+        if(card != null) callback.onFishCardLoaded(card)
+        else callback.onDataNotAvailable()
     }
 }
 

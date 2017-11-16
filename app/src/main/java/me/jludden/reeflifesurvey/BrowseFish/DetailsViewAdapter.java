@@ -32,6 +32,7 @@ import static me.jludden.reeflifesurvey.SharedPreferencesUtils.setUpFavoritesBut
 
 public class DetailsViewAdapter extends PagerAdapter {
 
+    private static final String TAG = "DetailsViewAdapter";
     private List<InfoCard.CardDetails> mData;
     private DetailsViewFragment mDetailsViewFragment;
 
@@ -71,7 +72,7 @@ public class DetailsViewAdapter extends PagerAdapter {
         Log.d("jludden.reeflifesurvey"  , "DetailsviewAdapter instantiateItem mData empty:"+mData.isEmpty());
 
         if(!mData.isEmpty()) {
-            Log.d("jludden.reeflifesurvey", "DetailsviewAdapter instantiateItem mData not empty");
+            Log.d(TAG, "DetailsviewAdapter instantiateItem mData not empty");
             final InfoCard.CardDetails cardDetails = mData.get(position);
 
             //set up favorites star button
@@ -113,7 +114,7 @@ public class DetailsViewAdapter extends PagerAdapter {
 
           /*  imageCarousel.stopAutoCycle();
             if (cardDetails.imageURLs == null) {
-                Log.d("jludden.reeflifesurvey", "DetailsviewAdapter card details no images to load");
+                Log.d(TAG, "DetailsviewAdapter card details no images to load");
                 newText.append("\n No Images Found");
 //                imageCarousel.setVisibility(View.INVISIBLE);
             } else {
@@ -128,7 +129,7 @@ public class DetailsViewAdapter extends PagerAdapter {
 
             LinearLayout additionalImages = (LinearLayout) viewLayout.findViewById(R.id.details_additional_images);
             if (cardDetails.imageURLs == null) {
-                Log.d("jludden.reeflifesurvey", "DetailsviewAdapter card details no images to load");
+                Log.d(TAG, "DetailsviewAdapter card details no images to load");
                 newText.append("\n No Images Found");
 //                imageCarousel.setVisibility(View.INVISIBLE);
             } else {

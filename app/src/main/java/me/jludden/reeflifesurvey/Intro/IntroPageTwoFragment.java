@@ -46,6 +46,7 @@ import me.jludden.reeflifesurvey.R;
 
 public class IntroPageTwoFragment extends Fragment {
 
+    private static final String TAG = "IntroPageTwoFragment";
     private Picasso mPicasso;
     SliderLayout mImageCarousel;
     SliderLayout mImageCarouselSmall;
@@ -71,7 +72,7 @@ public class IntroPageTwoFragment extends Fragment {
         mImageCarousel.setIndicatorVisibility(PagerIndicator.IndicatorVisibility.Invisible);
         mImageCarousel.setDuration(12000);
 
-        Log.d("jludden.reeflifesurvey", "IntroPageOneFragment loaded");
+        Log.d(TAG, "IntroPageOneFragment loaded");
 
 
   /*      for (String url : top_slider_images) {

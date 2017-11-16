@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,16 +26,15 @@ import me.jludden.reeflifesurvey.ReefLifeDataFragment;
  * Created by Jason on 10/25/2017.
  */
 
-public class DetailsViewFragment extends Fragment {
+public class DetailsViewFragment extends Fragment implements DataRepository.LoadFishCardCallBack {
 
-    private final static String ARG_CARD = "CardDetailsParam";
+    private static final String ARG_CARD = "CardDetailsParam";
+    private static String ARG_SPECIES_ID = "CardDetailsID";
     public static final String TAG = "DetailsViewFragment";
-
 
     ViewPager mViewPager;
     DetailsViewAdapter mViewAdapter;
 
-    ReefLifeDataFragment.ReefLifeDataRetrievalCallback mDataRetrievalCallback; //todo unused
     List<InfoCard.CardDetails> mData = new ArrayList<>(); //todo
 
     /**
@@ -41,14 +42,15 @@ public class DetailsViewFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param cardDetails Parameter 1.
-     * @param param2 Parameter 2. todo
+     * @param id Parameter 2. todo
      * @return A new instance of fragment DetailsViewFragment.
      */
-    public static DetailsViewFragment newInstance(InfoCard.CardDetails cardDetails, String param2) {
+    public static DetailsViewFragment newInstance(InfoCard.CardDetails cardDetails, String id) {
         DetailsViewFragment fragment = new DetailsViewFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_CARD, cardDetails);
-        //args.putString(ARG_PARAM2, param2);
+        if(cardDetails != null) args.putParcelable(ARG_CARD, cardDetails);
+        //todo this approach may require an addtl enum param SearchResultType
+        args.putString(ARG_SPECIES_ID, id);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,41 +58,20 @@ public class DetailsViewFragment extends Fragment {
     public static DetailsViewFragment newInstance(SearchResult searchResult) {
         InfoCard.CardDetails card;
         if(searchResult.getType() == SearchResultType.FishSpecies){
-            card = new InfoCard.CardDetails("");//DataRepository.
-
+            return newInstance(null, searchResult.getId());
         }
         else {
-
-
-            card = new InfoCard.CardDetails("");//DataRepository.
+            return newInstance(null, ""); //todo handle survey site
         }
-        return newInstance(card, "");
     }
 
     //todo considering another newInstance() where we just pass in a fish species id and it generates the CardDetails object?
 
     @Override
-    public void onAttach(Context context){
-        super.onAttach(context);
-        String errMsg = "";
-
-        if(context instanceof ReefLifeDataFragment.ReefLifeDataRetrievalCallback){
-            mDataRetrievalCallback = (ReefLifeDataFragment.ReefLifeDataRetrievalCallback) context;
-        } else {
-            errMsg += context.toString() + "must implement" +
-                    ReefLifeDataFragment.ReefLifeDataRetrievalCallback.class.getName();
-        }
-
-        if(errMsg.length() > 0){
-            throw new ClassCastException(errMsg);
-        }
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(getArguments() == null) {
-            Log.d("jludden.reeflifesurvey", "DetailsViewFragment onCreate - no params passed in");
+            Log.d(TAG, "DetailsViewFragment onCreate - no params passed in");
         }
 
         if (getArguments() != null) {
@@ -99,13 +80,24 @@ public class DetailsViewFragment extends Fragment {
 //            mCardType = CardViewFragment.CardType.values()[getArguments().getInt(ARG_PARAM1, 0)]; //wow why is getting an enum from an int so difficult
 //            mParam2 = getArguments().getString(ARG_PARAM2);
             InfoCard.CardDetails cardDetails = getArguments().getParcelable(ARG_CARD);
+            String id = getArguments().getString(ARG_SPECIES_ID);
+
             if(cardDetails != null) {
                 mData.add(cardDetails);
                 Log.d("jludden.reeflifesurvey"  ,"DetailsViewFragment onCreate added card passed in from main: "+mData.size());
             }
+            else if(id != null){
+                Log.d("jludden.reeflifesurvey"  ,"DetailsViewFragment onCreate card ID passed in: "+id);
+                DataRepository.Companion.getInstance(getContext()).getFishCard(id, this);
+            }
+            else {
+                onDataNotAvailable();
+            }
         }
 
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -119,5 +111,16 @@ public class DetailsViewFragment extends Fragment {
         mViewPager.setAdapter(mViewAdapter);
 
         return view;
+    }
+
+    @Override
+    public void onFishCardLoaded(@NotNull InfoCard.CardDetails card) {
+        mData.add(card);
+    }
+
+    @Override
+    public void onDataNotAvailable() {
+        Log.d(TAG, "onDataNotAvailable: DetailsViewFrag");
+        //todo
     }
 }

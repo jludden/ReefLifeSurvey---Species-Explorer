@@ -94,6 +94,7 @@ import static me.jludden.reeflifesurvey.LoaderUtils.loadFishSurveySites;
 
 public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
 
+    private static final String TAG = "InfoCardLoader";
     private List<CardDetails> mData; //final, sorted list of fish cards TODO why not just InfoCard, which is already a card list
     private String mPassedInSurveySiteCode = "";//optional passed in parameter. otherwise load favorite sites
 
@@ -550,9 +551,9 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> {
             imageURL = imageURL.replace("\\", ""); //remove weird backslashes
             List<String> urls = LoaderUtils.parseURLs(imageURL);
             if (urls.size() < 1)
-                Log.d("jludden.reeflifesurvey", "parseSpeciesDetailsHelper no image found for card (image url too short): " + fishCard.getId() + " original url string: "+basicData.getString(4));
+                Log.d(TAG, "parseSpeciesDetailsHelper no image found for card (image url too short): " + fishCard.getId() + " original url string: "+basicData.getString(4));
             else {
-    //            Log.d("jludden.reeflifesurvey", "parseSpeciesDetailsHelper url parsing for: " + fishCard.getId() + " full: " + imageURL + "\n #1: " + urls.get(0));
+    //            Log.d(TAG, "parseSpeciesDetailsHelper url parsing for: " + fishCard.getId() + " full: " + imageURL + "\n #1: " + urls.get(0));
                 fishCard.imageURLs = urls;
             }
         }

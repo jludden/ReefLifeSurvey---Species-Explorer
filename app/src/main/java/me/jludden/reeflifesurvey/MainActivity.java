@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements
         ReefLifeDataFragment.ReefLifeDataUpdateCallback {
 
 
+    private static final String TAG = "MainActivity";
     private GoogleMap mMap;
     private FloatingActionButton mFAB, mBottomSheetButton;
     private FloatingActionButton[] mFABmenu;
@@ -295,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onPause(){
-        Log.d("jludden.reeflifesurvey","MainActivity onPause");
+        Log.d(TAG,"MainActivity onPause");
         if(mBottomSheetImageCarousel != null) { //todo dont do this in onstop and onpause, probably
             mBottomSheetImageCarousel.removeAllSliders();
             mBottomSheetImageCarousel.stopAutoCycle(); //prevent a memory leak
@@ -372,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements
                             getString(R.string.transition_search_back)).toBundle();
                 }
 //                startActivity(new Intent(this, SearchActivity.class), options);
-                Log.d("jludden.reeflifesurvey","STARTING SEARCH ACTIVITY");
+                Log.d(TAG,"STARTING SEARCH ACTIVITY");
 
                 startActivityForResult(new Intent(this, SearchActivity.class), SEARCH_ACTIVITY_RETURN_CODE, options);
                 return true;
@@ -388,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == SEARCH_ACTIVITY_RETURN_CODE){
-            Log.d("jludden.reeflifesurvey","main activity onactivity result FROM SEARCH ACTIVITY");
+            Log.d(TAG,"main activity onactivity result FROM SEARCH ACTIVITY");
         }
     }
 
@@ -768,13 +769,13 @@ public class MainActivity extends AppCompatActivity implements
         launch_species.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("jludden.reeflifesurvey", "Bottom Sheet Top TextView clicked.. hidden?: " + v.isShown());
+                Log.d(TAG, "Bottom Sheet Top TextView clicked.. hidden?: " + v.isShown());
                 //todo refactor this
                 //if the detailsviewfragment is showing, and they click the top of bottom sheet,
                 //navigate them back to the mapview
                 MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
                 if (mapFrag != null && !mapFrag.isVisible()) {
-                    Log.d("jludden.reeflifesurvey", "Bottom Sheet TEST1 PASSED");
+                    Log.d(TAG, "Bottom Sheet TEST1 PASSED");
                     mBottomSheetButton.setVisibility(View.VISIBLE);
                     launch_species.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_view_in_list, 0, 0, 0);
                     launchUIFragment(mapFrag, MapViewFragment.TAG);
@@ -857,8 +858,8 @@ public class MainActivity extends AppCompatActivity implements
         try{
             //Load fish cards
             List<InfoCard.CardDetails> fishCards = InfoCardLoader.loadSingleSite(siteInfo, this, 5);
-            Log.d("jludden.reeflifesurvey", "BottomSheet fishCards loaded: "+fishCards.size());
-            if(fishCards.size() > 0 ) Log.d("jludden.reeflifesurvey", "BottomSheet fishCards loaded: "+fishCards.get(0).commonNames);
+            Log.d(TAG, "BottomSheet fishCards loaded: "+fishCards.size());
+            if(fishCards.size() > 0 ) Log.d(TAG, "BottomSheet fishCards loaded: "+fishCards.get(0).commonNames);
 
             //add cards to carousel. consider doing this in a reactive way?
             mBottomSheetImageCarousel = (SliderLayout) findViewById(R.id.site_preview_carousel);
@@ -911,7 +912,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void onFishDetailsRequested(InfoCard.CardDetails cardDetails, View sharedElement) {
-        Log.d("jludden.reeflifesurvey", "MainActivity onFishDetailsRequested: "+cardDetails.toString());
+        Log.d(TAG, "MainActivity onFishDetailsRequested: "+cardDetails.toString());
 
         //hide a bunch of shit todo probably want at least a fab or a bottom bar, cant decide
         mFAB.hide();
@@ -998,7 +999,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        Log.d("jludden.reeflifesurvey","button pressed: "+buttonView.getId()+" is checked: "+isChecked);
+        Log.d(TAG,"button pressed: "+buttonView.getId()+" is checked: "+isChecked);
         CardViewFragment viewFragment = (CardViewFragment) getSupportFragmentManager().findFragmentByTag(CardViewFragment.TAG);
 
         switch(buttonView.getId()){
@@ -1019,11 +1020,11 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 break;
             default: //handle survey site location button pressed
-                Log.d("jludden.reeflifesurvey","unhandled toggle button (#"+buttonView.getId()+") pressed: "+buttonView.getText());
+                Log.d(TAG,"unhandled toggle button (#"+buttonView.getId()+") pressed: "+buttonView.getText());
                 if(buttonView.getTag() != null) {
                     //SurveySiteList.SurveySite site = (SurveySiteList.SurveySite) buttonView.getTag();
                     String siteCode = (String) buttonView.getTag();
-                    Log.d("jludden.reeflifesurvey", "toggle button tag: " + siteCode + " is checked: " + buttonView.isChecked());
+                    Log.d(TAG, "toggle button tag: " + siteCode + " is checked: " + buttonView.isChecked());
                     if (buttonView.isChecked()) retrieveSurveySiteList().saveFavoriteSite(siteCode, getBaseContext()); //update saved sites in datafragment
                     else retrieveSurveySiteList().removeFavoriteSite(siteCode, getBaseContext());
                     if (viewFragment != null && viewFragment.isVisible()) { //reload card view fragment

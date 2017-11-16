@@ -22,6 +22,7 @@ import me.jludden.reeflifesurvey.Data.InfoCard;
 public class SharedPreferencesUtils {
 
     private static final String SAVED_SITES_KEY = "me.jludden.reeflifesurvey.SitePrefs";
+    private static final String TAG = "SharedPreferenceUtils";
 
     //set up the favorites button initial state and onclick listener
     public static void setUpFavoritesButton(final InfoCard.CardDetails cardDetails, final CheckBox mFavoriteBtn, final Activity activity){
@@ -42,7 +43,7 @@ public class SharedPreferencesUtils {
     //set up the on click listener for a favorites button
     //todo unhappy about direct refernces to carddetails.favorited
     public static void onFavoritesButtonClick(final InfoCard.CardDetails cardDetails, final CheckBox mFavoriteBtn, final Activity activity) {
-        Log.d("jludden.reeflifesurvey", "Favorites Button onClick. now favorited: " + !cardDetails.favorited);
+        Log.d(TAG, "Favorites Button onClick. now favorited: " + !cardDetails.favorited);
 
         if (cardDetails.favorited) {
             mFavoriteBtn.setButtonDrawable(R.drawable.ic_star_border);
