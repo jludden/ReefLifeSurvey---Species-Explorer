@@ -100,6 +100,12 @@ public class SurveySiteList {
 
     //returns the list of saved survey site codes
     //EST1, EST2, EST3, etc. will only be returned once as EST
+
+    /**
+     * Returns saved survey sites by code
+     *  e.g. EST1, EST2, EST3, etc. will only be returned once as EST
+     * @return each unique code in saved survey sites
+     */
     public List<String> getSelectedSiteCodes(){
         //todo performance
         Map<String, String> codeDict = new Hashtable<>();
@@ -110,8 +116,11 @@ public class SurveySiteList {
         return new ArrayList<String>(codeDict.keySet());
     }
 
-    //returns the list of saved survey sites
-    //EST1, EST2, EST3, etc. will all be returned as separate entries
+    /**
+     * Returns all saved survey sites, with multiple ids per code
+     *  e.g. EST1, EST2, EST3, etc. will all be returned as separate entries
+     * @return all saved survey site code+id combinations
+     */
     public List<SurveySite> getSelectedSitesAll(){
         return SELECTED_SURVEY_SITES;
     }
@@ -207,6 +216,8 @@ public class SurveySiteList {
                 LatLng pos = new LatLng(latitude, longitude);
 
      */
+
+        public String getDisplayName() { return ecoRegion + " [" + code + "]";}
 
         public String getCode() {
             return code;

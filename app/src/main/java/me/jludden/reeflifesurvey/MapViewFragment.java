@@ -17,8 +17,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 
+import me.jludden.reeflifesurvey.Data.DataRepository;
 import me.jludden.reeflifesurvey.Data.SurveySiteList;
 import me.jludden.reeflifesurvey.Data.SurveySiteList.SurveySite;
+import me.jludden.reeflifesurvey.Data.SurveySiteType;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -30,6 +33,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -65,7 +70,8 @@ import java.util.ArrayList;
 public class MapViewFragment extends Fragment
         implements OnMapReadyCallback,
             GoogleMap.OnMapClickListener,
-            GoogleMap.OnMarkerClickListener {
+            GoogleMap.OnMarkerClickListener,
+            DataRepository.LoadSurveySitesCallBack {
 
     private static final float FAVORITED_SITE_COLOR = BitmapDescriptorFactory.HUE_AZURE;
     private static final float NORMAL_SITE_COLOR = BitmapDescriptorFactory.HUE_RED;
@@ -76,7 +82,7 @@ public class MapViewFragment extends Fragment
     private MapView mMapView;
    // private MapCallback mMapCallback;
     private Marker mSelectedMarker;
-    private ArrayList<Marker> mSelectedSiteList = new ArrayList<>(); //todo use static selected site list //todo save these preferences
+    private ArrayList<Marker> mSelectedSiteList = new ArrayList<>(); //todo use static selected site list //todo save these preferences //11/16 TODO DELETE
     private FloatingActionButton mFAB;
     private FloatingActionButton[] mFABmenu;
     private BottomSheetBehavior mBottomSheetBehavior;
@@ -85,7 +91,6 @@ public class MapViewFragment extends Fragment
 
     //data retrieval from the retained, headless fragment
     private SurveySiteList mSurveySiteList;
-    private ReefLifeDataFragment.ReefLifeDataRetrievalCallback mDataRetrievalCallback;
 
     private MapViewFragmentInteractionListener mMapViewFragmentInteractionListener;
 
@@ -114,12 +119,15 @@ public class MapViewFragment extends Fragment
         super.onAttach(context);
         String errMsg = "";
 
-        if(context instanceof ReefLifeDataFragment.ReefLifeDataRetrievalCallback){
+        DataRepository.Companion.getInstance(getContext().getApplicationContext())
+                .getSurveySites(SurveySiteType.CODES,this);
+
+        /*if(context instanceof ReefLifeDataFragment.ReefLifeDataRetrievalCallback){
             mDataRetrievalCallback = (ReefLifeDataFragment.ReefLifeDataRetrievalCallback) context;
         } else {
             errMsg += context.toString() + "must implement" +
                     ReefLifeDataFragment.ReefLifeDataRetrievalCallback.class.getName();
-        }
+        }*/
         if(context instanceof MapViewFragmentInteractionListener){
             mMapViewFragmentInteractionListener = (MapViewFragmentInteractionListener) context;
         } else {
@@ -241,7 +249,9 @@ public class MapViewFragment extends Fragment
         //this toolbar links to the actual google maps app and has a directions button
         mMap.getUiSettings().setMapToolbarEnabled(false);
 
-        addSurveySites();
+        if(mSurveySiteList != null) {
+            addSurveySites();
+        }
     }
 
     @Override
@@ -330,7 +340,7 @@ public class MapViewFragment extends Fragment
                 Snackbar.make(mMapView, mSelectedMarker.getTitle()+" is already in the site list" , Snackbar.LENGTH_LONG).show();
                 //todo should this remove? how else to remove an icon
             } else {
-                mSelectedSiteList.add(mSelectedMarker); //todo save this to preferences
+                mSelectedSiteList.add(mSelectedMarker); //todo save this to preferences 11/16 TODO DELETE
                 String siteCode = ((SurveySite) mSelectedMarker.getTag()).getCode();
                 mSurveySiteList.saveFavoriteSite(siteCode, getContext());
                 //mSurveySiteList.SELECTED_SURVEY_SITES.add((SurveySite) mSelectedMarker.getTag()); //todo why both REMOVE
@@ -387,14 +397,17 @@ public class MapViewFragment extends Fragment
         //todo remove from preferences list
     }
 
-    /**
-     * CALLED FROM MAIN
-     * Let's the Map Fragment know that the data
-     */
-    public void onDataFragmentLoadFinished() {
+    @Override
+    public void onSurveySitesLoaded(@NotNull SurveySiteList sites) {
+        mSurveySiteList = sites;
         if(mMap != null) { //make sure that onMapReady has already been called
             addSurveySites();
         }
+    }
+
+    @Override
+    public void onDataNotAvailable(@NotNull String reason) {
+
     }
 
     //Add the loaded survey sites to the map
@@ -406,13 +419,13 @@ public class MapViewFragment extends Fragment
         }
 
         //retrieve survey sites from data fragment
-        if(mDataRetrievalCallback != null){
+    /*    if(mDataRetrievalCallback != null){
             mSurveySiteList = mDataRetrievalCallback.retrieveSurveySiteList();
         }
 
         if ((mDataRetrievalCallback == null) || (mSurveySiteList == null) || (mSurveySiteList.size() <= 0))
             Log.e("jludden.reeflifesurvey" ,"MapViewFragment addSurveySites mDataRetrievalCallback error");
-        else Log.d("jludden.reeflifesurvey"  ,"MapViewFragment addSurveySites called. "+mSurveySiteList.size()+" survey sites loaded");
+        else Log.d("jludden.reeflifesurvey"  ,"MapViewFragment addSurveySites called. "+mSurveySiteList.size()+" survey sites loaded");*/
 
         //Add Survey Sites to Map
         for(SurveySite site : mSurveySiteList.SITE_CODE_LIST) {

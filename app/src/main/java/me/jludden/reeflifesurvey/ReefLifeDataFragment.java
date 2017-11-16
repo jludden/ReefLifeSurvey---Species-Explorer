@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import me.jludden.reeflifesurvey.Data.LoaderUtils;
 import me.jludden.reeflifesurvey.Data.SurveySiteList;
 
 /**
@@ -82,7 +83,7 @@ public class ReefLifeDataFragment extends Fragment implements LoaderManager.Load
         String errMsg = "";
 
         if(context instanceof ReefLifeDataFragment.ReefLifeDataUpdateCallback){
-            mCallbacks = (ReefLifeDataFragment.ReefLifeDataUpdateCallback) context;
+                mCallbacks = (ReefLifeDataFragment.ReefLifeDataUpdateCallback) context;
         } else {
             errMsg += context.toString() + "must implement" +
                     ReefLifeDataFragment.ReefLifeDataUpdateCallback.class.getName();

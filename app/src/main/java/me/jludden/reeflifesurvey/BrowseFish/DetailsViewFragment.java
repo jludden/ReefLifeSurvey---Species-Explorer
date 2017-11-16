@@ -88,10 +88,10 @@ public class DetailsViewFragment extends Fragment implements DataRepository.Load
             }
             else if(id != null){
                 Log.d("jludden.reeflifesurvey"  ,"DetailsViewFragment onCreate card ID passed in: "+id);
-                DataRepository.Companion.getInstance(getContext()).getFishCard(id, this);
+                DataRepository.Companion.getInstance(getContext().getApplicationContext()).getFishCard(id, this);
             }
             else {
-                onDataNotAvailable();
+                onDataNotAvailable(id);
             }
         }
 
@@ -119,8 +119,8 @@ public class DetailsViewFragment extends Fragment implements DataRepository.Load
     }
 
     @Override
-    public void onDataNotAvailable() {
-        Log.d(TAG, "onDataNotAvailable: DetailsViewFrag");
+    public void onDataNotAvailable(String id) {
+        Log.d(TAG, "onDataNotAvailable: DetailsViewFrag card_id: "+id);
         //todo
     }
 }

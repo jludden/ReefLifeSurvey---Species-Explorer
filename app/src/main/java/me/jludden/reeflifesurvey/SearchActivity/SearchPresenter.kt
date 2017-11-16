@@ -2,6 +2,7 @@ package me.jludden.reeflifesurvey.SearchActivity
 
 import io.reactivex.Observable
 import me.jludden.reeflifesurvey.Data.*
+import me.jludden.reeflifesurvey.Data.SurveySiteType.CODES
 
 /**
  * Created by Jason on 11/12/2017.
@@ -10,8 +11,8 @@ import me.jludden.reeflifesurvey.Data.*
 
 class SearchPresenter(
         val dataRepository: DataRepository,
-        val searchView: SearchContract.View) :
-        SearchContract.Presenter {
+        val searchView: SearchContract.View)
+    : SearchContract.Presenter {
 
     init {
         searchView.presenter = this

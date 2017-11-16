@@ -47,11 +47,14 @@ import me.jludden.reeflifesurvey.BrowseFish.CardViewFragment;
 import me.jludden.reeflifesurvey.BrowseFish.CardViewFragment.CardViewSettings;
 
 import me.jludden.reeflifesurvey.BrowseFish.DetailsViewFragment;
+import me.jludden.reeflifesurvey.Data.DataRepository;
+import me.jludden.reeflifesurvey.Data.LoaderUtils;
 import me.jludden.reeflifesurvey.FullScreenImageActivity.FullScreenImageActivity;
 import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader;
 import me.jludden.reeflifesurvey.Data.InfoCard;
 import me.jludden.reeflifesurvey.CountryList.CountryListFragment;
 
+import me.jludden.reeflifesurvey.InterfaceComponents.BottomSheet;
 import me.jludden.reeflifesurvey.Intro.IntroViewPagerFragment;
 import me.jludden.reeflifesurvey.SearchActivity.SearchActivity;
 import me.jludden.reeflifesurvey.Data.DummyContent;
@@ -65,6 +68,7 @@ import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.google.android.gms.maps.GoogleMap;
 //import com.google.android.gms.maps.SupportMapFragment;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -80,7 +84,8 @@ public class MainActivity extends AppCompatActivity implements
         CardViewFragment.OnCardViewFragmentInteractionListener,
         MapViewFragment.MapViewFragmentInteractionListener,
         ReefLifeDataFragment.ReefLifeDataRetrievalCallback,
-        ReefLifeDataFragment.ReefLifeDataUpdateCallback {
+        ReefLifeDataFragment.ReefLifeDataUpdateCallback,
+        BottomSheet.OnBottomSheetInteractionListener {
 
 
     private static final String TAG = "MainActivity";
@@ -91,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements
     public static final int FAB_ONCLICK_ANIMATION_DURATION = 150; //snappy fab animations
     private ReefLifeDataFragment mDataFragment;
     private SurveySiteList mSurveySiteList;
-    private SliderLayout mBottomSheetImageCarousel;
+//    private SliderLayout mBottomSheetImageCarousel;
 
     private static final int SEARCH_ACTIVITY_RETURN_CODE = 0;
 
@@ -210,8 +215,9 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         //Set up the bottom sheet
-        View bottomSheet = findViewById(R.id.bottom_sheet);
+        BottomSheet bottomSheet = (BottomSheet) findViewById(R.id.bottom_sheet);
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        //bottomSheet.set
 
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         //bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -297,10 +303,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onPause(){
         Log.d(TAG,"MainActivity onPause");
-        if(mBottomSheetImageCarousel != null) { //todo dont do this in onstop and onpause, probably
-            mBottomSheetImageCarousel.removeAllSliders();
-            mBottomSheetImageCarousel.stopAutoCycle(); //prevent a memory leak
-        }
+
+        ((BottomSheet) findViewById(R.id.bottom_sheet)).clearView();//todo dont do this in onstop and onpause, probably
 
         super.onPause();
         if(isFinishing()){ getSupportFragmentManager().beginTransaction()
@@ -574,10 +578,10 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onDataFragmentLoadFinished() {
-        MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
+   /*     MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
         if (mapFrag != null && mapFrag.isVisible()) {
             mapFrag.onDataFragmentLoadFinished();
-        }
+        }*/
 
         /*CardViewFragment viewFragment = (CardViewFragment) getSupportFragmentManager().findFragmentByTag(CardViewFragment.TAG);
         if (viewFragment != null && viewFragment.isVisible()) {
@@ -755,7 +759,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         final TextView topText = (TextView) findViewById(R.id.bottom_sheet_top);
-        topText.setText(siteInfo.getEcoRegion()); //todo THIS IS NOT ENOUGH
+        topText.setText(siteInfo.getDisplayName());
         topText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -810,7 +814,8 @@ public class MainActivity extends AppCompatActivity implements
         bottomText.scrollTo(0,0);
 
         //set up image carousel
-        createImageCarousel(siteInfo);
+        //createImageCarousel(siteInfo);
+        ((BottomSheet) bottomSheet).setupImageSliders(siteInfo);
     }
 
     /**
@@ -846,52 +851,8 @@ public class MainActivity extends AppCompatActivity implements
         bottomText.scrollTo(0,0);
 
         //set up image carousel
-        createImageCarousel(siteInfo);
-    }
-
-    //BottomSheet related:
-    //helper function to load and display a fish carousel in the bottom sheet,
-    //based on fish that can be found in the survey site
-    //todo move to bottomsheet class
-    private void createImageCarousel(@Nullable SurveySiteList.SurveySite siteInfo) {
-        //todo show a fish carousel
-        try{
-            //Load fish cards
-            List<InfoCard.CardDetails> fishCards = InfoCardLoader.loadSingleSite(siteInfo, this, 5);
-            Log.d(TAG, "BottomSheet fishCards loaded: "+fishCards.size());
-            if(fishCards.size() > 0 ) Log.d(TAG, "BottomSheet fishCards loaded: "+fishCards.get(0).commonNames);
-
-            //add cards to carousel. consider doing this in a reactive way?
-            mBottomSheetImageCarousel = (SliderLayout) findViewById(R.id.site_preview_carousel);
-            mBottomSheetImageCarousel.removeAllSliders();
-
-            for(InfoCard.CardDetails card : fishCards) {
-                TextSliderView textSliderView = createCarouselEntry(card);
-                mBottomSheetImageCarousel.addSlider(textSliderView);
-            }
-            //mDemoSlider.addOnPageChangeListener(this);
-
-        } catch (JSONException e){
-            Log.e("jludden.reefLifeSurvey" , "Failed to parse surveysitelist json. species found but corresponding sitings count could not be retrieved");
-        }
-    }
-
-    //BottomSheet related:
-    //creates a TextSliderView (a fish preview image, with description and onclick listener) that can be added to a SliderLayout (an image carousel of fish previews)
-    private TextSliderView createCarouselEntry(final InfoCard.CardDetails card){
-        String name = card.cardName;
-        final TextSliderView textSliderView = new TextSliderView(this);
-        textSliderView
-                .description(name)
-                .image(card.getPrimaryImageURL())
-                .setScaleType(BaseSliderView.ScaleType.Fit)
-                .setOnSliderClickListener(new BaseSliderView.OnSliderClickListener() {
-                    @Override
-                    public void onSliderClick(BaseSliderView slider) {
-                        onFishDetailsRequested(card, textSliderView.getView());
-                    }
-                });
-        return textSliderView;
+//        createImageCarousel(siteInfo);
+        ((BottomSheet) bottomSheet).setupImageSliders(siteInfo);
     }
 
     public FloatingActionButton[] getFABmenu(){
@@ -966,10 +927,7 @@ public class MainActivity extends AppCompatActivity implements
     //todo restart image sliders when power on (onResume, see IntroPageTwoFragment)
     @Override
     protected void onStop() {
-        if(mBottomSheetImageCarousel != null) {
-            mBottomSheetImageCarousel.removeAllSliders();
-            mBottomSheetImageCarousel.stopAutoCycle(); //prevent a memory leak
-        }
+        ((BottomSheet) findViewById(R.id.bottom_sheet)).clearView();
         super.onStop();
     }
 
@@ -1069,5 +1027,26 @@ public class MainActivity extends AppCompatActivity implements
                 * | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
                 * | View.SYSTEM_UI_FLAG_IMMERSIVE
                 */
+    }
+
+    @Override
+    public void onImageSliderClick(@NotNull InfoCard.CardDetails card, @NotNull View sharedElement) {
+        onFishDetailsRequested(card, sharedElement);
+    }
+}
+
+abstract class DataLoadedCallbacks implements DataRepository.LoadFishCardCallBack {
+    private static final String TAG = "MainActivity.data";
+
+    @Override
+    public void onFishCardLoaded(@NotNull InfoCard.CardDetails card) {
+        Log.d(TAG, "onFishCardLoaded: "+card.getId());
+
+
+    }
+
+    @Override
+    public void onDataNotAvailable(@NotNull String id) {
+        Log.d(TAG, "onDataNotAvailable: "+id);
     }
 }

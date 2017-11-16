@@ -4,12 +4,12 @@ import android.content.Context
 import android.util.Log
 import io.reactivex.Observable
 import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader.parseSpeciesDetailsHelperTwo
-import me.jludden.reeflifesurvey.LoaderUtils
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.Data.InfoCard.CardDetails
 import org.json.JSONObject
-import java.util.*
 import kotlin.collections.HashMap
+import me.jludden.reeflifesurvey.Data.SurveySiteType.*
+
 
 /**
  * Created by Jason on 11/11/2017.
@@ -44,7 +44,8 @@ class DataRepository private constructor(context: Context) {
     }
 
     //use Observable.from to emit items one at a time from a iterable
-    fun getSurveySitesObservable(): Observable<SurveySiteList.SurveySite> {
+    fun getSurveySitesObservable(type: SurveySiteType = CODES): Observable<SurveySiteList.SurveySite> {
+        if(type != CODES) TODO()
         return Observable.fromIterable(siteList.SITE_CODE_LIST)
     }
 
@@ -55,7 +56,6 @@ class DataRepository private constructor(context: Context) {
     //consider wrapping this in an async call (separate rxjava-async module):
     //https://github.com/ReactiveX/RxJava/wiki/Async-Operators
     fun getFishSpeciesObservable(): Observable<CardDetails> {
-//        val cardDict :HashMap<String, CardDetails> = HashMap()
         return Observable.fromIterable(speciesCards.values)
     }
 
@@ -143,20 +143,24 @@ class DataRepository private constructor(context: Context) {
 
     //interface for providing callbacks for accessing data
     //todo add onDataNotAvailable callbacks to each interface as well
-    interface LoadSurveySitesCallBack {
+    interface LoadSurveySitesCallBack : DataLoadCallback {
         fun onSurveySitesLoaded(sites : SurveySiteList)
     }
 
-    interface LoadFishSpeciesJSONCallBack {
+    interface LoadFishSpeciesJSONCallBack : DataLoadCallback {
         fun onFishSpeciesJSONLoaded(speciesJSON: JSONObject)
     }
 
-    interface LoadFishCardCallBack {
+    interface LoadFishCardCallBack : DataLoadCallback {
         fun onFishCardLoaded(card: CardDetails)
-        fun onDataNotAvailable()
     }
 
-    fun getSurveySites(callback: LoadSurveySitesCallBack) {
+    fun getSurveySites(type: SurveySiteType, callback: LoadSurveySitesCallBack) {
+ /*       if(type == ALL_IDS) TODO()
+        else if(type == CODES) {
+            callback.onSurveySitesLoaded(siteList.SITE_CODE_LIST)
+        } "fail"
+*/
         callback.onSurveySitesLoaded(siteList)
     }
 
@@ -167,10 +171,19 @@ class DataRepository private constructor(context: Context) {
     fun getFishCard(id: String, callback: LoadFishCardCallBack){
         val card: CardDetails? = speciesCards.get(id)
         if(card != null) callback.onFishCardLoaded(card)
-        else callback.onDataNotAvailable()
+        else callback.onDataNotAvailable(id)
     }
 }
 
+interface DataLoadCallback {
+    fun onDataNotAvailable(reason: String)
+}
+
+enum class SurveySiteType {
+    ALL_IDS,    //load all sites (you probably just want Codes)
+    CODES, //load only one site per code (usually more useful than having a bunch of markers at the same spot)
+    FAVORITES //load only favorite sites
+}
 
 
 //SingletonHolder implementing a double-checked locking algorithm

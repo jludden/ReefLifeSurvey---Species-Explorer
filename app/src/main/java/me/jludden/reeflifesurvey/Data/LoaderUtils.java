@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey;
+package me.jludden.reeflifesurvey.Data;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,7 +10,6 @@ import android.util.Log;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.target.Target;
-import me.jludden.reeflifesurvey.Data.SurveySiteList;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -33,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
+import me.jludden.reeflifesurvey.R;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -42,6 +42,62 @@ import okhttp3.Response;
  */
 
 public class LoaderUtils {
+
+
+
+    //region Loading Single Site
+
+    //11/4 FIXED shouldn't this really be loading all sites for a code?
+    //10/24 todo currently only called from mapview->bottomsheet
+    //          would like it to be called during the normal incremental load for each site, then have results aggregated
+    public static void loadSingleSite(SurveySiteList.SurveySite site, DataRepository dataRepo, DataRepository.LoadFishCardCallBack callback, final int CARDS_TO_LOAD) throws JSONException {
+        Log.d("jludden.reeflifesurvey"  , "loadSingleSite: "+site.getSiteName()+" attempting to load: "+CARDS_TO_LOAD+" fish cards");
+
+        // List<CardDetails> fishCards = new ArrayList<>(); //todo...
+        int cards_loaded = 0;
+        String speciesKey;
+
+        JSONObject fullSpeciesJSON = site.getSpeciesFound();
+        Iterator<String> speciesList = fullSpeciesJSON.keys();
+
+        //add each species to the dictionary
+        while (speciesList.hasNext()
+                && (cards_loaded++ < CARDS_TO_LOAD)) {
+
+            speciesKey = speciesList.next();
+            dataRepo.getFishCard(speciesKey, callback);
+
+
+
+            InfoCard.CardDetails fishCard = new InfoCard.CardDetails(speciesKey);
+            int numSightings = fullSpeciesJSON.getInt(speciesKey); //number of sightings of this fish in this survey site (may not be accurate due to datasource)
+
+/*            if(fishCards.contains(fishCard)) { //todo verify using overriden equals() func
+                Log.d(TAG  , "load single site - already have fish card loaded: "+fishCard.getId()+"-"+fishCard.commonNames);
+
+                int index = fishCards.indexOf(fishCard);
+                fishCards.get(index).setFoundInSites(site, numSightings);
+            }
+            else{
+                fishCard = parseSpeciesDetailsHelper(fishCard, dataRetrievalCallback);
+                fishCard.setFoundInSites(site, numSightings);
+                fishCards.add(fishCard);
+            }*/
+        }
+//        return fishCards;
+    }
+
+//endregion
+
+
+
+
+
+
+
+
+
+
     //region Loading Utility Functions
 
     /**
