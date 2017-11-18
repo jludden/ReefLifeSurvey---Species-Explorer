@@ -3,7 +3,7 @@ package me.jludden.reeflifesurvey.Data
 import android.content.Context
 import android.util.Log
 import io.reactivex.Observable
-import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader.parseSpeciesDetailsHelperTwo
+import me.jludden.reeflifesurvey.Data.InfoCardLoader.parseSpeciesDetailsHelper
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.Data.InfoCard.CardDetails
 import org.json.JSONObject
@@ -71,7 +71,7 @@ class DataRepository private constructor(context: Context) {
             val speciesData = speciesJSON.getJSONArray(curKey)
 
             val cardDetails = CardDetails(curKey)
-            species.put(curKey, parseSpeciesDetailsHelperTwo(cardDetails, speciesData))
+            species.put(curKey, parseSpeciesDetailsHelper(cardDetails, speciesData))
         }
         Log.d("DataRepository", "loaded fish species: "+species.size)
 
@@ -137,7 +137,7 @@ class DataRepository private constructor(context: Context) {
 
                 }
                 .map<JSONArray>{ key -> speciesJSON.getJSONArray(key) }
-                .map<CardDetails>{ speciesData -> parseSpeciesDetailsHelperTwo(CardDetails("1"), speciesData)}*/
+                .map<CardDetails>{ speciesData -> parseSpeciesDetailsHelper(CardDetails("1"), speciesData)}*/
     }
         */
 

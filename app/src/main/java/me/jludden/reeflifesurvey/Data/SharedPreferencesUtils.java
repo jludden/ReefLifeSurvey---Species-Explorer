@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey;
+package me.jludden.reeflifesurvey.Data;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import me.jludden.reeflifesurvey.Data.InfoCard;
+import me.jludden.reeflifesurvey.R;
 
 /**
  * Created by Jason on 10/29/2017.

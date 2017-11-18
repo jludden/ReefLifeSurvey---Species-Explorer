@@ -1,21 +1,15 @@
-package me.jludden.reeflifesurvey.Intro
+package me.jludden.reeflifesurvey
 
-import android.media.Image
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import com.squareup.picasso.Picasso
 
-import kotlinx.android.synthetic.main.home_fragment.*
-import me.jludden.reeflifesurvey.BrowseFish.CardViewFragment
-import me.jludden.reeflifesurvey.MainActivity
-import me.jludden.reeflifesurvey.MapViewFragment
-import me.jludden.reeflifesurvey.R
+import me.jludden.reeflifesurvey.FishSpeciesCards.CardViewFragment
+import me.jludden.reeflifesurvey.SurveySiteMap.MapViewFragment
 
 
 /**

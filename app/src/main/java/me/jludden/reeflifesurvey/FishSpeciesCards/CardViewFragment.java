@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.BrowseFish;
+package me.jludden.reeflifesurvey.FishSpeciesCards;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -17,7 +17,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.ToggleButton;
 
+import org.jetbrains.annotations.NotNull;
+
+import me.jludden.reeflifesurvey.Data.DataRepository;
+import me.jludden.reeflifesurvey.Data.InfoCardLoader;
+import me.jludden.reeflifesurvey.Data.SurveySiteList;
+import me.jludden.reeflifesurvey.Data.SurveySiteType;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.Data.InfoCard;
 import me.jludden.reeflifesurvey.Data.InfoCard.CardDetails;
@@ -32,7 +41,10 @@ import java.util.List;
  * Use the {@link CardViewFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CardViewFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<CardDetails>> {
+public class CardViewFragment extends Fragment implements
+        LoaderManager.LoaderCallbacks<List<CardDetails>>,
+        DataRepository.LoadSurveySitesCallBack,
+        CompoundButton.OnCheckedChangeListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String TYPE_TO_LOAD = "param1";
@@ -61,6 +73,7 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
 //    private boolean mFilterFavorites = false;
     private boolean mLoadedAll = false;
     private String mPassedInSurveySiteCode = "";//optional passed in parameter. otherwise load favorite sites
+    private SurveySiteList mSurveySiteList;
 
 
     public enum CardType{
@@ -143,7 +156,7 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
         mLayoutManager = new LinearLayoutManager(context);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mViewAdapter = new CardViewAdapter(this, InfoCard.ITEMS, mRecyclerView, mListener); //todo reconcile infocard.items with the onloadfinished(arraylist<InfoCard.CardDetails>)
+        mViewAdapter = new CardViewAdapter(this, mRecyclerView, mListener); //todo reconcile infocard.items with the onloadfinished(arraylist<InfoCard.CardDetails>)
         mRecyclerView.setAdapter(mViewAdapter);
 
         mProgressBar = view.findViewById(R.id.progress_overlay);
@@ -259,6 +272,9 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
             throw new RuntimeException(context.toString()
                     + " must implement OnCardViewFragmentInteractionListener");
         }
+
+        DataRepository dataRepo = DataRepository.Companion.getInstance(getContext().getApplicationContext());
+        dataRepo.getSurveySites(SurveySiteType.CODES, this);
     }
 
     @Override
@@ -344,6 +360,69 @@ public class CardViewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoaderReset(Loader<List<CardDetails>> loader) {
 
+    }
+
+    @Override
+    public void onSurveySitesLoaded(@NotNull SurveySiteList sites) {
+        mSurveySiteList = sites;
+
+        //todo this is just adding favorites to toolbar
+        //  update to add th actual sites being searched
+        addSiteLocationsToToolbar(sites.getSelectedSiteCodes());
+    }
+
+    /**
+     * Set the expandable toolbar buttons to include the site locations
+     * called when launching CardViewFragment
+     */
+    public void addSiteLocationsToToolbar(List<String> siteCodeList) {
+        LinearLayout toolbarLayout = (LinearLayout) getActivity().findViewById(R.id.toolbar_layout);
+
+
+        int offset=4;//TODO this is the number of buttons before the survey sites
+
+        //remove the previously added site buttons
+        int childCount = toolbarLayout.getChildCount()-offset;
+        if(childCount > 0) {
+            toolbarLayout.removeViews(offset, childCount);
+        }
+
+        int count = 0;
+        for(String siteCode : siteCodeList){
+            ToggleButton siteButton = new ToggleButton(getContext());
+            siteButton.setId(offset + count++);
+            siteButton.setTextOn(siteCode);
+            siteButton.setChecked(true); //default state true
+            siteButton.setTextOff("("+siteCode+")");
+            siteButton.setTag(siteCode); //store the site associated with this button
+            siteButton.setOnCheckedChangeListener(this);
+            toolbarLayout.addView(siteButton);
+        }
+    }
+
+    @Override
+    public void onDataNotAvailable(@NotNull String reason) {
+        Log.d(TAG,"onDataNotAvailable - unable to add survey sites to toolbar");
+    }
+
+    /**
+     * Called when the checked state of a compound button has changed.
+     *
+     * @param buttonView The compound button view whose state has changed.
+     * @param isChecked  The new checked state of buttonView.
+     */
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        Log.d(TAG,"unhandled toggle button (#"+buttonView.getId()+") pressed: "+buttonView.getText());
+        if(buttonView.getTag() != null && mSurveySiteList != null) {
+            //SurveySiteList.SurveySite site = (SurveySiteList.SurveySite) buttonView.getTag();
+            String siteCode = (String) buttonView.getTag();
+            Log.d(TAG, "toggle button tag: " + siteCode + " is checked: " + buttonView.isChecked());
+            if (buttonView.isChecked())
+                mSurveySiteList.saveFavoriteSite(siteCode, getContext()); //update saved sites in datafragment
+            else mSurveySiteList.removeFavoriteSite(siteCode, getContext());
+            onLoadMore(true);
+        }
     }
 
     public static class CardViewSettings {

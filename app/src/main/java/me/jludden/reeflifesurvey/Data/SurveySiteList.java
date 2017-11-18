@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static me.jludden.reeflifesurvey.SharedPreferencesUtils.*;
+import static me.jludden.reeflifesurvey.Data.SharedPreferencesUtils.*;
 
 /**
  * Created by Jason on 8/20/2017.
@@ -202,8 +202,8 @@ public class SurveySiteList {
         int number_of_surveys;
         JSONObject speciesFound;
 
-    /*
-     String realm = site1.getString(0);
+        /*
+         String realm = site1.getString(0);
                 String ecoRegion = site1.getString(1);
                 String name = site1.getString(2);
                 double longitude = site1.getDouble(3);
@@ -214,8 +214,7 @@ public class SurveySiteList {
 
                 //LatLng pos = new LatLng(-37.26, 150.05);
                 LatLng pos = new LatLng(latitude, longitude);
-
-     */
+        */
 
         public String getDisplayName() { return ecoRegion + " [" + code + "]";}
 

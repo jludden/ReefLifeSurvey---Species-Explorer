@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.BrowseFish;
+package me.jludden.reeflifesurvey.FishSpeciesCards;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -24,7 +24,7 @@ import me.jludden.reeflifesurvey.Data.InfoCard;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.Data.SurveySiteList;
 
-import static me.jludden.reeflifesurvey.SharedPreferencesUtils.setUpFavoritesButton;
+import static me.jludden.reeflifesurvey.Data.SharedPreferencesUtils.setUpFavoritesButton;
 
 /**
  * Created by Jason on 10/25/2017.

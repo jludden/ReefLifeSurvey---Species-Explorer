@@ -8,8 +8,6 @@ import android.util.Log;
 
 import org.jetbrains.annotations.NotNull;
 
-import me.jludden.reeflifesurvey.CountryList.model.CityInfo;
-
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -17,7 +15,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import static me.jludden.reeflifesurvey.SharedPreferencesUtils.getPref;
+import static me.jludden.reeflifesurvey.Data.SharedPreferencesUtils.getPref;
 
 /**
  * Helper class for providing sample cardName for user interfaces created by
@@ -30,14 +28,14 @@ public class InfoCard {
     /**
      * An array of sample (model) items.
      */
-    public static final List<CardDetails> ITEMS = new ArrayList<CardDetails>();
+    //public static final List<CardDetails> ITEMS = new ArrayList<CardDetails>();
 
     /**
      * A map of sample (model) items, by ID.
      */
-    public static final Map<String, CardDetails> ITEM_MAP = new HashMap<String, CardDetails>();
+  /*  public static final Map<String, CardDetails> ITEM_MAP = new HashMap<String, CardDetails>();
 
-    private static final int COUNT = 0;
+    private static final int COUNT = 0;*/
 
 
     //static members to help load/save to SharedPreferences
@@ -89,9 +87,7 @@ public class InfoCard {
         private static final String TAG = "InfoCard.CardDetails";
         public final String id;
         public String cardName;
-        public String language;// = "Indonesian"; //todo remove defaults
         public String subregion;// = "South-Eastern Asia";
-        public CityInfo capitalCity;
         public String commonNames;
         public int numSightings; //TODO this could redone... times seen per survey site... Dictionary<SurveySiteList.SurveySite, Integer> FoundInSites
         public Dictionary<SurveySiteList.SurveySite, Integer> FoundInSites = new Hashtable<>();
@@ -101,18 +97,6 @@ public class InfoCard {
 
         public CardDetails(String id) {
             this.id = id;
-        }
-
-        public void setLanguage(String language){
-            this.language = language;
-        }
-
-        public void setSubregion(String subregion){
-            this.subregion = subregion;
-        }
-
-        public void setCapitalCity(CityInfo city){
-            this.capitalCity = city;
         }
 
         //todo performance impact? we are not caching this value but preferences should be in memory
@@ -139,8 +123,6 @@ public class InfoCard {
            // if(cardName!=null) sb.append(cardName);
             if (commonNames!=null) sb.append("Also known as: " + commonNames);
             if (subregion!=null) sb.append("\n Location: " + subregion);
-            //if (capitalCity.isPresent()) sb.append("\n\t Capital city: " + capitalCity.get().toString());
-            if (language!=null) sb.append("\n Language: " + language);
 
             //sb.append("\nSeen " + numSightings + " times");
 

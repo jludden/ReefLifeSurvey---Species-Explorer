@@ -2,7 +2,6 @@ package me.jludden.reeflifesurvey.FullScreenImageActivity;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GestureDetectorCompat;
@@ -15,14 +14,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import org.json.JSONObject;
-
-import me.jludden.reeflifesurvey.BrowseFish.CardViewFragment;
-import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader;
+import me.jludden.reeflifesurvey.FishSpeciesCards.CardViewFragment;
+import me.jludden.reeflifesurvey.Data.InfoCardLoader;
 import me.jludden.reeflifesurvey.Data.InfoCard;
 import me.jludden.reeflifesurvey.R;
-import me.jludden.reeflifesurvey.ReefLifeDataFragment;
-import me.jludden.reeflifesurvey.Data.SurveySiteList;
 
 import java.util.List;
 
@@ -31,9 +26,7 @@ import java.util.List;
  */
 
 public class FullScreenImageActivity extends FragmentActivity
-        implements ReefLifeDataFragment.ReefLifeDataRetrievalCallback,
-        ReefLifeDataFragment.ReefLifeDataUpdateCallback,
-        LoaderManager.LoaderCallbacks<List<InfoCard.CardDetails>> {
+        implements LoaderManager.LoaderCallbacks<List<InfoCard.CardDetails>> {
 
     final static String DEBUG_TAG = "me.jludden.reeflifesurvey" ;
 
@@ -42,7 +35,6 @@ public class FullScreenImageActivity extends FragmentActivity
     ViewPager mViewPager;
     private GestureDetectorCompat mDetector;
     private static final float MIN_SWIPE_DISTANCE = 250;
-    private ReefLifeDataFragment mDataFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,27 +42,6 @@ public class FullScreenImageActivity extends FragmentActivity
         setContentView(R.layout.image_view_activity); //TODO layout for view_activity
 
         Log.d("jludden.reeflifesurvey"  , "FullScreenImageActivity onCreate");
-
-        /* todo
-
-            So the problem with this full screen image activity is the fact that it is an activity
-            the data fragment will need to be recreated every time. this is obviously not ideal.
-            basically, there is no workaround for having the loader here. either we load it here
-            or we create a new instance of the data fragment which has the loader
-
-         */
-        //Start the retained data fragment TODO would really rather use the existing one
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        mDataFragment = (ReefLifeDataFragment) fragmentManager.findFragmentByTag(ReefLifeDataFragment.TAG);
-        if( mDataFragment == null) {
-            mDataFragment = new ReefLifeDataFragment();
-            fragmentManager.beginTransaction()
-                    .add(mDataFragment, ReefLifeDataFragment.TAG)
-                    .commit();
-        } /*else { TODO not sure how this fragment behaves during a config change
-            mDataFragment.setTargetFragment(this, mDataFragment.getTargetRequestCode());
-        }*/
-
 
         mViewAdapter = new FullScreenImageAdapter(this);
 
@@ -191,18 +162,5 @@ public class FullScreenImageActivity extends FragmentActivity
     public void onLoaderReset(Loader<List<InfoCard.CardDetails>> loader) {
 
     }
-
-    @Override
-    public SurveySiteList retrieveSurveySiteList(){
-        return mDataFragment.getSurveySites();
-    }
-
-    @Override
-    public JSONObject retrieveFishSpecies() {
-        return mDataFragment.getFishSpecies();
-    }
-
-    @Override
-    public void onDataFragmentLoadFinished() {   }
 
 }

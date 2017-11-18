@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.BrowseFish;
+package me.jludden.reeflifesurvey.FishSpeciesCards;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,8 +19,8 @@ import me.jludden.reeflifesurvey.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.jludden.reeflifesurvey.BrowseFish.CardViewFragment.TAG;
-import static me.jludden.reeflifesurvey.SharedPreferencesUtils.setUpFavoritesButton;
+import static me.jludden.reeflifesurvey.FishSpeciesCards.CardViewFragment.TAG;
+import static me.jludden.reeflifesurvey.Data.SharedPreferencesUtils.setUpFavoritesButton;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link InfoCard.CardDetails} and makes a call to the
@@ -30,9 +30,9 @@ import static me.jludden.reeflifesurvey.SharedPreferencesUtils.setUpFavoritesBut
 public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
 
     private CardViewHeader mHeader;
-    private List<InfoCard.CardDetails> mCardList; //visible cards, the Adapters backing data source
-    private List<InfoCard.CardDetails> mAllCardList; //All cards, including any hidden / filtered ones
-    private List<String> mHiddenList; //list of hidden cards (just their string IDs) TODO delete in favor of ALL + SHOWN model
+    private List<InfoCard.CardDetails> mCardList = new ArrayList<>(); //visible cards, the Adapters backing data source
+    private List<InfoCard.CardDetails> mAllCardList = new ArrayList<>(); //All cards, including any hidden / filtered ones
+    private List<String> mHiddenList = new ArrayList<>(); //list of hidden cards (just their string IDs) TODO delete in favor of ALL + SHOWN model
     private RequestManager glide;
     private RequestOptions mGlideRequestOptions;
     private RecyclerView mRecyclerView;
@@ -43,17 +43,12 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public static final int TYPE_ITEM = 1;
 
     //todo add param for listener
-    public CardViewAdapter(CardViewFragment parent, List<InfoCard.CardDetails> items, RecyclerView listView,
-                           CardViewFragment.OnCardViewFragmentInteractionListener listener) {
-        this.mCardList = items;
+    public CardViewAdapter(CardViewFragment parent, RecyclerView listView, CardViewFragment.OnCardViewFragmentInteractionListener listener) {
         this.glide = Glide.with(parent); //cache the Glide RequestManager object
         this.mGlideRequestOptions = new RequestOptions().placeholder(R.drawable.ic_menu_camera); //todo change placeholder image
 
         this.mHeader = new CardViewHeader("hi this is a header");
         //mListener = listener;
-        this.mHiddenList = new ArrayList<>();
-        this.mAllCardList = new ArrayList<>();
-        this.mAllCardList.addAll(items);
         this.mRecyclerView = listView;
         this.mCardViewFragment = parent;
         this.mListener = listener;

@@ -1,6 +1,7 @@
 package me.jludden.reeflifesurvey.InterfaceComponents
 
 import android.content.Context
+import android.text.method.ScrollingMovementMethod
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,12 +10,9 @@ import android.widget.LinearLayout
 import com.daimajia.slider.library.SliderLayout
 import com.daimajia.slider.library.SliderTypes.BaseSliderView
 import com.daimajia.slider.library.SliderTypes.TextSliderView
-import me.jludden.reeflifesurvey.Data.DataRepository
 import me.jludden.reeflifesurvey.Data.DataRepository.*
-import me.jludden.reeflifesurvey.Data.InfoCard
-import me.jludden.reeflifesurvey.Data.LoaderUtils
-import me.jludden.reeflifesurvey.Data.SurveySiteList
-
+import kotlinx.android.synthetic.main.bottom_sheet.view.*
+import me.jludden.reeflifesurvey.Data.*
 import me.jludden.reeflifesurvey.R
 
 /**
@@ -25,6 +23,9 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
     private lateinit var dataRepo: DataRepository
     private lateinit var imageSliders: SliderLayout
     private lateinit var interactionListener: OnBottomSheetInteractionListener
+
+    private var surveySiteList : SurveySiteList? = null
+    private var currentSite : SurveySiteList.SurveySite? = null
 
     constructor(context: Context) : super(context) {
         inflateViews(context)
@@ -54,24 +55,47 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
 
         Log.d(TAG, "onFinishInflate: ")
         //TODO setup onclick listeners, etc
+
+        bottom_sheet_main_text.movementMethod = ScrollingMovementMethod()
     }
 
     /**
-     * set up image sliders for this survey site
+     * Public function to call to update the bottom sheet display
+     *  this will trigger calls to the data repository
+     *  when survey sites load the text can come in
+     *  as fish come in they will be added to the image preview slider
      * @param: site survey site to load images for
      */
-    fun setupImageSliders(site: SurveySiteList.SurveySite) {
+    fun loadNewSite(site: SurveySiteList.SurveySite) {
+        currentSite = site
+        if(surveySiteList == null) dataRepo.getSurveySites(SurveySiteType.CODES, this)
+        else setupSiteDetails()
+
         imageSliders.removeAllSliders()
-        LoaderUtils.loadSingleSite(site, dataRepo, this, 5);
+        LoaderUtils.loadSingleSiteSpeciesPreview(site, dataRepo, this, 5);
     }
 
-    override fun onFishCardLoaded(card: InfoCard.CardDetails) {
-        val textSliderView: TextSliderView = createCarouselEntry(card);
-        imageSliders.addSlider(textSliderView);
+    private fun setupSiteDetails() {
+        val siteInfo = currentSite
+        siteInfo ?: return
+        surveySiteList ?: return
+
+        val details = StringBuilder()
+        details.append("Code (ID) : " + siteInfo.getCode() + " (" + siteInfo.getID() + ")")
+        details.append("\n SiteName " + siteInfo.getSiteName())
+        details.append("\n EcoRegion " + siteInfo.getEcoRegion())
+        details.append("\n Realm " + siteInfo.getRealm())
+        details.append("\n Position: " + siteInfo.getPosition())
+        details.append("\n Num Surveys " + siteInfo.getNumberOfSurveys())
+        details.append("\n" + surveySiteList?.codeList(siteInfo.getCode(), -1))
+
+        bottom_sheet_main_text.text = details
+        bottom_sheet_main_text.scrollTo(0, 0)
+
     }
 
     //creates a TextSliderView (a fish preview image, with description and onclick listener) that can be added to a SliderLayout (an image carousel of fish previews)
-    private fun createCarouselEntry(card: InfoCard.CardDetails): TextSliderView {
+    private fun addSliderImage(card: InfoCard.CardDetails) {
         val name = card.cardName
         val textSliderView = TextSliderView(context)
         textSliderView
@@ -81,9 +105,8 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
                 .setOnSliderClickListener {
                     interactionListener.onImageSliderClick(card, textSliderView.view)
                 }
-        return textSliderView
+        imageSliders.addSlider(textSliderView);
     }
-
 
     /**
      * function to dispose of any image sliders or anything else that might leak
@@ -96,7 +119,12 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
     //todo fun restartView()
 
     override fun onSurveySitesLoaded(sites: SurveySiteList) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        surveySiteList = sites
+        setupSiteDetails()
+    }
+
+    override fun onFishCardLoaded(card: InfoCard.CardDetails) {
+        addSliderImage(card);
     }
 
     override fun onDataNotAvailable(reason: String) {

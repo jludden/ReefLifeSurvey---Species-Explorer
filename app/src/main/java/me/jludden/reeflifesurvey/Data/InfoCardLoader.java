@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.BrowseFish;
+package me.jludden.reeflifesurvey.Data;
 
 import android.content.Context;
 import android.os.OperationCanceledException;
@@ -8,13 +8,9 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 
-import me.jludden.reeflifesurvey.Data.DataRepository;
+import me.jludden.reeflifesurvey.FishSpeciesCards.CardViewFragment;
 import me.jludden.reeflifesurvey.Data.InfoCard.CardDetails;
-import me.jludden.reeflifesurvey.Data.SurveySiteList;
-import me.jludden.reeflifesurvey.Data.SurveySiteType;
-import me.jludden.reeflifesurvey.Data.LoaderUtils;
 import me.jludden.reeflifesurvey.R;
-import me.jludden.reeflifesurvey.ReefLifeDataFragment;
 import me.jludden.reeflifesurvey.Data.SurveySiteList.SurveySite;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -104,7 +100,6 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
 
     private CardViewFragment.CardType mCardType;
     private final static boolean DOWNLOAD_FISH_SPECIES_FROM_GITHUB = false;
-    //private static JSONObject mFishData;    //json object from api_species.json
     private Map<String, CardDetails> mCardDict; //map of fish ID to fish card details. these values are then sorted to the final, mData, order
     private Iterator<CardDetails> mCardListIterator; //iterator of fish IDs in sorted order
     private final int NUM_LOAD_PER_ITER = 20; //load 20 cards per iteration
@@ -505,20 +500,14 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
     }
 
     /**
-     * takes the fishcard in, which really just has an id
-     *   jumps to the api_species json and maps out the fields for the species onto the fishCard
-     *   ASSUMES mFishData (the raw json from api_species)
-     * @param fishCard input card, which should be empty besides the ID
+     * takes the fishcard in, which really just has an id and parses its corresponding JSON data
+     *
+     * @param fishCard input card, which should be empty besides the ID, and the JSONArray
+     * @param basicData JSONArray of data for this fish species
      * @return the same fishCard, with details added (name, image url, etc.)
      * Created 10/24
      */
-    private static CardDetails parseSpeciesDetailsHelper(CardDetails fishCard, ReefLifeDataFragment.ReefLifeDataRetrievalCallback dataRetrievalCallback) throws JSONException {
-        JSONObject fishSpecies = dataRetrievalCallback.retrieveFishSpecies();
-        JSONArray basicData = fishSpecies.getJSONArray(fishCard.getId());
-        return parseSpeciesDetailsHelperTwo(fishCard, basicData);
-    }
-
-    public static CardDetails parseSpeciesDetailsHelperTwo(CardDetails fishCard, JSONArray basicData) throws JSONException {
+    public static CardDetails parseSpeciesDetailsHelper(CardDetails fishCard, JSONArray basicData) throws JSONException {
         fishCard.cardName = basicData.getString(0);
         fishCard.commonNames = basicData.getString(1);
         fishCard.reefLifeSurveyURL = basicData.getString(2);

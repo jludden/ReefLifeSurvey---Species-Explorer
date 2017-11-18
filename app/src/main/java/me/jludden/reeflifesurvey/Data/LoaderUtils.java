@@ -50,7 +50,17 @@ public class LoaderUtils {
     //11/4 FIXED shouldn't this really be loading all sites for a code?
     //10/24 todo currently only called from mapview->bottomsheet
     //          would like it to be called during the normal incremental load for each site, then have results aggregated
-    public static void loadSingleSite(SurveySiteList.SurveySite site, DataRepository dataRepo, DataRepository.LoadFishCardCallBack callback, final int CARDS_TO_LOAD) throws JSONException {
+
+    /**
+     * Loads a number of a fish for a single site
+     *  currently only used to load a 5 fish preview into the bottom sheet
+     * @param site
+     * @param dataRepo
+     * @param callback
+     * @param CARDS_TO_LOAD
+     * @throws JSONException
+     */
+    public static void loadSingleSiteSpeciesPreview(SurveySiteList.SurveySite site, DataRepository dataRepo, DataRepository.LoadFishCardCallBack callback, final int CARDS_TO_LOAD) throws JSONException {
         Log.d("jludden.reeflifesurvey"  , "loadSingleSite: "+site.getSiteName()+" attempting to load: "+CARDS_TO_LOAD+" fish cards");
 
         // List<CardDetails> fishCards = new ArrayList<>(); //todo...

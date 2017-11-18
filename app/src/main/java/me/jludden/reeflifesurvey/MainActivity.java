@@ -17,7 +17,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewCompat;
-import android.text.method.ScrollingMovementMethod;
 import android.transition.ChangeImageTransform;
 import android.transition.ChangeTransform;
 import android.transition.Fade;
@@ -37,42 +36,24 @@ import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import me.jludden.reeflifesurvey.BrowseFish.CardViewFragment;
-import me.jludden.reeflifesurvey.BrowseFish.CardViewFragment.CardViewSettings;
 
-import me.jludden.reeflifesurvey.BrowseFish.DetailsViewFragment;
-import me.jludden.reeflifesurvey.Data.DataRepository;
-import me.jludden.reeflifesurvey.Data.LoaderUtils;
+import me.jludden.reeflifesurvey.FishSpeciesCards.CardViewFragment;
+import me.jludden.reeflifesurvey.FishSpeciesCards.CardViewFragment.CardViewSettings;
+
+import me.jludden.reeflifesurvey.FishSpeciesCards.DetailsViewFragment;
 import me.jludden.reeflifesurvey.FullScreenImageActivity.FullScreenImageActivity;
-import me.jludden.reeflifesurvey.BrowseFish.InfoCardLoader;
 import me.jludden.reeflifesurvey.Data.InfoCard;
-import me.jludden.reeflifesurvey.CountryList.CountryListFragment;
-
 import me.jludden.reeflifesurvey.InterfaceComponents.BottomSheet;
-import me.jludden.reeflifesurvey.Intro.IntroViewPagerFragment;
 import me.jludden.reeflifesurvey.SearchActivity.SearchActivity;
-import me.jludden.reeflifesurvey.Data.DummyContent;
 import me.jludden.reeflifesurvey.Data.SurveySiteList;
+import me.jludden.reeflifesurvey.SurveySiteMap.MapViewFragment;
 import me.jludden.reeflifesurvey.transitions.CircularReveal;
-import me.jludden.reeflifesurvey.Intro.HomeFragment;
-
-import com.daimajia.slider.library.SliderLayout;
-import com.daimajia.slider.library.SliderTypes.BaseSliderView;
-import com.daimajia.slider.library.SliderTypes.TextSliderView;
-import com.google.android.gms.maps.GoogleMap;
-//import com.google.android.gms.maps.SupportMapFragment;
-
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.List;
 
 import static com.daimajia.androidanimations.library.Techniques.SlideInUp;
 import static com.daimajia.androidanimations.library.Techniques.SlideOutDown;
@@ -80,27 +61,20 @@ import static com.daimajia.androidanimations.library.Techniques.SlideOutDown;
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         CompoundButton.OnCheckedChangeListener,
-        CountryListFragment.OnListFragmentInteractionListener,
         CardViewFragment.OnCardViewFragmentInteractionListener,
         MapViewFragment.MapViewFragmentInteractionListener,
-        ReefLifeDataFragment.ReefLifeDataRetrievalCallback,
-        ReefLifeDataFragment.ReefLifeDataUpdateCallback,
         BottomSheet.OnBottomSheetInteractionListener {
 
 
     private static final String TAG = "MainActivity";
-    private GoogleMap mMap;
+    private static final int SEARCH_ACTIVITY_RETURN_CODE = 0;
     private FloatingActionButton mFAB, mBottomSheetButton;
     private FloatingActionButton[] mFABmenu;
     private boolean mFabMenuVisible = false;
     public static final int FAB_ONCLICK_ANIMATION_DURATION = 150; //snappy fab animations
-    private ReefLifeDataFragment mDataFragment;
     private SurveySiteList mSurveySiteList;
-//    private SliderLayout mBottomSheetImageCarousel;
 
-    private static final int SEARCH_ACTIVITY_RETURN_CODE = 0;
-
-    //   private FloatingActionsMenu mFabMenu;
+    //private ReefLifeDataFragment mDataFragment;
 
 
     @Override
@@ -190,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 Snackbar.make(v, "FAB2 Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                expandBottomSheet(null);
+                //expandBottomSheet(null);
                 hideFABmenu();
             }
         });
@@ -259,13 +233,13 @@ public class MainActivity extends AppCompatActivity implements
 
         //Start the retained data fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
-        mDataFragment = (ReefLifeDataFragment) fragmentManager.findFragmentByTag(ReefLifeDataFragment.TAG);
+      /*  mDataFragment = (ReefLifeDataFragment) fragmentManager.findFragmentByTag(ReefLifeDataFragment.TAG);
         if( mDataFragment == null) {
             mDataFragment = new ReefLifeDataFragment();
             fragmentManager.beginTransaction()
                     .add(mDataFragment, ReefLifeDataFragment.TAG)
                     .commit();
-        } /*else { TODO not sure how this fragment behaves during a config change
+        }*/ /*else { TODO not sure how this fragment behaves during a config change
             mDataFragment.setTargetFragment(this, mDataFragment.getTargetRequestCode());
         }*/
 
@@ -307,9 +281,9 @@ public class MainActivity extends AppCompatActivity implements
         ((BottomSheet) findViewById(R.id.bottom_sheet)).clearView();//todo dont do this in onstop and onpause, probably
 
         super.onPause();
-        if(isFinishing()){ getSupportFragmentManager().beginTransaction()
+    /*    if(isFinishing()){ getSupportFragmentManager().beginTransaction()
                 .remove(mDataFragment).commit();
-        }
+        }*/
 
     }
 
@@ -415,11 +389,7 @@ public class MainActivity extends AppCompatActivity implements
 //        switch(id) {
 //            case R.id
 //        }
-
-        if (id == R.id.nav_home){
-            launchNewFragment(IntroViewPagerFragment.class);
-        }
-        else if (id == R.id.nav_card_view) {   // Handle the camera action
+        if (id == R.id.nav_card_view) {   // Handle the camera action
             //newFragment = new CardViewFragment();
             newFragment = CardViewFragment.newInstance(CardViewFragment.CardType.Fish, "");
             tag = CardViewFragment.TAG;
@@ -430,7 +400,6 @@ public class MainActivity extends AppCompatActivity implements
 //            getSupportActionBar().setSubtitle(subtitle);
             AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
             toolbar.setExpanded(true,true);
-            addSiteLocationsToToolbar();
 
             mFAB.show();
             launchUIFragment(newFragment, tag);
@@ -455,7 +424,8 @@ public class MainActivity extends AppCompatActivity implements
         } else if ( id == R.id.nav_about) {
             //todo create dialog box or floating context menu
             return true;
-
+        }
+/*
         } else if (id == R.id.nav_send) {
             newFragment = CardViewFragment.newInstance(CardViewFragment.CardType.Countries, "");
             tag = "CountryFragment"; //TODO refactor these tags. They should be public static final vars on fragment classes
@@ -467,8 +437,8 @@ public class MainActivity extends AppCompatActivity implements
             tag = "CountryListFragment"; //TODO refactor these tags. They should be public static final vars on fragment classes
             mFAB.hide();
             launchUIFragment(newFragment, tag);
+*/
 
-        }
 //
 //        } else if (id == R.id.nav_slideshow) {
 //
@@ -492,20 +462,7 @@ public class MainActivity extends AppCompatActivity implements
      * @param fragmentClass
      */
     public void launchNewFragment(Class fragmentClass){
-        if(fragmentClass == IntroViewPagerFragment.class){
-            String tag = IntroViewPagerFragment.TAG;
-            Fragment newFragment = getSupportFragmentManager().findFragmentByTag(tag);
-            if(newFragment == null) {
-                newFragment = IntroViewPagerFragment.newInstance();
-            }
-            mFAB.hide();
-            hideFABmenu();
-            mBottomSheetButton.setVisibility(View.GONE);
-            AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
-            toolbar.setExpanded(false,true);
-            launchUIFragment(newFragment, tag);
-        }
-        else if(fragmentClass == CardViewFragment.class){
+        if(fragmentClass == CardViewFragment.class){
             launchNewCardViewFragment("");
         }
         else if(fragmentClass == MapViewFragment.class){
@@ -539,34 +496,7 @@ public class MainActivity extends AppCompatActivity implements
                 .commit();
     }
 
-    /**
-     * Set the expandable toolbar buttons to include the site locations
-     * called when launching CardViewFragment
-     */
-    private void addSiteLocationsToToolbar() {
-        LinearLayout toolbar_layout = (LinearLayout) findViewById(R.id.toolbar_layout);
-        int offset=4;//TODO this is the number of buttons before the survey sites
-
-        //remove the previously added site buttons
-        int childCount = toolbar_layout.getChildCount()-offset;
-        if(childCount > 0) {
-            toolbar_layout.removeViews(offset, childCount);
-        }
-
-        int count = 0;
-        for(String siteCode : retrieveSurveySiteList().getSelectedSiteCodes()) {
-            ToggleButton siteButton = new ToggleButton(getBaseContext());
-            siteButton.setId(offset + count++);
-            siteButton.setTextOn(siteCode);
-            siteButton.setChecked(true); //default state true
-            siteButton.setTextOff("("+siteCode+")");
-            siteButton.setTag(siteCode); //store the site associated with this button
-            siteButton.setOnCheckedChangeListener(this);
-            toolbar_layout.addView(siteButton);
-        }
-    }
-
-    @Override
+  /*  @Override
     public SurveySiteList retrieveSurveySiteList(){
         return mDataFragment.getSurveySites();
     }
@@ -575,10 +505,10 @@ public class MainActivity extends AppCompatActivity implements
     public JSONObject retrieveFishSpecies() {
         return mDataFragment.getFishSpecies();
     }
-
-    @Override
+*/
+   /*  @Override
     public void onDataFragmentLoadFinished() {
-   /*     MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
+       MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
         if (mapFrag != null && mapFrag.isVisible()) {
             mapFrag.onDataFragmentLoadFinished();
         }*/
@@ -586,8 +516,8 @@ public class MainActivity extends AppCompatActivity implements
         /*CardViewFragment viewFragment = (CardViewFragment) getSupportFragmentManager().findFragmentByTag(CardViewFragment.TAG);
         if (viewFragment != null && viewFragment.isVisible()) {
             viewFragment.();
-        }*/
-    }
+        }
+    }*/
 
     //todo - launch activity - right now just the full screen quiz mode
     public void launchFullScreenQuizModeActivity(){
@@ -757,18 +687,6 @@ public class MainActivity extends AppCompatActivity implements
         if(bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
-
-        final TextView topText = (TextView) findViewById(R.id.bottom_sheet_top);
-        topText.setText(siteInfo.getDisplayName());
-        topText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //todo state_expanded or whole fullscreen view?
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
-            }
-        });
-
         final TextView launch_species = (TextView) findViewById(R.id.bottom_sheet_launch_species);
         launch_species.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -795,73 +713,26 @@ public class MainActivity extends AppCompatActivity implements
         });
         //if added to favs, set the fab to remove
 
+        ((BottomSheet) bottomSheet).loadNewSite(siteInfo);
+
+
         //show some info like num sites etc
 
-
-        final TextView bottomText = (TextView) findViewById(R.id.bottom_sheet_main_text);
-        if (mSurveySiteList == null) mSurveySiteList = this.retrieveSurveySiteList();
-
-        StringBuilder details = new StringBuilder();
-        details.append("Code (ID) : "+siteInfo.getCode()+" ("+siteInfo.getID()+")");
-        details.append("\n SiteName "+siteInfo.getSiteName());
-        details.append("\n EcoRegion "+siteInfo.getEcoRegion());
-        details.append("\n Realm "+siteInfo.getRealm());
-        details.append("\n Position: "+siteInfo.getPosition());
-        details.append("\n Num Surveys "+siteInfo.getNumberOfSurveys());
-        details.append("\n" + mSurveySiteList.codeList(siteInfo.getCode(), -1));
-        bottomText.setText(details.toString()); //todo
-        bottomText.setMovementMethod(new ScrollingMovementMethod());
-        bottomText.scrollTo(0,0);
-
-        //set up image carousel
-        //createImageCarousel(siteInfo);
-        ((BottomSheet) bottomSheet).setupImageSliders(siteInfo);
-    }
-
-    /**
-     * Show the bottom sheet with full details about the survey site
-     */
-    public void expandBottomSheet(@Nullable SurveySiteList.SurveySite siteInfo) {
-        //Set up the bottom sheet
-        View bottomSheet = findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        if (siteInfo == null) return; //todo coming from mainactivity fab 2
-
         final TextView topText = (TextView) findViewById(R.id.bottom_sheet_top);
-        final TextView bottomText = (TextView) findViewById(R.id.bottom_sheet_main_text);
-        if (mSurveySiteList == null) mSurveySiteList = this.retrieveSurveySiteList();
-        if ((bottomText == null) || (siteInfo == null) || (mSurveySiteList == null)) {
-            Log.e("jludden.reeflifesurvey", "MainActivity^expandBottomSheet something null: " + (bottomText == null) + (siteInfo == null) + (mSurveySiteList == null));
-            throw new NullPointerException("MainActivity^expandBottomSheet something null"); //todo error signature
-        }
+        topText.setText(siteInfo.getDisplayName());
+        topText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //todo state_expanded or whole fullscreen view?
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
-        //set up text fields
-        topText.setText(siteInfo.getEcoRegion());
-        StringBuilder details = new StringBuilder();
-        details.append("Code (ID) : "+siteInfo.getCode()+" ("+siteInfo.getID()+")");
-        details.append("\n SiteName "+siteInfo.getSiteName());
-        details.append("\n EcoRegion "+siteInfo.getEcoRegion());
-        details.append("\n Realm "+siteInfo.getRealm());
-        details.append("\n Position: "+siteInfo.getPosition());
-        details.append("\n Num Surveys "+siteInfo.getNumberOfSurveys());
-        details.append("\n" + mSurveySiteList.codeList(siteInfo.getCode(), -1));
-        bottomText.setText(details.toString()); //todo
-        bottomText.setMovementMethod(new ScrollingMovementMethod());
-        bottomText.scrollTo(0,0);
+            }
+        });
 
-        //set up image carousel
-//        createImageCarousel(siteInfo);
-        ((BottomSheet) bottomSheet).setupImageSliders(siteInfo);
     }
 
     public FloatingActionButton[] getFABmenu(){
         return mFABmenu;
-    }
-
-    @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
-        //TODO delete (old stuff from countrylist)
     }
 
     /**
@@ -979,16 +850,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             default: //handle survey site location button pressed
                 Log.d(TAG,"unhandled toggle button (#"+buttonView.getId()+") pressed: "+buttonView.getText());
-                if(buttonView.getTag() != null) {
-                    //SurveySiteList.SurveySite site = (SurveySiteList.SurveySite) buttonView.getTag();
-                    String siteCode = (String) buttonView.getTag();
-                    Log.d(TAG, "toggle button tag: " + siteCode + " is checked: " + buttonView.isChecked());
-                    if (buttonView.isChecked()) retrieveSurveySiteList().saveFavoriteSite(siteCode, getBaseContext()); //update saved sites in datafragment
-                    else retrieveSurveySiteList().removeFavoriteSite(siteCode, getBaseContext());
-                    if (viewFragment != null && viewFragment.isVisible()) { //reload card view fragment
-                        viewFragment.onLoadMore(true);
-                    }
-                }
 
         }
     }
@@ -1032,21 +893,5 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onImageSliderClick(@NotNull InfoCard.CardDetails card, @NotNull View sharedElement) {
         onFishDetailsRequested(card, sharedElement);
-    }
-}
-
-abstract class DataLoadedCallbacks implements DataRepository.LoadFishCardCallBack {
-    private static final String TAG = "MainActivity.data";
-
-    @Override
-    public void onFishCardLoaded(@NotNull InfoCard.CardDetails card) {
-        Log.d(TAG, "onFishCardLoaded: "+card.getId());
-
-
-    }
-
-    @Override
-    public void onDataNotAvailable(@NotNull String id) {
-        Log.d(TAG, "onDataNotAvailable: "+id);
     }
 }

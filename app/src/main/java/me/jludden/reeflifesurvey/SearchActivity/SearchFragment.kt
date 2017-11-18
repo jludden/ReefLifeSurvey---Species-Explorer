@@ -10,11 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.bumptech.glide.Glide
 import com.squareup.picasso.Picasso
 import me.jludden.reeflifesurvey.Data.SearchResult
 import kotlinx.android.synthetic.main.activity_search_results_item.view.*
-import me.jludden.reeflifesurvey.BrowseFish.DetailsViewFragment
+import me.jludden.reeflifesurvey.FishSpeciesCards.DetailsViewFragment
 import me.jludden.reeflifesurvey.R
 
 
@@ -84,6 +83,7 @@ class SearchFragment : Fragment(), SearchContract.View {
         (activity as SearchActivity).supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.search_results_container, DetailsViewFragment.newInstance(searchResult), DetailsViewFragment.TAG)
+                .addToBackStack(null)
                 .commit()
     }
 

@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey;
+package me.jludden.reeflifesurvey.SurveySiteMap;
 
 import android.content.Context;
 import android.graphics.Point;
@@ -21,6 +21,8 @@ import me.jludden.reeflifesurvey.Data.DataRepository;
 import me.jludden.reeflifesurvey.Data.SurveySiteList;
 import me.jludden.reeflifesurvey.Data.SurveySiteList.SurveySite;
 import me.jludden.reeflifesurvey.Data.SurveySiteType;
+import me.jludden.reeflifesurvey.MainActivity;
+import me.jludden.reeflifesurvey.R;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -85,9 +87,8 @@ public class MapViewFragment extends Fragment
     private ArrayList<Marker> mSelectedSiteList = new ArrayList<>(); //todo use static selected site list //todo save these preferences //11/16 TODO DELETE
     private FloatingActionButton mFAB;
     private FloatingActionButton[] mFABmenu;
-    private BottomSheetBehavior mBottomSheetBehavior;
 
-    public static final String TAG = "SurveySiteMap";
+    public static final String TAG = "MapViewFragment";
 
     //data retrieval from the retained, headless fragment
     private SurveySiteList mSurveySiteList;
@@ -96,8 +97,6 @@ public class MapViewFragment extends Fragment
 
     public interface MapViewFragmentInteractionListener{
         void peekBottomSheet(SurveySite siteInfo);
-
-        void expandBottomSheet(SurveySite siteInfo);
 
         FloatingActionButton getFloatingActionButton(); //// TODO: 9/14/2017
         //i would rather, instead of getting the whole button, pass back to the activity the two different actions:
@@ -117,24 +116,16 @@ public class MapViewFragment extends Fragment
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
-        String errMsg = "";
-
         DataRepository.Companion.getInstance(getContext().getApplicationContext())
                 .getSurveySites(SurveySiteType.CODES,this);
 
-        /*if(context instanceof ReefLifeDataFragment.ReefLifeDataRetrievalCallback){
-            mDataRetrievalCallback = (ReefLifeDataFragment.ReefLifeDataRetrievalCallback) context;
-        } else {
-            errMsg += context.toString() + "must implement" +
-                    ReefLifeDataFragment.ReefLifeDataRetrievalCallback.class.getName();
-        }*/
+        String errMsg = "";
         if(context instanceof MapViewFragmentInteractionListener){
             mMapViewFragmentInteractionListener = (MapViewFragmentInteractionListener) context;
         } else {
             errMsg += "\n" + context.toString() + "must implement" +
                     MapViewFragmentInteractionListener.class.getName();
         }
-
         if(errMsg.length() > 0){
             throw new ClassCastException(errMsg);
         }
@@ -143,11 +134,11 @@ public class MapViewFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("jludden.reeflifesurvey"  ,"map view fragment created");
+        Log.d(TAG  ,"map view fragment created");
 
         MainActivity main = (MainActivity) getActivity();
         //mFAB = main.getFAB(); //TODO
-        mFAB = mMapViewFragmentInteractionListener.getFloatingActionButton();
+//        mFAB = mMapViewFragmentInteractionListener.getFloatingActionButton();
        // mFAB = main.getFloatingActionButton();
 
         //make sure these are being cleaned up in onDestroy TODO
@@ -181,7 +172,7 @@ public class MapViewFragment extends Fragment
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        Log.d("jludden.reeflifesurvey"  , "MapViewFragment View Created. Has rootview: "+(rootView==null));
+        Log.d("jludden.reeflifesurvey"  , "MapViewFragment onCreateView. Has rootview: "+(rootView==null));
 
         if(rootView == null){
             rootView = inflater.inflate(R.layout.maps_view_fragment, null, false); //pass in viewgroup?
@@ -205,22 +196,22 @@ public class MapViewFragment extends Fragment
 //        mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(
 //                R.id.fragment_map)).getMapAsync(this);
 
-
-        View bottomSheet = getActivity().findViewById(R.id.bottom_sheet);
-        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
         return rootView;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "onViewCreated: ");
         if(mMap == null) {
             mMapView = (MapView) rootView.findViewById(R.id.fragment_map);
             mMapView.getMapAsync(this);
             mMapView.onCreate(getArguments());
         }
+        if(mFAB == null){
+            mFAB = mMapViewFragmentInteractionListener.getFloatingActionButton();
+        }
+
     }
 
     /**
@@ -272,8 +263,10 @@ public class MapViewFragment extends Fragment
         mSelectedMarker = null;
         mFAB.setImageResource(R.drawable.ic_add_white);
         //todo delete ic_add_location_black_24dp, ic_add_loc_2,
-
-        if(mBottomSheetBehavior.getState()==BottomSheetBehavior.STATE_EXPANDED)  mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        View bottomSheet = getActivity().findViewById(R.id.bottom_sheet);
+        BottomSheetBehavior<View> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        if(bottomSheetBehavior.getState()==BottomSheetBehavior.STATE_EXPANDED)
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         //hideFABmenu();
     }
 
@@ -285,20 +278,14 @@ public class MapViewFragment extends Fragment
             mSelectedMarker.setIcon((BitmapDescriptorFactory.defaultMarker(NORMAL_SITE_COLOR)));
         }
 
-        Log.v("ludden.reeflifesurvey" , "MapViewFragment onMarkerClick marker: "+ marker.toString());
+        Log.d("ludden.reeflifesurvey" , "MapViewFragment onMarkerClick marker: "+ marker.toString());
         mSelectedMarker = marker;
         mSelectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
         //hideFABmenu();
         mFAB.setImageResource(R.drawable.ic_fab_add_loc); //todo animate and change? //todo would a favorites star be a better icon?
 
-        //already showing info for a different marker - update bottom sheet contents
-        if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED){
-            mMapViewFragmentInteractionListener.expandBottomSheet((SurveySite) marker.getTag());
-            //((MainActivity) getActivity()).expandBottomSheet((SurveySite) marker.getTag());
-        }
-        else{
-            mMapViewFragmentInteractionListener.peekBottomSheet((SurveySite) marker.getTag());//todo only this
-        }
+        mMapViewFragmentInteractionListener.peekBottomSheet((SurveySite) marker.getTag());//todo only this
+
 
         //todo want to center the map, but it doesnt work so well
         //if the bottom sheet is hiding most of the map.
@@ -468,6 +455,8 @@ public class MapViewFragment extends Fragment
     public void onResume() {
         super.onResume();
 
+        Log.d(TAG, "onResume: ");
+
         //TODO - can move camera back to previous position, if necessary
         //   if(mPrevCameraPos != null) mMap.moveCamera(CameraUpdateFactory.newLatLng(mPrevCameraPos));
 
@@ -495,8 +484,8 @@ public class MapViewFragment extends Fragment
     public void onDestroyView() {
         Log.d("jludden.reeflifesurvey"  ,"map view fragment destroyed");
 
-        SupportMapFragment f = (SupportMapFragment) getFragmentManager()
-                .findFragmentById(R.id.fragment_map);
+        Fragment f = getFragmentManager()
+                .findFragmentByTag(MapViewFragment.TAG);
         if (f != null)
             getFragmentManager().beginTransaction().remove(f).commit();
 
@@ -506,7 +495,9 @@ public class MapViewFragment extends Fragment
     @Override
     public void onDetach() {
         super.onDetach();
+        mMapView = null;
         mMapViewFragmentInteractionListener = null;
+        mFAB = null;
     }
 
     @Override

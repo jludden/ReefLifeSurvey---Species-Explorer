@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.BrowseFish;
+package me.jludden.reeflifesurvey.FishSpeciesCards;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -20,7 +20,6 @@ import me.jludden.reeflifesurvey.Data.InfoCard;
 import me.jludden.reeflifesurvey.Data.SearchResult;
 import me.jludden.reeflifesurvey.Data.SearchResultType;
 import me.jludden.reeflifesurvey.R;
-import me.jludden.reeflifesurvey.ReefLifeDataFragment;
 
 /**
  * Created by Jason on 10/25/2017.
@@ -97,7 +96,17 @@ public class DetailsViewFragment extends Fragment implements DataRepository.Load
 
     }
 
+    @Override
+    public void onDestroyView() {
+        Log.d(TAG ,"Details view fragment destroyed");
 
+        DetailsViewFragment f = (DetailsViewFragment) getFragmentManager()
+                .findFragmentByTag(DetailsViewFragment.TAG);
+        if (f != null)
+            getFragmentManager().beginTransaction().remove(f).commit();
+
+        super.onDestroyView();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
