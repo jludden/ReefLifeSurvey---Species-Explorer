@@ -90,7 +90,7 @@ public class DetailsViewFragment extends Fragment implements DataRepository.Load
                 DataRepository.Companion.getInstance(getContext().getApplicationContext()).getFishCard(id, this);
             }
             else {
-                onDataNotAvailable(id);
+                onDataNotAvailable("");
             }
         }
 
@@ -100,10 +100,10 @@ public class DetailsViewFragment extends Fragment implements DataRepository.Load
     public void onDestroyView() {
         Log.d(TAG ,"Details view fragment destroyed");
 
-        DetailsViewFragment f = (DetailsViewFragment) getFragmentManager()
+/*        DetailsViewFragment f = (DetailsViewFragment) getFragmentManager()
                 .findFragmentByTag(DetailsViewFragment.TAG);
         if (f != null)
-            getFragmentManager().beginTransaction().remove(f).commit();
+            getFragmentManager().beginTransaction().remove(f).commit();*/
 
         super.onDestroyView();
     }

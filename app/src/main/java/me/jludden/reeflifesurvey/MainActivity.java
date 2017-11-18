@@ -23,9 +23,6 @@ import android.transition.Fade;
 import android.transition.TransitionSet;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -80,13 +77,34 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+//        setContentView(R.layout.activity_main);
+        setContentView(R.layout.app_bar_main);
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar); //todo could this be the collapsing toolbar?
+
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 //This will set Expanded text to transparent so it wount overlap the content of the toolbar
         collapsingToolbar.setExpandedTitleColor(Color.parseColor("#00FF0000"));//ContextCompat.getColor(this, R.color.transparent));
+
+       // getSupportActionBar().setDisplayHomeAsUpEnabled(true); //todo testing
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+
+        getSupportFragmentManager().addOnBackStackChangedListener(
+            new FragmentManager.OnBackStackChangedListener() {
+                @Override
+                public void onBackStackChanged() {
+                    if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(true); // show back button
+                    } else {
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                    }
+                }
+        });
+
+
         //  collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.black_semi_transparent));
 
 ////        CoordinatorLayout.LayoutParams params =(CoordinatorLayout.LayoutParams) collapsingToolbar.getLayoutParams();
@@ -222,39 +240,17 @@ public class MainActivity extends AppCompatActivity implements
         });
         //bottomSheet.addTouchables();
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+ /*       DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        //Start the retained data fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-      /*  mDataFragment = (ReefLifeDataFragment) fragmentManager.findFragmentByTag(ReefLifeDataFragment.TAG);
-        if( mDataFragment == null) {
-            mDataFragment = new ReefLifeDataFragment();
-            fragmentManager.beginTransaction()
-                    .add(mDataFragment, ReefLifeDataFragment.TAG)
-                    .commit();
-        }*/ /*else { TODO not sure how this fragment behaves during a config change
-            mDataFragment.setTargetFragment(this, mDataFragment.getTargetRequestCode());
-        }*/
-
-//
-//        SupportMapFragment mapFragment  = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(
-//                R.id.fragment_map));
-//        mapFragment.getMapAsync(this);
-
+        navigationView.setNavigationItemSelectedListener(this);*/
 
         //start the home fragment
         hideClutter();
-        // Old, disgusting home fragment
-        // launchUIFragment(new IntroViewPagerFragment(), IntroViewPagerFragment.TAG);
-
-
         launchUIFragment(new HomeFragment(), HomeFragment.TAG);
     }
 
@@ -264,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
-    @Override
+   /* @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -272,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             super.onBackPressed();
         }
-    }
+    }*/
 
     @Override
     protected void onPause(){
@@ -358,11 +354,21 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.settings_opt_hide_menus:
                 hideClutter();
                 return true;
+            case android.R.id.home: //todo support back button in action bar
+                Log.d(TAG,"HOME OPTION SELECTED ");
+                hideClutter();
+                onBackPressed();
+                // Navigate to parent activity
+                // NavUtils.navigateUpFromSameTask(this);
+                return true;
+
 
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -451,8 +457,8 @@ public class MainActivity extends AppCompatActivity implements
 //        }
 
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+ /*       DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);*/
 
         return true;
     }
@@ -491,6 +497,8 @@ public class MainActivity extends AppCompatActivity implements
     private void launchUIFragment(Fragment newFragment, String tag) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
+                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
+                        R.anim.enter_from_left, R.anim.exit_to_right)
                 .replace(R.id.content_frame, newFragment, tag)
                 .addToBackStack(null)
                 .commit();
@@ -778,12 +786,19 @@ public class MainActivity extends AppCompatActivity implements
                 addTransition(new ChangeImageTransform());
             }
         });
+
+
+
+        //launchUIFragment(newFragment, tag);
+
+        //todo make it enter from right as well
+        //      .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
+        //R.anim.enter_from_left, R.anim.exit_to_right)
         newFragment.setEnterTransition(new Fade());
         newFragment.setExitTransition(new Fade());
         newFragment.setSharedElementReturnTransition(new CircularReveal());
 
 
-        //launchUIFragment(newFragment, tag);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager
