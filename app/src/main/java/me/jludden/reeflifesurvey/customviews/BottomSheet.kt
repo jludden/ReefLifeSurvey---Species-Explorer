@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.InterfaceComponents
+package me.jludden.reeflifesurvey.customviews
 
 import android.content.Context
 import android.text.method.ScrollingMovementMethod
@@ -10,9 +10,9 @@ import android.widget.LinearLayout
 import com.daimajia.slider.library.SliderLayout
 import com.daimajia.slider.library.SliderTypes.BaseSliderView
 import com.daimajia.slider.library.SliderTypes.TextSliderView
-import me.jludden.reeflifesurvey.Data.DataRepository.*
+import me.jludden.reeflifesurvey.data.DataRepository.*
 import kotlinx.android.synthetic.main.bottom_sheet.view.*
-import me.jludden.reeflifesurvey.Data.*
+import me.jludden.reeflifesurvey.data.*
 import me.jludden.reeflifesurvey.R
 
 /**
@@ -57,6 +57,7 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
         //TODO setup onclick listeners, etc
 
         bottom_sheet_main_text.movementMethod = ScrollingMovementMethod()
+
     }
 
     /**
@@ -81,17 +82,25 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
         surveySiteList ?: return
 
         val details = StringBuilder()
-        details.append("Code (ID) : " + siteInfo.getCode() + " (" + siteInfo.getID() + ")")
+        val code = siteInfo.code
+        var indivSites = surveySiteList?.getSitesForCode(code)
+        details.append("Code (ID) : " + code + " (" + siteInfo.getID() + ")")
         details.append("\n SiteName " + siteInfo.getSiteName())
         details.append("\n EcoRegion " + siteInfo.getEcoRegion())
         details.append("\n Realm " + siteInfo.getRealm())
         details.append("\n Position: " + siteInfo.getPosition())
         details.append("\n Num Surveys " + siteInfo.getNumberOfSurveys())
-        details.append("\n" + surveySiteList?.codeList(siteInfo.getCode(), -1))
+        details.append("\n" + getCodeList(indivSites!!))
 
         bottom_sheet_main_text.text = details
         bottom_sheet_main_text.scrollTo(0, 0)
 
+        bottom_sheet_number_surveys.text = resources.getString(
+                R.string.bottom_sheet_total_surveys,
+                getTotalSurveysForCode(indivSites),
+                indivSites.size)
+
+        //"${surveySiteList?.getTotalSurveysForCode(code)} Surveys"
     }
 
     //creates a TextSliderView (a fish preview image, with description and onclick listener) that can be added to a SliderLayout (an image carousel of fish previews)
@@ -100,11 +109,14 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
         val textSliderView = TextSliderView(context)
         textSliderView
                 .description(name)
-                .image(card.primaryImageURL)
                 .setScaleType(BaseSliderView.ScaleType.Fit)
                 .setOnSliderClickListener {
                     interactionListener.onImageSliderClick(card, textSliderView.view)
                 }
+
+        if(card.primaryImageURL == "") textSliderView.image(R.drawable.ic_menu_camera)
+        else textSliderView.image(card.primaryImageURL)
+
         imageSliders.addSlider(textSliderView);
     }
 
@@ -141,5 +153,29 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
     interface OnBottomSheetInteractionListener {
         fun onImageSliderClick(card: InfoCard.CardDetails, sharedElement: View)
     }
+
+    //todo combine these loops
+    //possibly destructured syntax https://kotlinlang.org/docs/reference/multi-declarations.html
+    fun getCodeList(siteList: List<SurveySiteList.SurveySite>): String { //todo change len to charlen instead of numsites
+        val nameBuilder = StringBuilder().append(siteList!!.size).append(": ")
+
+        var iterCount = 0
+        for (tSite in siteList!!) {
+            nameBuilder.append(tSite.getSiteName() + ", ")
+        }
+
+        nameBuilder.delete(nameBuilder.length - 2, nameBuilder.length) //remove trailing comma
+
+        return nameBuilder.toString()
+    }
+
+    fun getTotalSurveysForCode(siteList: List<SurveySiteList.SurveySite>): Int {
+        var numSurveys = 0
+        for (site in siteList) {
+            numSurveys += site.getNumberOfSurveys()
+        }
+        return numSurveys
+    }
+
 
 }

@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.SurveySiteMap;
+package me.jludden.reeflifesurvey.mapsites;
 
 import android.content.Context;
 import android.graphics.Point;
@@ -17,10 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 
-import me.jludden.reeflifesurvey.Data.DataRepository;
-import me.jludden.reeflifesurvey.Data.SurveySiteList;
-import me.jludden.reeflifesurvey.Data.SurveySiteList.SurveySite;
-import me.jludden.reeflifesurvey.Data.SurveySiteType;
+import me.jludden.reeflifesurvey.data.DataRepository;
+import me.jludden.reeflifesurvey.data.SurveySiteList;
+import me.jludden.reeflifesurvey.data.SurveySiteList.SurveySite;
+import me.jludden.reeflifesurvey.data.SurveySiteType;
 import me.jludden.reeflifesurvey.MainActivity;
 import me.jludden.reeflifesurvey.R;
 
@@ -30,7 +30,6 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 //import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.Projection;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -75,8 +74,10 @@ public class MapViewFragment extends Fragment
             GoogleMap.OnMarkerClickListener,
             DataRepository.LoadSurveySitesCallBack {
 
-    private static final float FAVORITED_SITE_COLOR = BitmapDescriptorFactory.HUE_AZURE;
-    private static final float NORMAL_SITE_COLOR = BitmapDescriptorFactory.HUE_RED;
+//    private static final float FAVORITED_SITE_COLOR = BitmapDescriptorFactory.HUE_AZURE;
+//    private static final float NORMAL_SITE_COLOR = BitmapDescriptorFactory.HUE_ROSE;
+    private static final float FAVORITED_SITE_COLOR = BitmapDescriptorFactory.HUE_RED;
+    private static final float NORMAL_SITE_COLOR = BitmapDescriptorFactory.HUE_AZURE;
 
     private MapViewFragment mapFragment; //todo just use fragment manager
     View rootView;
@@ -282,7 +283,13 @@ public class MapViewFragment extends Fragment
         mSelectedMarker = marker;
         mSelectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
         //hideFABmenu();
-        mFAB.setImageResource(R.drawable.ic_fab_add_loc); //todo animate and change? //todo would a favorites star be a better icon?
+
+        //mFAB.setImageResource(R.drawable.ic_fab_add_loc); //todo animate and change? //todo would a favorites star be a better icon?
+        mFAB.setImageResource(R.drawable.ic_favorites_heart_filled_two);
+
+//        mFAB.setImageResource(R.drawable.ic_favorite_heart_filled);
+//        mFAB.setImageResource(R.drawable.ic_favorite_heart_outline);
+//        mFAB.setImageResource(R.drawable.ic_star_selected);
 
         mMapViewFragmentInteractionListener.peekBottomSheet((SurveySite) marker.getTag());//todo only this
 
@@ -417,12 +424,8 @@ public class MapViewFragment extends Fragment
         //Add Survey Sites to Map
         for(SurveySite site : mSurveySiteList.SITE_CODE_LIST) {
             LatLng pos = site.getPosition();
-            //String realm = site.getRealm();
-            String ecoRegion = site.getEcoRegion();
-            //String name = site.getSiteName(); //just the name of one site...
-            String summary = mSurveySiteList.codeSummary(site.getCode());
 
-            float color = BitmapDescriptorFactory.HUE_RED; //todo make it a final field
+            float color = NORMAL_SITE_COLOR;
             if(mSurveySiteList.getSelectedSiteCodes().contains(site.getCode())) { //already favorited so set the color!
                 color = FAVORITED_SITE_COLOR;
             }
@@ -483,11 +486,12 @@ public class MapViewFragment extends Fragment
     @Override
     public void onDestroyView() {
         Log.d("jludden.reeflifesurvey"  ,"map view fragment destroyed");
-
+/*
         Fragment f = getFragmentManager()
                 .findFragmentByTag(MapViewFragment.TAG);
         if (f != null)
             getFragmentManager().beginTransaction().remove(f).commit();
+*/
 
         super.onDestroyView();
     }

@@ -39,16 +39,16 @@ import android.widget.ToggleButton;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
-import me.jludden.reeflifesurvey.FishSpeciesCards.CardViewFragment;
-import me.jludden.reeflifesurvey.FishSpeciesCards.CardViewFragment.CardViewSettings;
+import me.jludden.reeflifesurvey.fishcards.CardViewFragment;
+import me.jludden.reeflifesurvey.fishcards.CardViewFragment.CardViewSettings;
 
-import me.jludden.reeflifesurvey.FishSpeciesCards.DetailsViewFragment;
-import me.jludden.reeflifesurvey.FullScreenImageActivity.FullScreenImageActivity;
-import me.jludden.reeflifesurvey.Data.InfoCard;
-import me.jludden.reeflifesurvey.InterfaceComponents.BottomSheet;
-import me.jludden.reeflifesurvey.SearchActivity.SearchActivity;
-import me.jludden.reeflifesurvey.Data.SurveySiteList;
-import me.jludden.reeflifesurvey.SurveySiteMap.MapViewFragment;
+import me.jludden.reeflifesurvey.fishcards.DetailsViewFragment;
+import me.jludden.reeflifesurvey.fullscreenquiz.FullScreenImageActivity;
+import me.jludden.reeflifesurvey.data.InfoCard;
+import me.jludden.reeflifesurvey.customviews.BottomSheet;
+import me.jludden.reeflifesurvey.search.SearchActivity;
+import me.jludden.reeflifesurvey.data.SurveySiteList;
+import me.jludden.reeflifesurvey.mapsites.MapViewFragment;
 import me.jludden.reeflifesurvey.transitions.CircularReveal;
 import org.jetbrains.annotations.NotNull;
 
@@ -209,10 +209,7 @@ public class MainActivity extends AppCompatActivity implements
         //Set up the bottom sheet
         BottomSheet bottomSheet = (BottomSheet) findViewById(R.id.bottom_sheet);
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        //bottomSheet.set
-
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        //bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             /**
              * Called when the bottom sheet changes its state.

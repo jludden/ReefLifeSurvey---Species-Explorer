@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.InterfaceComponents;
+package me.jludden.reeflifesurvey.customviews;
 
 /**
  *               DO WHAT YOU WANT TO PUBLIC LICENSE
@@ -36,7 +36,10 @@ import android.widget.TextView;
 public class AutoResizeTextView extends AppCompatTextView {
 
     // Minimum text size for this text view
-    public static final float MIN_TEXT_SIZE = 20;
+    public static final float MIN_TEXT_SIZE = 10;
+
+    // Maximum text size for this text view
+    public static final float MAX_TEXT_SIZE = 116;
 
     // Interface for resize notifications
     public interface OnTextResizeListener {
@@ -56,7 +59,7 @@ public class AutoResizeTextView extends AppCompatTextView {
     private float mTextSize;
 
     // Temporary upper bounds on the starting text size
-    private float mMaxTextSize = 0;
+    private float mMaxTextSize = MAX_TEXT_SIZE;
 
     // Lower bounds for text size
     private float mMinTextSize = MIN_TEXT_SIZE;
@@ -94,6 +97,7 @@ public class AutoResizeTextView extends AppCompatTextView {
         mNeedsResize = true;
         // Since this view may be reused, it is good to reset the text size
         resetTextSize();
+        resizeText();
     }
 
     /**
@@ -105,6 +109,13 @@ public class AutoResizeTextView extends AppCompatTextView {
             mNeedsResize = true;
         }
     }
+
+/*    @Override
+    protected void onMeasure(int wMeasureSpec, int hMeasureSpec) {
+        super.onMeasure(wMeasureSpec, hMeasureSpec);
+        mNeedsResize = true;
+        resetTextSize();
+    }*/
 
     /**
      * Register listener to receive resize notifications
@@ -200,7 +211,8 @@ public class AutoResizeTextView extends AppCompatTextView {
     public void resetTextSize() {
         if (mTextSize > 0) {
             super.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
-            mMaxTextSize = mTextSize;
+            //mMaxTextSize = mTextSize;
+            mTextSize = mMaxTextSize;
         }
     }
 
