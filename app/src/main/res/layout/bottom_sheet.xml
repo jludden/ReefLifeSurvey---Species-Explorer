@@ -63,7 +63,7 @@
             android:drawableLeft="@drawable/ic_view_in_list"
             android:gravity="center_vertical"
             android:paddingRight="5dp"
-            android:text="Browse"
+            android:text="@string/bottom_sheet_secondary_button_browse"
             android:textAlignment="center"
             android:textColor="@color/white" />
 

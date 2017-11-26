@@ -39,8 +39,8 @@
         android:layout_height="?android:actionBarSize"
         android:outlineProvider="bounds"
         android:elevation="@dimen/z_app_bar"
-        android:transitionGroup="false">
-        <!--android:theme="@style/SearchViewTheme">-->
+        android:transitionGroup="false"
+        android:theme="@style/SearchViewTheme">
 
         <View
             android:id="@+id/search_background"
@@ -106,7 +106,20 @@
             android:indeterminate="true"
             android:indeterminateTint="?android:colorAccent"
             android:indeterminateTintMode="src_in" />
+        -->
+        <!-- Include the bottom sheet -->
+   <!--     <me.jludden.reeflifesurvey.InterfaceComponents.BottomSheet
+            android:id="@+id/bottom_sheet"
+            android:layout_width="match_parent"
+            android:layout_height="450dp"
+            android:background="@android:color/darker_gray"
+            android:orientation="vertical"
+            app:behavior_hideable="true"
+            app:behavior_peekHeight="90dp"
+            app:layout_behavior="android.support.design.widget.BottomSheetBehavior"/>-->
 
+
+        <!--
         <ViewStub
             android:id="@+id/stub_no_search_results"
             android:layout_width="match_parent"

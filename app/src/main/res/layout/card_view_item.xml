@@ -51,16 +51,23 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/card_image"
+            android:minLines="1"
+            android:maxLines="3"
+            android:paddingEnd="30dp"
+            android:paddingStart="30dp"
             android:padding="16dp"/>
 
         <CheckBox
             android:id="@+id/favorite_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/info_text"
+            android:layout_alignBottom="@+id/info_text"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/card_image"
-            android:button="@drawable/ic_star_border" />
+            android:button="@drawable/ic_favorite_heart_outline"
+            android:paddingEnd="8dp"
+            android:paddingStart="2dp"
+            android:paddingTop="12dp" />
 
     </RelativeLayout>
 

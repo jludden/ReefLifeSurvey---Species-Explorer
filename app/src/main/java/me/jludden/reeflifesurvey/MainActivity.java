@@ -31,6 +31,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -124,6 +125,14 @@ public class MainActivity extends AppCompatActivity implements
 
 //Set the color of collapsed toolbar text
      //   collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
+
+        Button quizButton = (Button) findViewById(R.id.toolbar_button_quiz);
+        quizButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchFullScreenQuizModeActivity();
+            }
+        });
 
         ToggleButton mToolbarButton_starred = (ToggleButton) findViewById(R.id.toolbar_button_starred);
         mToolbarButton_starred.setOnCheckedChangeListener(this);
@@ -404,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements
             AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
             toolbar.setExpanded(true,true);
 
-            mFAB.show();
+            //mFAB.show();
             launchUIFragment(newFragment, tag);
 
         } else if (id == R.id.nav_map_view) {
@@ -481,7 +490,7 @@ public class MainActivity extends AppCompatActivity implements
             mBottomSheetButton.setVisibility(View.VISIBLE);
             AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
             toolbar.setExpanded(false,true);
-            launchUIFragment(newFragment, tag);
+            launchUIFragment(newFragment, tag); //todo make it so there aren't multiple map fragments on the backstack
         }
     }
 
@@ -563,14 +572,18 @@ public class MainActivity extends AppCompatActivity implements
      *
      * @return true if the menu will be shown
      *      false if the menu is already shown
+     *
+     *      TODO disabling button
      */
     public boolean showFABmenu() {
+        return false;
+        /*
         if(!mFabMenuVisible){
             mFabMenuVisible = true;
             animateFAB(mFABmenu, true);
             return true;
         }
-        else return false;
+        else return false;*/
     }
 
     /**
@@ -705,13 +718,15 @@ public class MainActivity extends AppCompatActivity implements
                     Log.d(TAG, "Bottom Sheet TEST1 PASSED");
                     mBottomSheetButton.setVisibility(View.VISIBLE);
                     launch_species.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_view_in_list, 0, 0, 0);
+                    launch_species.setText(R.string.bottom_sheet_secondary_button_browse);
                     launchUIFragment(mapFrag, MapViewFragment.TAG);
                 } else if (mapFrag != null) { //launch browse fish details for this site
                     //AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
                     //toolbar.setExpanded(true,true);
                     //addSiteLocationsToToolbar();
-                    mFAB.show();
-                    launch_species.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_survey_site_icon_todo, 0, 0, 0);
+                    //mFAB.show();
+                    launch_species.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_open_in_map, 0, 0, 0);
+                    launch_species.setText(R.string.bottom_sheet_secondary_button_map);
                     launchNewCardViewFragment(siteInfo.getCode());
                 }
             }

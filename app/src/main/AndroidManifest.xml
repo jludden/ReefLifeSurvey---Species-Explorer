@@ -40,7 +40,7 @@
 
         <!--http://www.androidhive.info/2013/09/android-fullscreen-image-slider-with-swipe-and-pinch-zoom-gestures/-->
         <activity
-            android:name="me.jludden.reeflifesurvey.FullScreenImageActivity.FullScreenImageActivity"
+            android:name="me.jludden.reeflifesurvey.fullscreenquiz.FullScreenImageActivity"
             android:parentActivityName="me.jludden.reeflifesurvey.MainActivity"
             android:theme="@android:style/Theme.Holo.NoActionBar">
             <!--<intent-filter>-->
@@ -50,10 +50,17 @@
         </activity>
 
         <activity
-            android:name=".SearchActivity.SearchActivity"
+            android:name=".search.SearchActivity"
             android:parentActivityName="me.jludden.reeflifesurvey.MainActivity"
             android:theme="@style/Search">
         </activity>
+
+        <activity
+            android:name=".detailed.DetailsActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+
     </application>
 
 </manifest>

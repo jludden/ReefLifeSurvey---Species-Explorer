@@ -34,4 +34,9 @@
         <item name="android:windowExitAnimation">@anim/fade_out_rapidly</item>
     </style>
 
+    <style name="SearchViewTheme">
+        <item name="android:editTextColor">@android:color/white</item>
+        <item name="android:textColorHint">@android:color/white</item>
+    </style>
+
 </resources>
