@@ -17,7 +17,7 @@
         android:gravity="bottom|center_horizontal"
         android:orientation="horizontal"
         android:background="@color/background_dark"
-        android:alpha="0.5"
+        android:alpha="0.6"
         android:weightSum="1">
 
         <!--flat:-->
@@ -30,6 +30,12 @@
             android:text="Browse Species"
             android:theme="@style/IntroButtons"
             android:layout_weight=".5"/>
+
+        <View
+            android:layout_width="5dp"
+            android:layout_height="match_parent"
+            android:background="?android:attr/listDivider"
+            />
 
         <Button
             android:layout_height="wrap_content"
