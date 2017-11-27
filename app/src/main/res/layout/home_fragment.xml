@@ -12,17 +12,21 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:gravity="bottom|center_horizontal"
         android:orientation="horizontal"
+        android:background="@color/background_dark"
+        android:alpha="0.5"
         android:weightSum="1">
 
+        <!--flat:-->
+        <!--style="?android:attr/borderlessButtonStyle"-->
         <Button
             android:layout_height="wrap_content"
             android:layout_width="0dp"
-
-            android:id="@+id/button_launch_browse_species"
             style="?android:attr/borderlessButtonStyle"
+            android:id="@+id/button_launch_browse_species"
             android:text="Browse Species"
             android:theme="@style/IntroButtons"
             android:layout_weight=".5"/>
@@ -30,10 +34,9 @@
         <Button
             android:layout_height="wrap_content"
             android:layout_width="0dp"
-
+            style="?android:attr/borderlessButtonStyle"
             android:id="@+id/button_launch_select_sites"
             android:theme="@style/IntroButtons"
-            style="?android:attr/borderlessButtonStyle"
             android:text="Select Reefs"
             android:layout_weight=".5"/>
 
