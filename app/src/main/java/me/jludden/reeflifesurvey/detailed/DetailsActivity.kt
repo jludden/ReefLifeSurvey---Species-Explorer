@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import com.bumptech.glide.Glide
@@ -57,106 +58,101 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
 
             }
         }
+
+
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true) // show back button
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.getItemId()
+        if (id == android.R.id.home) {
+            onBackPressed()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 
-
     fun setupFishDetails(card: InfoCard.CardDetails) {
-         val imageView = findViewById(R.id.details_image_main) as ImageView
+        val mainImageView = findViewById(R.id.details_image_main) as ImageView
         val textView = findViewById(R.id.details_text) as TextView
-      //  SliderLayout imageCarousel = (SliderLayout) findViewById(R.id.details_image_carousel);
         val favoriteBtn = findViewById(R.id.favorite_btn) as CheckBox //star to favorite the fish
         val linkBtn = findViewById(R.id.link_btn) as ImageButton
 
 
-            //set up favorites star button
-            setUpFavoritesButton(card, favoriteBtn, this)
+        //set up favorites star button
+        setUpFavoritesButton(card, favoriteBtn, this)
 
 
-           /* glide
-                .load(card.imageURL)
-                .into(imageView);*/
+       /* glide
+            .load(card.imageURL)
+            .into(mainImageView);*/
 
-            val newText = StringBuilder(
-                    card.cardName + "\n" +
-                    card.commonNames + "\n" +
-                    "Num sightings " + card.numSightings + "\n" +
-                    "Found in " + card.FoundInSites.size() + " sites" + "\n" +
-                    "Number images: " + card.imageURLs.size + "\n")
+        val newText = StringBuilder(
+                card.cardName + "\n" +
+                card.commonNames + "\n" +
+                "Num sightings " + card.numSightings + "\n" +
+                "Found in " + card.FoundInSites.size() + " sites" + "\n" +
+                "Number images: " + card.imageURLs.size + "\n")
 
-            val siteKeys = card.FoundInSites.keys()
-            var site: SurveySiteList.SurveySite
-            while (siteKeys.hasMoreElements())
-            {
-                site = siteKeys.nextElement()
+        val siteKeys = card.FoundInSites.keys()
+        var site: SurveySiteList.SurveySite
+        while (siteKeys.hasMoreElements())
+        {
+            site = siteKeys.nextElement()
 
-                val numSightings = card.FoundInSites.get(site)
-                newText.append("\n" + site.siteName + "\t" + numSightings)
-            }
+            val numSightings = card.FoundInSites.get(site)
+            newText.append("\n" + site.siteName + "\t" + numSightings)
+        }
 
-            if (card.imageURLs != null && card.imageURLs.size >= 1)
-            {
-                imageView.loadURL(card.imageURLs.get(0))
-            }
+        if (card.imageURLs != null && card.imageURLs.size >= 1)
+        {
+            mainImageView.loadURL(card.imageURLs.get(0))
+        }
 
-          /*  imageCarousel.stopAutoCycle();
-            if (card.imageURLs == null) {
-                Log.d(TAG, "DetailsviewAdapter card details no images to load");
-                newText.append("\n No Images Found");
-//                imageCarousel.setVisibility(View.INVISIBLE);
-            } else {
-                for (String url : card.imageURLs) {
-                    DefaultSliderView sliderView = new DefaultSliderView(container.getContext());
-                    sliderView
-                            .image(url)
-                            .setScaleType(BaseSliderView.ScaleType.Fit);
-                    imageCarousel.addSlider(sliderView);
-                }
-            }*//*
 
-            val additionalImages = viewLayout.findViewById(R.id.details_additional_images) as LinearLayout
-            if (card.imageURLs == null)
-            {
+        val additionalImages = findViewById(R.id.details_additional_images) as LinearLayout
+        if (card.imageURLs == null)
+        {
             Log.d(TAG, "DetailsviewAdapter card details no images to load")
             newText.append("\n No Images Found")
-             //                imageCarousel.setVisibility(View.INVISIBLE);
-                        }
-            else
-            {
-            for (url in card.imageURLs)
-            {
-            val iv = ImageView(mDetailsViewFragment.getContext())
+        }
+        else
+        {
+            for (url in card.imageURLs) {
+                val iv = ImageView(this)
                 iv.layoutParams = LinearLayout.LayoutParams(250, 250)
 
                 //todo really shouldnt make a new one for each item
-                                iv.setOnClickListener {
-                                    Picasso.with(mDetailsViewFragment.getContext())
-                                            .load(url)
-                                            .placeholder(imageView.drawable) //placeholder = current image, to minimize gap
-                                            .into(imageView)
-                                }
-
-                Picasso.with(mDetailsViewFragment.getContext())
-            .load(url)
-            .placeholder(R.drawable.ic_menu_camera)
-            .into(iv)
-            iv.setPadding(0, 0, 0, 5)
-            additionalImages.addView(iv)
-            }
-            }
-
-
-            newText.append("\n").append("SPECIES PAGE URL: ").append(card.reefLifeSurveyURL)
-
-            textView.setText(newText.toString())
-
-            linkBtn.setOnClickListener {
-                val url = card.reefLifeSurveyURL
-                if (url.startsWith("http://") || url.startsWith("https://")) {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                    mDetailsViewFragment.getActivity().startActivity(intent)
+                iv.setOnClickListener {
+                    Picasso.with(this)
+                            .load(url)
+                            .placeholder(mainImageView.drawable) //placeholder = current image, to minimize gap
+                            .into(mainImageView)
                 }
-            }*/
+
+                Picasso.with(this)
+                    .load(url)
+                    .placeholder(R.drawable.ic_menu_camera)
+                    .into(iv)
+                iv.setPadding(0, 0, 0, 5)
+                additionalImages.addView(iv)
+            }
+        }
+
+
+        newText.append("\n").append("SPECIES PAGE URL: ").append(card.reefLifeSurveyURL)
+
+        textView.setText(newText.toString())
+
+        linkBtn.setOnClickListener {
+            val url = card.reefLifeSurveyURL
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                startActivity(intent)
+            }
+        }
 
         }
 

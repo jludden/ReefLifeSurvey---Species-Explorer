@@ -5,7 +5,9 @@
     android:layout_height="match_parent">
 
     <include layout="@layout/details_view_pager_item" />
-<!--
+
+
+    <!--
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
@@ -14,12 +16,7 @@
         />-->
 
     <!--<include layout="@layout/bottom_sheet" />-->
-
-    <!-- Include the hidden-by-default floating button menu -->
-    <!-- TODO it apppears putting this over the bottom sheet-->
-    <!-- will make the Map intercept the bottom sheet's touch events-->
-
-    <!-- Include the bottom sheet -->
+        <!-- Include the bottom sheet -->
   <!--  <me.jludden.reeflifesurvey.customviews.BottomSheet
         android:visibility="gone"
         android:id="@+id/bottom_sheet"

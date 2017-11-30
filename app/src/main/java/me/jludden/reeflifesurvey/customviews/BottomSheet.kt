@@ -157,10 +157,10 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
     //todo combine these loops
     //possibly destructured syntax https://kotlinlang.org/docs/reference/multi-declarations.html
     fun getCodeList(siteList: List<SurveySiteList.SurveySite>): String { //todo change len to charlen instead of numsites
-        val nameBuilder = StringBuilder().append(siteList!!.size).append(": ")
+        val nameBuilder = StringBuilder().append(siteList.size).append(": ")
 
         var iterCount = 0
-        for (tSite in siteList!!) {
+        for (tSite in siteList) {
             nameBuilder.append(tSite.getSiteName() + ", ")
         }
 

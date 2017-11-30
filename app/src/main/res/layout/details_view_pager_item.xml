@@ -21,7 +21,7 @@
         android:transitionName="transition_search_back"/>
 -->
 
-    <!--linear layout or grid layout (TODO) to show additional images-->
+    <!--layout to show additional images-->
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
