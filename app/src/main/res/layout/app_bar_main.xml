@@ -35,9 +35,8 @@
                <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="100dp"
-
                     app:srcCompat="@color/colorPrimary" />
-                    <!--app:srcCompat="@android:drawable/sym_def_app_icon" />-->
+                <!--app:srcCompat="@drawable/rls_logo_horizontal"/>-->
 
                 <include layout="@layout/app_bar_tools" />
 

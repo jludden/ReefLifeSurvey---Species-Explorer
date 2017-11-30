@@ -109,9 +109,8 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         if(holder instanceof HeaderViewHolder) {
             final HeaderViewHolder vhHeader = (HeaderViewHolder) holder;
-          /*  if(getItemCount() <= 1) {
-                vhHeader.mContentView.setText("No items loaded");
-            }*/
+            String headerText = (getItemCount() <= 1) ? "No items loaded" : "";
+            vhHeader.mContentView.setText(headerText);
         }
         //todo clean this mess up
         else if(holder instanceof FishCardViewHolder) {
@@ -418,7 +417,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             super(view);
             mView = view;
             // mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.info_text);
+            mContentView = (TextView) view.findViewById(R.id.header_text);
         }
     }
 

@@ -4,14 +4,20 @@
     android:layout_height="75dp"
     android:background="@color/white"
     android:orientation="horizontal"
-    android:visibility="visible"/>
+    android:visibility="visible">
 <!--todo currently doing this whole thing just for a little extra padding?-->
 
-    <!--<TextView-->
-        <!--android:id="@+id/info_text"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:padding="16dp"/>-->
+
+
+    <TextView
+        android:id="@+id/header_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_gravity="center"
+        android:padding="16dp"/>
+
+    </LinearLayout>
 
     <!--<ImageView-->
     <!--android:id="@+id/menu_icon"-->

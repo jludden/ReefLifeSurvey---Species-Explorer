@@ -93,8 +93,7 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
                 card.cardName + "\n" +
                 card.commonNames + "\n" +
                 "Num sightings " + card.numSightings + "\n" +
-                "Found in " + card.FoundInSites.size() + " sites" + "\n" +
-                "Number images: " + card.imageURLs.size + "\n")
+                "Found in " + card.FoundInSites.size() + " sites" + "\n")
 
         val siteKeys = card.FoundInSites.keys()
         var site: SurveySiteList.SurveySite
@@ -120,6 +119,7 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
         }
         else
         {
+            newText.append("Number of images: " + card.imageURLs.size + "\n")
             for (url in card.imageURLs) {
                 val iv = ImageView(this)
                 iv.layoutParams = LinearLayout.LayoutParams(250, 250)

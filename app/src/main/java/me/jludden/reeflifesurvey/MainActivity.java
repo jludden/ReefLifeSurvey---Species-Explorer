@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_main);
+        setTheme(R.style.AppTheme_NoActionBar);
         setContentView(R.layout.app_bar_main);
 
 
@@ -257,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements
 
         //start the home fragment
         hideClutter();
-        launchUIFragment(new HomeFragment(), HomeFragment.TAG);
+        launchUIFragment(new HomeFragment(), HomeFragment.TAG, true);
     }
 
     @Override
@@ -500,14 +502,21 @@ public class MainActivity extends AppCompatActivity implements
         launchUIFragment(cardViewFrag, CardViewFragment.TAG);
     }
 
-    private void launchUIFragment(Fragment newFragment, String tag) {
+    private void launchUIFragment(Fragment newFragment, String tag){
+        launchUIFragment(newFragment, tag, false);
+    }
+
+    private void launchUIFragment(Fragment newFragment, String tag, boolean noAnim) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
-                        R.anim.enter_from_left, R.anim.exit_to_right)
-                .replace(R.id.content_frame, newFragment, tag)
-                .addToBackStack(null)
-                .commit();
+        android.support.v4.app.FragmentTransaction tx = fragmentManager.beginTransaction();
+        if(!noAnim) {
+            tx.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
+                R.anim.enter_from_left, R.anim.exit_to_right);
+        }
+        tx
+            .replace(R.id.content_frame, newFragment, tag)
+            .addToBackStack(null)
+            .commit();
     }
 
   /*  @Override
