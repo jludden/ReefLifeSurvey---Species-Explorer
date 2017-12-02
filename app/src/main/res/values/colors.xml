@@ -18,4 +18,7 @@
     <color name="scrim">#99323232</color>
     <color name="background_dark">#ff333333</color>
     <color name="text_primary_light">#ffffffff</color>
+    <color name="page_indicator_dark">#80333333</color>
+    <color name="page_indicator_dark_selected">#ff333333</color>
+    <color name="grey_200">#ffeeeeee</color>
 </resources>

@@ -343,17 +343,15 @@ public class MainActivity extends AppCompatActivity implements
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         Log.d("jludden.reeflifesurvey"  , "menu item selected: " + id);
-
+        Bundle options;
 
         switch (id) {
             // TODO: 11/9/2017 catch the search clicked item here
             case R.id.action_search: //Inspiration and implementation from the Plaid App
                 View searchMenuView = findViewById(R.id.action_search);
-                Bundle options = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                    options = ActivityOptions.makeSceneTransitionAnimation(this, searchMenuView,
+                options = ActivityOptions.makeSceneTransitionAnimation(this, searchMenuView,
                             getString(R.string.transition_search_back)).toBundle();
-                }
+
 //                startActivity(new Intent(this, SearchActivity.class), options);
                 Log.d(TAG,"STARTING SEARCH ACTIVITY");
 
@@ -362,6 +360,16 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.settings_opt_hide_menus:
                 hideClutter();
                 return true;
+            case R.id.settings_opt_del_favorite_sites:
+                //todo
+                return true;
+            case R.id.settings_opt_del_favorite_species:
+                //todo
+                return true;
+            case R.id.settings_opt_about:
+                options =  ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+                startActivity(new Intent(this, AboutActivity.class), options);
+                return true;
             case android.R.id.home: //todo support back button in action bar
                 Log.d(TAG,"HOME OPTION SELECTED ");
                 hideClutter();
@@ -369,8 +377,6 @@ public class MainActivity extends AppCompatActivity implements
                 // Navigate to parent activity
                 // NavUtils.navigateUpFromSameTask(this);
                 return true;
-
-
         }
 
         return super.onOptionsItemSelected(item);

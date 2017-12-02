@@ -61,6 +61,13 @@
             <!--android:theme="@style/AppTheme.NoActionBar"-->
         </activity>
 
+        <activity
+            android:name=".AboutActivity"
+            android:theme="@style/About"
+            android:parentActivityName="me.jludden.reeflifesurvey.MainActivity">
+        </activity>
+
+
 
     </application>
 

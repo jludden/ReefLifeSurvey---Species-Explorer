@@ -8,4 +8,6 @@
     <dimen name="text_margin">16dp</dimen>
     <dimen name="z_app_bar">4dp</dimen>
     <dimen name="padding_normal">16dp</dimen>
+    <dimen name="drag_dismiss_distance">112dp</dimen>
+    <dimen name="spacing_normal">8dp</dimen>
 </resources>
