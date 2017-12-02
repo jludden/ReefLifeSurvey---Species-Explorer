@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_label">RLS</string>
     <string name="app_name">Reef Life Survey</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -7,13 +8,29 @@
     <string name="action_settings">Settings</string>
     <string name="del_favorite_sites">Clear favorite survey sites</string>
     <string name="del_favorite_species">Clear favorite species</string>
-    <string name="about_app">This app was created by Jason Ludden with special thanks to the ReefLifeSurrvey team and Yanir Seroussi</string>
-    <string name="website_launch_url">https://reeflifesurvey.com/</string>
     <string name="transition_search_back">transition_search_back</string>
     <string name="path_search">M13.3843083,13.3956843 C11.233862,15.5399983 7.7581039,15.5381046 5.61000013,13.3900003 C3.46000004,11.2399998 3.46000004,7.76000023 5.61000013,5.61000013 C7.76000023,3.46000004 11.2400007,3.46000004 13.3900003,5.61000013 C15.54,7.76000023 15.5400009,11.2400007 13.3900003,13.3900003 C13.388104,13.3918967 13.3862067,13.3937913 13.3843083,13.3956843 C15.1427975,15.1834093 19.6826174,19.798706 19.6826172,19.7987061 L13.3843085,13.3956846 L13.3843083,13.3956843 Z</string>
     <string name="transition_launch_details">transition_launch_details</string>
     <string name="bottom_sheet_total_surveys">%1$d surveys in %2$d dive sites</string>
     <string name="bottom_sheet_secondary_button_browse">Browse</string>
     <string name="bottom_sheet_secondary_button_map">Map</string>
+
+    <!--About this app-->
+    <string name="about_rls"> The Reef Life Survey Foundation (RLS) is a non-profit environmental organisation that makes the underwater world visible – to scientists, governments, artists and anyone with an interest in rocky and coral reefs around the world and how these reefs are changing./n/n
+Reef Life Survey relies on the skills and dedication of recreational SCUBA divers using the same detailed methodology to record the abundance of all conspicuous species observed on reefs. Since 2008, this RLS methodology has been used to survey over 3000 reefs across more than 50 countries spanning every continent in the world (including Antarctica!)./n/n
+Working collaboratively with government and management agencies, professional scientists and recreational divers, RLS aims to use this high-quality temporal and spatial information on the condition of reefs to improve biodiversity conservation and the sustainable management of marine resources.</string>
+    <string name="website_launch_url">https://reeflifesurvey.com/</string>
+    <string name="about_app_pitch">Please consider donating: </string>
+    <string name="donation_launch_url"><![CDATA[https://www.paypal.com/donate/?token=NDJj6GNLXR-F-03Ob9TBTaS6eiHfY7pqIjYJURagwDJQPvNZ6R_ADGkhs1Bz_k1lMJOfzG&country.x=AU&locale.x=AU]]></string>
+    <string name="about_app_creation">This app was created by Jason Ludden and has been released as fully open-source on Github</string>
+    <!--TODO-->
+    <string name="github_launch_url">https://github.com/jludden?tab=repositories</string>
+
+
+    <!--Strings for AboutLibraries lib-->
+    <string name="aboutLibraries_description_showIcon">true</string>
+    <string name="aboutLibraries_description_showVersion">true</string>
+    <string name="aboutLibraries_description_text">This application would not be possible without the following Android libraries. In addition, special thanks to Nick Butcher and the Plaid application, as well as Google Android Architecture Blueprints</string>
+
 
 </resources>
