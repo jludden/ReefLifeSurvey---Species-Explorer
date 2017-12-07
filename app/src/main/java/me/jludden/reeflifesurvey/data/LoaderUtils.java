@@ -24,7 +24,11 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,6 +36,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
+import io.reactivex.Observable;
+import me.jludden.reeflifesurvey.data.InfoCard.CardDetails;
+import me.jludden.reeflifesurvey.data.SurveySiteList.SurveySite;
 import me.jludden.reeflifesurvey.R;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -50,6 +57,41 @@ public class LoaderUtils {
     //11/4 FIXED shouldn't this really be loading all sites for a code?
     //10/24 todo currently only called from mapview->bottomsheet
     //          would like it to be called during the normal incremental load for each site, then have results aggregated
+
+
+
+
+    // cant run on UI thread
+    // TCP/HTTP/DNS (depending on the port, 53=DNS, 80=HTTP, etc.)
+    public static boolean isOnline() {
+        try {
+            int timeoutMs = 1500;
+            Socket sock = new Socket();
+            SocketAddress sockaddr = new InetSocketAddress("www.reeflifesurvey.com", 80);
+
+            sock.connect(sockaddr, timeoutMs);
+            sock.close();
+
+            return true;
+        } catch (IOException e) { return false; }
+    }
+
+
+    /*public static Observable<CardDetails> loadCardsforSite(SurveySite site, DataRepository dataRepo) {
+        JSONObject fullSpeciesJSON = site.getSpeciesFound();
+        Iterator<String> speciesList = fullSpeciesJSON.keys();
+
+        String speciesKey;
+        List<String> speciesIDs = new ArrayList<>();
+
+        //add each species to the dictionary
+        while (speciesList.hasNext()) {
+            speciesKey = speciesList.next();
+            speciesIDs.add(speciesKey);
+        }
+
+        Observable.fromIterable(speciesIDs)
+    }*/
 
     /**
      * Loads a number of a fish for a single site
@@ -77,10 +119,8 @@ public class LoaderUtils {
             speciesKey = speciesList.next();
             dataRepo.getFishCard(speciesKey, callback);
 
-
-
-            InfoCard.CardDetails fishCard = new InfoCard.CardDetails(speciesKey);
-            int numSightings = fullSpeciesJSON.getInt(speciesKey); //number of sightings of this fish in this survey site (may not be accurate due to datasource)
+       //     InfoCard.CardDetails fishCard = new InfoCard.CardDetails(speciesKey);
+        //    int numSightings = fullSpeciesJSON.getInt(speciesKey); //number of sightings of this fish in this survey site (may not be accurate due to datasource)
 
 /*            if(fishCards.contains(fishCard)) { //todo verify using overriden equals() func
                 Log.d(TAG  , "load single site - already have fish card loaded: "+fishCard.getId()+"-"+fishCard.commonNames);

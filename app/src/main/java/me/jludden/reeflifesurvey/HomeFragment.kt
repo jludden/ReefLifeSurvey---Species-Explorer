@@ -6,6 +6,7 @@ import android.support.v7.content.res.AppCompatResources.getDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import me.jludden.reeflifesurvey.fishcards.CardViewFragment
@@ -34,6 +35,8 @@ class HomeFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val root = inflater.inflate(R.layout.home_fragment, container, false)
+
+
 /*
 
 
@@ -68,11 +71,11 @@ class HomeFragment : Fragment() {
 
 
         with(root) {
-            findViewById(R.id.button_launch_browse_species).setOnClickListener({
+            findViewById<Button>(R.id.button_launch_browse_species).setOnClickListener({
                 (activity as MainActivity).launchNewFragment(CardViewFragment::class.java)
                 //todo make sure that there is at least some survey site or rando survey sites loading
             })
-            findViewById(R.id.button_launch_select_sites).setOnClickListener({
+            findViewById<Button>(R.id.button_launch_select_sites).setOnClickListener({
                 (activity as MainActivity).launchNewFragment(MapViewFragment::class.java)
             })
         }

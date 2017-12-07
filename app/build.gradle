@@ -3,12 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "me.jludden.reeflifesurvey"
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -22,6 +22,10 @@ android {
     }
 //    packagingOptions {
 //        pickFirst  'META-INF/*'
+//    }
+//    compileOptions {
+//        targetCompatibility 1.8
+//        sourceCompatibility 1.8
 //    }
 }
 

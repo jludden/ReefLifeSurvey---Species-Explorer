@@ -90,7 +90,10 @@ public class InfoCard {
         public Dictionary<SurveySiteList.SurveySite, Integer> FoundInSites = new Hashtable<>();
         public boolean favorited = false;
         public List<String> imageURLs;
+        private boolean offline = false;
         public String reefLifeSurveyURL;
+
+        public static final String INTENT_EXTRA = "InfoCardDetail";
 
         public CardDetails(String id) {
             this.id = id;
@@ -190,6 +193,14 @@ public class InfoCard {
         @Override
         public int compareTo(@NonNull Object o) {
             return ((CardDetails) o).numSightings - this.numSightings;
+        }
+
+        public boolean getOffline(){
+            return offline;
+        }
+
+        public void setOffline(boolean isOffline){
+            offline = isOffline;
         }
 
         public String getId() {

@@ -63,17 +63,17 @@ class AboutActivity : AppCompatActivity() {
             val inflater = LayoutInflater.from(container.context)
             val layout : View
 
-            if(position == 0 ) {
-                layout = inflater.inflate(R.layout.about_reeflifesurvey, container, false)
-            }
-            else{
-                layout = inflater.inflate(R.layout.about_libraries, container, false)
+            when(position) {
+                0 -> layout = inflater.inflate(R.layout.about_reeflifesurvey, container, false)
+                else -> {
+                    layout = inflater.inflate(R.layout.about_libraries, container, false)
 
-                val aboutLibsFragment = LibsBuilder().fragment()
-                fragmentManager
-                        .beginTransaction()
-                        .replace(R.id.about_libs_content_frame, aboutLibsFragment, librariesFragmentTAG)
-                        .commit()
+                    val aboutLibsFragment = LibsBuilder().fragment()
+                    fragmentManager
+                            .beginTransaction()
+                            .replace(R.id.about_libs_content_frame, aboutLibsFragment, librariesFragmentTAG)
+                            .commit()
+                }
             }
 
             container.addView(layout);

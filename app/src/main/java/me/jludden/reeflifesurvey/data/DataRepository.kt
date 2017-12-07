@@ -9,6 +9,8 @@ import me.jludden.reeflifesurvey.data.InfoCard.CardDetails
 import org.json.JSONObject
 import kotlin.collections.HashMap
 import me.jludden.reeflifesurvey.data.SurveySiteType.*
+import java.io.InputStream
+import java.util.ArrayList
 
 
 /**
@@ -18,15 +20,20 @@ import me.jludden.reeflifesurvey.data.SurveySiteType.*
  */
 class DataRepository private constructor(context: Context) {
 
-    //Singleton that proves the getInstance() method
+    //Singleton that provides the getInstance() method
     companion object : SingletonHolder<DataRepository, Context>(::DataRepository)
 
-    private var siteList : SurveySiteList
-   // private val speciesString : String
+    private val siteList : SurveySiteList
+    // private val speciesString : String
     //private var speciesJSON : JSONObject
     //private val fishSpecies : Observable<InfoCard.CardDetails>
-  //  private val fishStringStream : Observable<String>
-    private val speciesCards: HashMap<String, CardDetails> //todo possibly sorted list better
+    //  private val fishStringStream : Observable<String>
+    private var allSpeciesLoaded: Boolean = false
+    private val speciesStream: InputStream
+
+    //todo possibly sorted list better
+    private var speciesCards: HashMap<String, CardDetails>
+
 
     init {
 
@@ -40,11 +47,13 @@ class DataRepository private constructor(context: Context) {
        // fishSpecies = loadFromDisk(R.raw.api_species, context)
    //     fishStringStream = loadFromDisk(R.raw.api_species, context)
 
-        speciesCards = loadFromDiskSync(R.raw.api_species, context)
+        //speciesCards = loadFromDiskBlocking(R.raw.api_species, context)
+        speciesStream = context.resources.openRawResource(R.raw.api_species)
+        speciesCards = loadFromDiskBlocking()
     }
 
     //use Observable.from to emit items one at a time from a iterable
-    fun getSurveySitesObservable(type: SurveySiteType = CODES): Observable<SurveySiteList.SurveySite> {
+    fun getSurveySitesAll(type: SurveySiteType = CODES): Observable<SurveySiteList.SurveySite> {
         if(type != CODES) TODO()
         return Observable.fromIterable(siteList.SITE_CODE_LIST)
     }
@@ -55,13 +64,35 @@ class DataRepository private constructor(context: Context) {
     //
     //consider wrapping this in an async call (separate rxjava-async module):
     //https://github.com/ReactiveX/RxJava/wiki/Async-Operators
-    fun getFishSpeciesObservable(): Observable<CardDetails> {
+    //
+    //the blocking method can be called with observable.just
+    //and it can be defered with observable.defer until it is actually subscribed to:
+    //Observable.defer(() -> Observable.just(slowBlockingMethod()))
+    //
+    fun getFishSpeciesAll(): Observable<CardDetails> {
+        /*if(!allSpeciesLoaded){
+            speciesCards = loadFromDiskBlocking()
+        }*/
         return Observable.fromIterable(speciesCards.values)
     }
 
+    fun getFishSpeciesForSite(site: SurveySiteList.SurveySite): Observable<CardDetails>
+    {
+        val speciesList = site.getSpeciesFound().keys()
+        val speciesIDs = ArrayList<String>()
+
+        //add each species to the list of ids
+        while (speciesList.hasNext()) {
+            speciesIDs.add(speciesList.next())
+        }
+
+        //map the id to the card
+        return Observable.fromIterable(speciesIDs).map { speciesCards[it] }
+    }
+
     //NOT asynchronously load the data but oh well at least its already on disk right todo delete and do it better
-    fun loadFromDiskSync(resID: Int, context: Context): HashMap<String, CardDetails> {
-        val speciesJSON = JSONObject(LoaderUtils.loadStringFromDisk(R.raw.api_species, context))
+    fun loadFromDiskBlocking(): HashMap<String, CardDetails> {
+        val speciesJSON = JSONObject(LoaderUtils.loadStringFromDiskHelper(speciesStream))
         val iter = speciesJSON.keys()
 
         val species = HashMap<String, CardDetails>()
@@ -75,11 +106,12 @@ class DataRepository private constructor(context: Context) {
         }
         Log.d("DataRepository", "loaded fish species: "+species.size)
 
+        allSpeciesLoaded = true
         return species
     }
 
     /*
-    fun getFishSpeciesObservable(context: Context): Observable<CardDetails> {
+    fun getFishSpeciesAll(context: Context): Observable<CardDetails> {
 
         fishStringStream
                 .map { str -> JSONObject(str)}
@@ -165,11 +197,12 @@ class DataRepository private constructor(context: Context) {
     }
 
     fun getFishSpeciesJSON(callback: LoadFishSpeciesJSONCallBack) {
+        TODO("not impl")
         //callback.onFishSpeciesJSONLoaded()
     }
 
     fun getFishCard(id: String, callback: LoadFishCardCallBack){
-        val card: CardDetails? = speciesCards.get(id)
+        val card: CardDetails? = speciesCards[id]
         if(card != null) callback.onFishCardLoaded(card)
         else callback.onDataNotAvailable(id)
     }

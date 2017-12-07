@@ -31,6 +31,10 @@ Working collaboratively with government and management agencies, professional sc
     <string name="aboutLibraries_description_showIcon">true</string>
     <string name="aboutLibraries_description_showVersion">true</string>
     <string name="aboutLibraries_description_text">This application would not be possible without the following Android libraries. In addition, special thanks to Nick Butcher and the Plaid application, as well as Google Android Architecture Blueprints</string>
+    <string name="ok">OK</string>
+    <string name="cancel">CANCEL</string>
+    <string name="del_favorite_sites_message">Delete all favorited sites?</string>
+    <string name="del_favorite_species_message">Delete all favorited species?</string>
 
 
 </resources>

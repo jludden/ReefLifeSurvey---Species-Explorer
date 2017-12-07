@@ -17,6 +17,8 @@ import me.jludden.reeflifesurvey.data.InfoCard;
 import me.jludden.reeflifesurvey.BuildConfig;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.data.SharedPreferencesUtils;
+import me.jludden.reeflifesurvey.data.StorageUtils;
+import me.jludden.reeflifesurvey.data.StoredImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private RequestOptions mGlideRequestOptions;
     private RecyclerView mRecyclerView;
     private CardViewFragment mCardViewFragment;
+    private StoredImageLoader mStoredImageLoader;
     private final CardViewFragment.OnCardViewFragmentInteractionListener mListener;
 
     private static final int TYPE_HEADER = 0;
@@ -55,6 +58,8 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.mRecyclerView = listView;
         this.mCardViewFragment = parent;
         this.mListener = listener;
+
+        this.mStoredImageLoader = new StoredImageLoader(parent.getContext().getApplicationContext());
 
         //setHasStableIds(true);//todo not sure what this does testing it out
     }
@@ -126,11 +131,19 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             final InfoCard.CardDetails cardDetails = mCardList.get(realPosition);
             // Log.d("jludden.reeflifesurvey"  , "CardViewAdapter onBind FishCardVH. CardListSize: "+ mCardList.size()+ " HiddenListSize: "+mHiddenList.size()+" adapter pos: "+ position + " datasource pos: "+position);
 
-            glide
-                    .load(cardDetails.getPrimaryImageURL())
-                    .apply(mGlideRequestOptions)
-                    .transition(withCrossFade())
-                    .into(vhItem.mImageView);
+
+            //todo maybe i can refactor this into a CardDetails method
+            if(cardDetails.getOffline()) {
+                vhItem.mImageView.setImageBitmap(
+                        mStoredImageLoader.loadPrimaryCardImage(cardDetails));
+            }
+            else {
+                glide
+                        .load(cardDetails.getPrimaryImageURL())
+                        .apply(mGlideRequestOptions)
+                        .transition(withCrossFade())
+                        .into(vhItem.mImageView);
+            }
 
             vhItem.mOverlayView.setText(cardDetails.cardName); //picture overlay text
 

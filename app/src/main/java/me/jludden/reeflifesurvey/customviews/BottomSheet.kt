@@ -47,7 +47,7 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
         if (context is OnBottomSheetInteractionListener) interactionListener = context else TODO()
 
         dataRepo = DataRepository.getInstance(context.applicationContext)
-        imageSliders = findViewById(R.id.site_preview_carousel) as SliderLayout
+        imageSliders = findViewById(R.id.site_preview_carousel)
     }
 
     override fun onFinishInflate() {
@@ -130,13 +130,18 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
 
     //todo fun restartView()
 
+
+    /**
+     * TODO instead of chaining these callbacks, use Observable.flatmap to handle the dependency
+     *
+     */
     override fun onSurveySitesLoaded(sites: SurveySiteList) {
         surveySiteList = sites
         setupSiteDetails()
     }
 
     override fun onFishCardLoaded(card: InfoCard.CardDetails) {
-        addSliderImage(card);
+        addSliderImage(card)
     }
 
     override fun onDataNotAvailable(reason: String) {

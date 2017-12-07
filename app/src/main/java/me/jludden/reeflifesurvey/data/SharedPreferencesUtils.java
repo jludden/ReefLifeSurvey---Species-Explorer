@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +22,12 @@ import me.jludden.reeflifesurvey.R;
 
 public class SharedPreferencesUtils {
 
-    private static final String SAVED_SITES_KEY = "me.jludden.reeflifesurvey.SitePrefs";
+    private static final String FAV_SITES_KEY = "me.jludden.reeflifesurvey.SiteFavs";
+    private static final String STORED_OFFLINE_SITES_KEY = "me.jludden.reeflifesurvey.SiteOffline";
+    private static final String STORED_OFFLINE_SITES_EXT_KEY = "me.jludden.reeflifesurvey.SiteOfflineExternal"; //SD card
+    private static final String STORED_OFFLINE_PATH_KEY = "me.jludden.reeflifesurvey.OfflineImagePath";
+    private static final String STORED_OFFLINE_PATH_EXT_KEY = "me.jludden.reeflifesurvey.OfflineImagePathExternal";
+
     private static final String TAG = "SharedPreferenceUtils";
 
     //private static final int FAVORITES_OUTLINE = R.drawable.ic_star_border;
@@ -85,18 +91,23 @@ public class SharedPreferencesUtils {
         // use a default value using new Date()
         //long l = prefs.getLong(dateTimeKey, new Date().getTime());
     }
+    
+    public static void clearFavSpecies(Context context) {
+        Log.d(TAG, "clearFavSpecies: clicked TODO not implemented") ;
+        //TODO
+    }
 
     /**
-     * Loads the saved survey site combined codes from SharedPreferences
+     * Loads the fav survey site combined codes from SharedPreferences
      * @param context
      * @return
      */
-    public static Set<String> getSavedSites(Context context) {
+    public static Set<String> getFavSites(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(
                 "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
 
         Set<String> siteCodes = new HashSet<>();
-        siteCodes = prefs.getStringSet(SAVED_SITES_KEY,siteCodes); //unordered set of SurveySite combinedCodes
+        siteCodes = prefs.getStringSet(FAV_SITES_KEY,siteCodes); //unordered set of SurveySite combinedCodes
 
         return siteCodes;
     }
@@ -106,13 +117,59 @@ public class SharedPreferencesUtils {
      * @param siteCodeList
      * @param context
      */
-    public static void updateSavedSites(List<String> siteCodeList, Context context) {
-       Log.d("jludden.reeflifesurvey"  , "updateSavedSites. Saving " + siteCodeList.size() + " sites");
+    public static void updateFavSites(List<String> siteCodeList, Context context) {
+       Log.d("jludden.reeflifesurvey"  , "updateFavSites. Saving " + siteCodeList.size() + " sites");
        SharedPreferences prefs = context.getSharedPreferences(
                 "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
 
        Set<String> set = new HashSet<>(siteCodeList);
-       prefs.edit().putStringSet(SAVED_SITES_KEY, set).apply();
+       prefs.edit().putStringSet(FAV_SITES_KEY, set).apply();
 
+    }
+    
+    public static void clearFavSites(Context context) {
+        updateFavSites(new ArrayList<String>(), context);
+    }
+
+
+    // save the set of sites that are stored offline
+    // todo, possibly also save a single? storage path
+    //
+    //old thoughts:
+    //todo - for each survey site, save to local prefs that its fish are indeed stored. save the whole path maybe?
+    //save the current site to local storage as a key, with a pointer to the path on local disk where fish are saved
+    public static void setSitesStoredOffline(List<String> siteCodeList, String path, Boolean isExternal, Context context) {
+
+        String sitesKey = isExternal ? STORED_OFFLINE_SITES_KEY : STORED_OFFLINE_SITES_EXT_KEY;
+        String pathKey = isExternal ? STORED_OFFLINE_PATH_KEY : STORED_OFFLINE_PATH_EXT_KEY;
+
+
+        SharedPreferences prefs = context.getSharedPreferences(
+                "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
+
+
+        Set<String> set = new HashSet<>(siteCodeList);
+        prefs.edit().putStringSet(sitesKey, set).apply();
+        prefs.edit().putString(pathKey, path).apply(); //save the path
+
+        Log.d(TAG, "setSitesStoredOffline: "+path+" sites: "+siteCodeList.size());
+    }
+
+    //return the lit of sites that are stored offline
+    public static Set<String> loadSitesStoredOffline(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(
+                "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
+
+        Set<String> siteCodes = new HashSet<>();
+        siteCodes = prefs.getStringSet(FAV_SITES_KEY,siteCodes); //unordered set of SurveySite combinedCodes
+
+        return siteCodes;
+    }
+
+    public static String loadStoredOfflinePath(Boolean isExternal, Context context){
+        SharedPreferences prefs = context.getSharedPreferences(
+                "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
+        String pathKey = isExternal ? STORED_OFFLINE_PATH_KEY : STORED_OFFLINE_PATH_EXT_KEY;
+        return prefs.getString(pathKey, "NONE");
     }
 }

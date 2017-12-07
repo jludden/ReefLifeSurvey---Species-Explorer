@@ -3,11 +3,7 @@ package me.jludden.reeflifesurvey.search
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v4.app.ActivityCompat.startActivity
-import android.support.v4.app.ActivityCompat.startActivityForResult
 import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.ViewHolder
@@ -20,11 +16,10 @@ import android.widget.ImageView
 import com.squareup.picasso.Picasso
 import me.jludden.reeflifesurvey.data.SearchResult
 import kotlinx.android.synthetic.main.activity_search_results_item.view.*
-import kotlinx.android.synthetic.main.app_bar_main.*
 import me.jludden.reeflifesurvey.data.SearchResultType
-import me.jludden.reeflifesurvey.fishcards.DetailsViewFragment
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.detailed.DetailsActivity
+import me.jludden.reeflifesurvey.detailed.DetailsActivity.Companion.REQUEST_CODE
 
 
 /**
@@ -106,7 +101,7 @@ class SearchFragment : Fragment(), SearchContract.View {
         val options: ActivityOptions =
             ActivityOptions.makeSceneTransitionAnimation(activity,
                     Pair.create(v, getString(R.string.transition_launch_details)))
-        startActivityForResult(intent, 123, options.toBundle()) //todo req code
+        startActivityForResult(intent, REQUEST_CODE, options.toBundle())
 
 
 

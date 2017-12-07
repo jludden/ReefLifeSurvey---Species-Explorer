@@ -4,7 +4,9 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.app.FragmentTransaction;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -17,15 +19,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewCompat;
-import android.transition.ChangeImageTransform;
-import android.transition.ChangeTransform;
-import android.transition.Fade;
-import android.transition.TransitionSet;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -41,17 +39,18 @@ import android.widget.ToggleButton;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
+import me.jludden.reeflifesurvey.data.SharedPreferencesUtils;
+import me.jludden.reeflifesurvey.detailed.DetailsActivity;
 import me.jludden.reeflifesurvey.fishcards.CardViewFragment;
 import me.jludden.reeflifesurvey.fishcards.CardViewFragment.CardViewSettings;
 
-import me.jludden.reeflifesurvey.fishcards.DetailsViewFragment;
 import me.jludden.reeflifesurvey.fullscreenquiz.FullScreenImageActivity;
 import me.jludden.reeflifesurvey.data.InfoCard;
 import me.jludden.reeflifesurvey.customviews.BottomSheet;
 import me.jludden.reeflifesurvey.search.SearchActivity;
 import me.jludden.reeflifesurvey.data.SurveySiteList;
 import me.jludden.reeflifesurvey.mapsites.MapViewFragment;
-import me.jludden.reeflifesurvey.transitions.CircularReveal;
+
 import org.jetbrains.annotations.NotNull;
 
 import static com.daimajia.androidanimations.library.Techniques.SlideInUp;
@@ -136,9 +135,9 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        ToggleButton mToolbarButton_starred = (ToggleButton) findViewById(R.id.toolbar_button_starred);
+        ToggleButton mToolbarButton_starred = (ToggleButton) findViewById(R.id.toolbar_button_filter_favorites);
         mToolbarButton_starred.setOnCheckedChangeListener(this);
-        ((ToggleButton) findViewById(R.id.toolbar_button_loadAll)).setOnCheckedChangeListener(this);
+        ((ToggleButton) findViewById(R.id.toolbar_button_store_offline)).setOnCheckedChangeListener(this);
 
         mBottomSheetButton = (FloatingActionButton) findViewById(R.id.bottom_sheet_fab);
         mBottomSheetButton.setOnClickListener(new View.OnClickListener() {
@@ -282,6 +281,8 @@ public class MainActivity extends AppCompatActivity implements
     protected void onPause(){
         Log.d(TAG,"MainActivity onPause");
 
+        //onPause is called when details activity is launched
+        //todo if you do this, make sure to regenerate the bottom sheet when we come back
         ((BottomSheet) findViewById(R.id.bottom_sheet)).clearView();//todo dont do this in onstop and onpause, probably
 
         super.onPause();
@@ -361,9 +362,13 @@ public class MainActivity extends AppCompatActivity implements
                 hideClutter();
                 return true;
             case R.id.settings_opt_del_favorite_sites:
+                showAlertDialog(this, R.string.del_favorite_sites_message);
                 //todo
                 return true;
             case R.id.settings_opt_del_favorite_species:
+                Context context = getApplicationContext();
+
+                showAlertDialog(this, R.string.del_favorite_species_message);
                 //todo
                 return true;
             case R.id.settings_opt_about:
@@ -391,6 +396,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    //TODO DELETE UNUSED
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -726,6 +732,7 @@ public class MainActivity extends AppCompatActivity implements
             public void onClick(View v) {
                 Log.d(TAG, "Bottom Sheet Top TextView clicked.. hidden?: " + v.isShown());
                 //todo refactor this
+                //todo this does not work properly if they are in details view
                 //if the detailsviewfragment is showing, and they click the top of bottom sheet,
                 //navigate them back to the mapview
                 MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
@@ -734,7 +741,10 @@ public class MainActivity extends AppCompatActivity implements
                     mBottomSheetButton.setVisibility(View.VISIBLE);
                     launch_species.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_view_in_list, 0, 0, 0);
                     launch_species.setText(R.string.bottom_sheet_secondary_button_browse);
-                    launchUIFragment(mapFrag, MapViewFragment.TAG);
+//                    launchUIFragment(mapFrag, MapViewFragment.TAG);
+
+                    hideClutter();
+                    onBackPressed();
                 } else if (mapFrag != null) { //launch browse fish details for this site
                     //AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
                     //toolbar.setExpanded(true,true);
@@ -778,62 +788,20 @@ public class MainActivity extends AppCompatActivity implements
      * @param sharedElement view to animate transition
      */
     @Override
-    public void onFishDetailsRequested(InfoCard.CardDetails cardDetails, View sharedElement) {
+    public void onFishDetailsRequested(InfoCard.CardDetails cardDetails, @Nullable View sharedElement) {
         Log.d(TAG, "MainActivity onFishDetailsRequested: "+cardDetails.toString());
 
-        //hide a bunch of shit todo probably want at least a fab or a bottom bar, cant decide
-        mFAB.hide();
-        hideFABmenu();
-        mBottomSheetButton.setVisibility(View.GONE);
-        AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
-        toolbar.setExpanded(false,true);
-        View bottomSheet = findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        if(bottomSheetBehavior.getState()==BottomSheetBehavior.STATE_EXPANDED) {
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        //launch details
+        Intent intent = new Intent(MainActivity.this,
+                DetailsActivity.class);
+        intent.putExtra(InfoCard.CardDetails.INTENT_EXTRA, cardDetails);
+        if(sharedElement != null) {
+            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
+                    new Pair<View, String>(sharedElement, getString(R.string.transition_launch_details)));
+            startActivityForResult(intent, DetailsActivity.REQUEST_CODE, options.toBundle());
+        } else {
+            startActivityForResult(intent, DetailsActivity.REQUEST_CODE);
         }
-
-
-
-
-
-        //set up animation
-        String transitionName = getString(R.string.transition_launch_details);
-        ViewCompat.setTransitionName(sharedElement, transitionName);
-
-
-        Fragment newFragment = DetailsViewFragment.newInstance(cardDetails, "whatever");
-        String tag = DetailsViewFragment.TAG;
-
-        newFragment.setSharedElementEnterTransition(new TransitionSet() {
-            {
-                setOrdering(ORDERING_TOGETHER);
-             //   addTransition(new ChangeBounds()).
-                addTransition(new ChangeTransform()).
-                addTransition(new ChangeImageTransform());
-            }
-        });
-
-
-
-        //launchUIFragment(newFragment, tag);
-
-        //todo make it enter from right as well
-        //      .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
-        //R.anim.enter_from_left, R.anim.exit_to_right)
-        newFragment.setEnterTransition(new Fade());
-        newFragment.setExitTransition(new Fade());
-        newFragment.setSharedElementReturnTransition(new CircularReveal());
-
-
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager
-                .beginTransaction()
-                .addSharedElement(sharedElement, transitionName)
-                .replace(R.id.content_frame, newFragment, tag)
-                .addToBackStack(null)
-                .commit();
     }
 
     //todo move to bottomsheet class
@@ -843,8 +811,6 @@ public class MainActivity extends AppCompatActivity implements
         ((BottomSheet) findViewById(R.id.bottom_sheet)).clearView();
         super.onStop();
     }
-
-
 
 
     /**
@@ -874,7 +840,7 @@ public class MainActivity extends AppCompatActivity implements
         CardViewFragment viewFragment = (CardViewFragment) getSupportFragmentManager().findFragmentByTag(CardViewFragment.TAG);
 
         switch(buttonView.getId()){
-            case(R.id.toolbar_button_starred):
+            case(R.id.toolbar_button_filter_favorites):
                 CardViewSettings.FILTER_FAVORITES = isChecked;
                 if (viewFragment != null && viewFragment.isVisible()) {
                     if(CardViewSettings.LOAD_ALL) viewFragment.onFilterApplied(); //already have everything loaded, just apply filters
@@ -884,10 +850,16 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 }
                 break;
-            case(R.id.toolbar_button_loadAll):
+            case(R.id.toolbar_button_store_offline):
+               /*
+                Old Load all button code:
                 CardViewSettings.LOAD_ALL = isChecked;
                 if (viewFragment != null && viewFragment.isVisible()) {
                     viewFragment.onLoadMore(false);
+                }*/
+
+                if (viewFragment != null && viewFragment.isVisible()) {
+                    viewFragment.storeInLocal();
                 }
                 break;
             default: //handle survey site location button pressed
@@ -934,6 +906,33 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onImageSliderClick(@NotNull InfoCard.CardDetails card, @NotNull View sharedElement) {
-        onFishDetailsRequested(card, sharedElement);
+        //todo the imageview from the image slider does not transition well into new activity, so implement an animation later if you want
+        onFishDetailsRequested(card, null);
+    }
+
+    /**
+     * Shows the dialog when the restart button is clicked
+     * Start new game, restart game, or cancel dialog
+     * @param activity
+     */
+    void showAlertDialog(Activity activity, final int message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage(message)
+                .setTitle(R.string.app_name);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked OK button;
+                if(message == R.string.del_favorite_sites_message) SharedPreferencesUtils.clearFavSites(getApplicationContext());
+                if(message == R.string.del_favorite_species_message) SharedPreferencesUtils.clearFavSpecies(getApplicationContext());
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

@@ -35,10 +35,9 @@ class SearchPresenter(
         //merge fish species and survey sites, filter by query string, then take a max of 15 results
         val matchesQuery: Observable<SearchResultable> =
                 Observable.concat(
-                    dataRepository.getFishSpeciesObservable(),
-                    dataRepository.getSurveySitesObservable())
+                    dataRepository.getFishSpeciesAll(),
+                    dataRepository.getSurveySitesAll())
                 .filter({ it.matchesQuery(query) })
-//                .filter({ result -> result.matchesQuery(query) }) todo IT. syntax
                 .take(15)
 
         //map the resulting species/sites to SearchResults

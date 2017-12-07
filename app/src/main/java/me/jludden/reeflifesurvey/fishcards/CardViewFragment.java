@@ -25,12 +25,15 @@ import org.jetbrains.annotations.NotNull;
 
 import me.jludden.reeflifesurvey.data.DataRepository;
 import me.jludden.reeflifesurvey.data.InfoCardLoader;
+import me.jludden.reeflifesurvey.data.SharedPreferencesUtils;
+import me.jludden.reeflifesurvey.data.StorageUtils;
 import me.jludden.reeflifesurvey.data.SurveySiteList;
 import me.jludden.reeflifesurvey.data.SurveySiteType;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.data.InfoCard;
 import me.jludden.reeflifesurvey.data.InfoCard.CardDetails;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -139,6 +142,7 @@ public class CardViewFragment extends Fragment implements
         super.onActivityCreated(savedInstanceState);
         Log.d("jludden.reeflifesurvey"  ,"CardViewFragment OnActivityCreated");
         getLoaderManager().initLoader(LOADER_ID, null, this);
+        animateView(mProgressBar, View.VISIBLE, 0.4f, 200);
     }
 
     @Override
@@ -334,6 +338,32 @@ public class CardViewFragment extends Fragment implements
         // (MainActivity) getActivity().setCardDetails(data)
     }
 
+    /**
+     * Store the current configuration of sites and all their relevant fish images to disk
+     * todo should this really be in this class? we really only need the passed in survey site code... get it from loader? store it somewhere static? main activity?
+     */
+    public void storeInLocal() {
+
+
+       /* if(!mLoadedAll) {
+            Log.e(TAG, "storeInLocal: not all loaded" );
+            return; //todo
+        }*/
+
+        //todo refactor. this logic in both infocardloader and cardviewfragment
+        List<String> siteCodes;
+        if (mPassedInSurveySiteCode == null) siteCodes = mSurveySiteList.getFavoritedSiteCodes();
+        else {
+            siteCodes = new ArrayList<>();
+            siteCodes.add(mPassedInSurveySiteCode);
+        }
+
+        //todo below here, everything should be in a different routine
+        StorageUtils.Companion.storeSites(
+          mViewAdapter.getCardList(), siteCodes, getContext());
+
+//        StorageUtils.Companion.storeSites(siteCodes, getContext());
+    }
 
 
     /**
@@ -368,7 +398,7 @@ public class CardViewFragment extends Fragment implements
 
         //todo this is just adding favorites to toolbar
         //  update to add th actual sites being searched
-        addSiteLocationsToToolbar(sites.getSelectedSiteCodes());
+        addSiteLocationsToToolbar(sites.getFavoritedSiteCodes());
     }
 
     /**
@@ -420,7 +450,7 @@ public class CardViewFragment extends Fragment implements
             String siteCode = (String) buttonView.getTag();
             Log.d(TAG, "toggle button tag: " + siteCode + " is checked: " + buttonView.isChecked());
             if (buttonView.isChecked())
-                mSurveySiteList.saveFavoriteSite(siteCode, getContext()); //update saved sites in datafragment
+                mSurveySiteList.addFavoriteSite(siteCode, getContext()); //update saved sites in datarepo
             else mSurveySiteList.removeFavoriteSite(siteCode, getContext());
             onLoadMore(true);
         }

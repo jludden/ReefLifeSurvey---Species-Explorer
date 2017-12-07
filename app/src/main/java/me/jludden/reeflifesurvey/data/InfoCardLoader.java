@@ -8,6 +8,10 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
+
+import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
 import me.jludden.reeflifesurvey.fishcards.CardViewFragment;
 import me.jludden.reeflifesurvey.data.InfoCard.CardDetails;
 import me.jludden.reeflifesurvey.R;
@@ -31,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static me.jludden.reeflifesurvey.BuildConfig.DEBUG;
+import static me.jludden.reeflifesurvey.data.LoaderUtils.isOnline;
 
 /**
  * Created by Jason on 5/1/2017.
@@ -113,6 +118,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
         mCardType = cardType;
         if(DEBUG) Log.d(TAG  , "CardInfoLoader Created. Card Type to load: " + cardType);
 
+//        if(!isOnline()) {} show snackbar
     }
 
     /**
@@ -154,7 +160,15 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
     @Override
     public List<CardDetails> loadInBackground() {
 
-        Log.d(TAG  , "CardInfoLoader loadInBackground called");
+        Log.d(TAG  , "CardInfoLoader loadInBackground called "+isOnline()+"_"+(mData == null || mData.size() <= 0)+"_"+(mPassedInSurveySiteCode.equals("")));
+
+        //no internet, no passed in site - load downloaded
+        if(!isOnline() && (mData == null || mData.size() <= 0) && (mPassedInSurveySiteCode.equals(""))) {
+            Log.d(TAG, "InfoCardLoader: No Internet Detected and no passed in site - showing all downloaded");
+            loadOffline();
+        }
+
+
 
         if(mData == null) {
             mData = new ArrayList<>(NUM_LOAD_PER_ITER);
@@ -170,10 +184,6 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
         try {
 
           //  getBasetripCountries();
-
-
-
-
                 loadFishCardsIncremental(); //Load more fish cards into mData
 
 
@@ -332,6 +342,13 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
 
         /**
          * TODO refactor
+         * 12/3 new plan
+         * 1. load passed in site
+         * 2. load favorite sites
+         * 3. load none (show no sites selected. load popular fish?)
+         * 4. load popular? fish
+         *
+         * old
          * 1. Load passed in site (no params)
          * 2. Load favorite sites (
          * 3. Load all fish
@@ -350,7 +367,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
 
         List<SurveySite> siteList;
         if(mPassedInSurveySiteCode.equals("")){
-            siteList = mSurveySitesList.getSelectedSitesAll();
+            siteList = mSurveySitesList.getFavoritedSitesAll();
             Log.d(TAG  , "InfoCardLoader loading favorite survey sites");
         } else {
             siteList = mSurveySitesList.getSitesForCode(mPassedInSurveySiteCode);
@@ -547,6 +564,27 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
         else {
             return LoaderUtils.loadStringFromDisk(R.raw.api_species, getContext());
         }
+    }
+
+    //no internet so lets just load whatevers on disk
+    private void loadOffline() {
+        Log.d(TAG, "InfoCardLoader loadOffline");
+        mData = new ArrayList<>();
+
+        Observable<CardDetails> offlineCards
+                = StorageUtils.Companion.loadStoredFishCards(getContext().getApplicationContext());
+
+        offlineCards.subscribe(new Consumer<CardDetails>() {
+            @Override
+            public void accept(CardDetails cardDetails) throws Exception {
+                Log.d(TAG, "load offline accept: "+cardDetails.cardName+" ["+cardDetails.getId()+"]");
+
+                cardDetails.setOffline(true);
+                mData.add(cardDetails);
+            }
+        });
+
+
     }
 
     @Override

@@ -336,7 +336,7 @@ public class MapViewFragment extends Fragment
             } else {
                 mSelectedSiteList.add(mSelectedMarker); //todo save this to preferences 11/16 TODO DELETE
                 String siteCode = ((SurveySite) mSelectedMarker.getTag()).getCode();
-                mSurveySiteList.saveFavoriteSite(siteCode, getContext());
+                mSurveySiteList.addFavoriteSite(siteCode, getContext());
                 //mSurveySiteList.SELECTED_SURVEY_SITES.add((SurveySite) mSelectedMarker.getTag()); //todo why both REMOVE
                 mSelectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(FAVORITED_SITE_COLOR));
                 mSelectedMarker.hideInfoWindow();
@@ -426,7 +426,7 @@ public class MapViewFragment extends Fragment
             LatLng pos = site.getPosition();
 
             float color = NORMAL_SITE_COLOR;
-            if(mSurveySiteList.getSelectedSiteCodes().contains(site.getCode())) { //already favorited so set the color!
+            if(mSurveySiteList.getFavoritedSiteCodes().contains(site.getCode())) { //already favorited so set the color!
                 color = FAVORITED_SITE_COLOR;
             }
 
@@ -444,7 +444,7 @@ public class MapViewFragment extends Fragment
             newMarker.setTag(site); //associate marker with an actual site object
 
 
-           /* if(mSurveySiteList.getSelectedSiteCodes().contains(site.getCode())) { //already favorited so set the color!
+           /* if(mSurveySiteList.getFavoritedSiteCodes().contains(site.getCode())) { //already favorited so set the color!
                 newMarker.setIcon(BitmapDescriptorFactory.defaultMarker(FAVORITED_SITE_COLOR));
             }*/
         }

@@ -19,6 +19,8 @@ import static me.jludden.reeflifesurvey.data.SharedPreferencesUtils.*;
 
 /**
  * Created by Jason on 8/20/2017.
+ *
+ * todo - make it have a constructor? or separate out favorite sites from all sites from saved sites
  */
 
 public class SurveySiteList {
@@ -78,15 +80,15 @@ public class SurveySiteList {
     //todo possibly want this to be a List<Codes> (then we can use CODE_MAP to resolve the list of locations)
     private List<SurveySite> SELECTED_SURVEY_SITES = new ArrayList<>();
 
-    //returns the list of saved survey site codes
+    //returns the list of favorited survey site codes
     //EST1, EST2, EST3, etc. will only be returned once as EST
 
     /**
-     * Returns saved survey sites by code
+     * Returns favorited survey sites by code
      *  e.g. EST1, EST2, EST3, etc. will only be returned once as EST
-     * @return each unique code in saved survey sites
+     * @return each unique code in favorited survey sites
      */
-    public List<String> getSelectedSiteCodes(){
+    public List<String> getFavoritedSiteCodes(){
         //todo performance
         Map<String, String> codeDict = new Hashtable<>();
         for (SurveySite possiblyDupedSite:
@@ -97,11 +99,11 @@ public class SurveySiteList {
     }
 
     /**
-     * Returns all saved survey sites, with multiple ids per code
+     * Returns all favorited survey sites, with multiple ids per code
      *  e.g. EST1, EST2, EST3, etc. will all be returned as separate entries
-     * @return all saved survey site code+id combinations
+     * @return all favorited survey site code+id combinations
      */
-    public List<SurveySite> getSelectedSitesAll(){
+    public List<SurveySite> getFavoritedSitesAll(){
         return SELECTED_SURVEY_SITES;
     }
 
@@ -111,12 +113,12 @@ public class SurveySiteList {
      * @return
      */
     public void loadFavoritedSites(Context context) {
-        Set<String> savedSites = getSavedSites(context);
-        Log.d("jludden.reeflifesurvey"  ,"Loading Favorite Sites : "+savedSites.size());
+        Set<String> favSites = getFavSites(context);
+        Log.d("jludden.reeflifesurvey"  ,"Loading Favorite Sites : "+favSites.size());
         StringBuilder sitesLoaded = new StringBuilder();
 
         //convert the set of strings to a real SurveySiteList
-        for(String siteCode : savedSites){
+        for(String siteCode : favSites){
             if(CODE_MAP.containsKey(siteCode)){
                 sitesLoaded.append(siteCode);
                 SELECTED_SURVEY_SITES.addAll(CODE_MAP.get(siteCode));
@@ -130,20 +132,20 @@ public class SurveySiteList {
     }
 
     /**
-     * NOTE THAT the SAVE and REMOVE really only save the code
+     * NOTE THAT the ADD and REMOVE really only store the code
      *  saving EST1 saves "EST", and EST1, EST2, EST3, etc will all load
      *  this is intended. we only have that level of granularity at this time
      * @param siteCode
      * @param context
      */
-    public void saveFavoriteSite(String siteCode, Context context){
+    public void addFavoriteSite(String siteCode, Context context){
         List<SurveySite> list = CODE_MAP.get(siteCode);
         if(list == null) {
             Log.e("jludden.reeflifesurvey"  ,"Saving favorite site - unable to resolve sites corresponding to code: "+siteCode);
         }
         else{
             SELECTED_SURVEY_SITES.addAll(list);
-            updateSavedSites(getSelectedSiteCodes(),context);
+            updateFavSites(getFavoritedSiteCodes(),context);
         }
     }
 
@@ -154,7 +156,7 @@ public class SurveySiteList {
         }
         else {
             SELECTED_SURVEY_SITES.removeAll(list);
-            updateSavedSites(getSelectedSiteCodes(),context);
+            updateFavSites(getFavoritedSiteCodes(),context);
         }
     }
 

@@ -25,6 +25,8 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
+
 import me.jludden.reeflifesurvey.data.InfoCard;
 import me.jludden.reeflifesurvey.R;
 
@@ -76,9 +78,11 @@ public class FullScreenImageAdapter extends PagerAdapter {
             //set up image
             //todo trying the just glide
             //todo cache glide.with
-            Glide.with(mActivity)
+            //Glide.with(mActivity)
+            Picasso.with(mActivity)
                     .load(cardDetails.getPrimaryImageURL())
                     .into(mImgDisplay);
+
 
           //   Try to draw from drawable first, then fall back to bitmap
 //            Drawable image = cardDetails.getDrawable(); //cardDetails.image; //todo getDrawable works but is causing asserts to fail

@@ -33,7 +33,7 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
         setContentView(R.layout.activity_details)
 
         //todo set support postpone enter transition, but it can be very slow
-        //supportPostponeEnterTransition() //postpone transition until the image is loaded
+        supportPostponeEnterTransition() //postpone transition until the image is loaded
         dataRepo = DataRepository.getInstance(applicationContext)
 
 
@@ -58,7 +58,19 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
 
             }
         }
+        else if(intent.hasExtra(InfoCard.CardDetails.INTENT_EXTRA)){
+            val card = intent.getParcelableExtra<InfoCard.CardDetails>(InfoCard.CardDetails.INTENT_EXTRA)
+            //todo doesnt look like the card passed in had any data
+            dataRepo.getFishCard(card.id, object: DataRepository.LoadFishCardCallBack{
+                override fun onFishCardLoaded(card: InfoCard.CardDetails) {
+                    setupFishDetails(card)
+                }
 
+                override fun onDataNotAvailable(reason: String) {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
+            })
+        }
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true) // show back button
 
@@ -192,5 +204,6 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
     }
     companion object {
         const val TAG: String = "DetailsActivity"
+        const val REQUEST_CODE = 12345
     }
 }

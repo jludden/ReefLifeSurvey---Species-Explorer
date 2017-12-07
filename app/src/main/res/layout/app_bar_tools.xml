@@ -21,24 +21,27 @@ Defines a layout for buttons, filters, and other goodies that exist in a horizon
         <Button
             android:id="@+id/toolbar_button_quiz"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:drawableLeft="@drawable/ic_fab_fullscreen"
+            android:layout_height="match_parent"
+            android:drawableStart="@drawable/ic_fab_fullscreen"
             android:text="Quiz" />
 
         <ToggleButton
-            android:id="@+id/toolbar_button_starred"
+            android:id="@+id/toolbar_button_store_offline"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:drawableLeft="@drawable/ic_favorite_heart_filled_trim"
+            android:drawableStart="@drawable/ic_store_offline"
+            android:textOn="Download"
+            android:textOff="Download" />
+
+        <ToggleButton
+            android:id="@+id/toolbar_button_filter_favorites"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawableStart="@drawable/ic_favorite_heart_filled"
             android:textOn="Favorites"
             android:textOff="Favorites" />
 
-        <ToggleButton
-            android:id="@+id/toolbar_button_loadAll"
-            android:layout_width="90dp"
-            android:layout_height="match_parent"
-            android:textOn="LOADALL"
-            android:textOff="LOADALL" />
+
 
    <!--     <ToggleButton
             android:id="@+id/toggleButton"
