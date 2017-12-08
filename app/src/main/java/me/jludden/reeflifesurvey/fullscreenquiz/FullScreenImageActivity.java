@@ -16,7 +16,7 @@ import android.widget.RelativeLayout;
 
 import me.jludden.reeflifesurvey.fishcards.CardViewFragment;
 import me.jludden.reeflifesurvey.data.InfoCardLoader;
-import me.jludden.reeflifesurvey.data.InfoCard;
+import me.jludden.reeflifesurvey.data.model.InfoCard;
 import me.jludden.reeflifesurvey.R;
 
 import java.util.List;

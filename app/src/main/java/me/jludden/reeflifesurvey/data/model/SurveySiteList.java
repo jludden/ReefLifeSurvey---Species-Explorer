@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.data;
+package me.jludden.reeflifesurvey.data.model;
 
 import android.content.Context;
 import android.util.Log;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static me.jludden.reeflifesurvey.data.SharedPreferencesUtils.*;
+import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.*;
 
 /**
  * Created by Jason on 8/20/2017.

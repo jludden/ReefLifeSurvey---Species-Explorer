@@ -1,6 +1,6 @@
 package me.jludden.reeflifesurvey.search
 
-import me.jludden.reeflifesurvey.data.SearchResult
+import me.jludden.reeflifesurvey.data.model.SearchResult
 
 /**
  * Created by Jason on 11/12/2017.

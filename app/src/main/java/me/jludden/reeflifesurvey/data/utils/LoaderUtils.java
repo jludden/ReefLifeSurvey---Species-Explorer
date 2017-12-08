@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.data;
+package me.jludden.reeflifesurvey.data.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -24,7 +24,6 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
@@ -36,10 +35,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
-import io.reactivex.Observable;
-import me.jludden.reeflifesurvey.data.InfoCard.CardDetails;
-import me.jludden.reeflifesurvey.data.SurveySiteList.SurveySite;
 import me.jludden.reeflifesurvey.R;
+import me.jludden.reeflifesurvey.data.DataRepository;
+import me.jludden.reeflifesurvey.data.model.SurveySiteList;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

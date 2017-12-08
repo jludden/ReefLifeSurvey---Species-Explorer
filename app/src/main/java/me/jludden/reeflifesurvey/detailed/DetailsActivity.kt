@@ -11,15 +11,20 @@ import android.view.View
 import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.squareup.picasso.Picasso
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.customviews.BottomSheet
 import me.jludden.reeflifesurvey.data.*
-import me.jludden.reeflifesurvey.data.SharedPreferencesUtils.setUpFavoritesButton
+import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.setUpFavoritesButton
+import me.jludden.reeflifesurvey.data.model.InfoCard
+import me.jludden.reeflifesurvey.data.model.SearchResult
+import me.jludden.reeflifesurvey.data.model.SearchResultType
+import me.jludden.reeflifesurvey.data.model.SurveySiteList
 
 /**
  * Created by Jason on 11/19/2017.
@@ -33,7 +38,7 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
         setContentView(R.layout.activity_details)
 
         //todo set support postpone enter transition, but it can be very slow
-        supportPostponeEnterTransition() //postpone transition until the image is loaded
+//        supportPostponeEnterTransition() //postpone transition until the image is loaded
         dataRepo = DataRepository.getInstance(applicationContext)
 
 
@@ -42,7 +47,7 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
                     = intent.getParcelableExtra<SearchResult>(SearchResult.INTENT_EXTRA)
 
             if(searchResult.type == SearchResultType.FishSpecies) {
-
+                supportPostponeEnterTransition()
                 dataRepo.getFishCard(searchResult.id, object: DataRepository.LoadFishCardCallBack{
                     override fun onFishCardLoaded(card: InfoCard.CardDetails) {
                         setupFishDetails(card)
@@ -61,6 +66,7 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
         else if(intent.hasExtra(InfoCard.CardDetails.INTENT_EXTRA)){
             val card = intent.getParcelableExtra<InfoCard.CardDetails>(InfoCard.CardDetails.INTENT_EXTRA)
             //todo doesnt look like the card passed in had any data
+            supportPostponeEnterTransition()
             dataRepo.getFishCard(card.id, object: DataRepository.LoadFishCardCallBack{
                 override fun onFishCardLoaded(card: InfoCard.CardDetails) {
                     setupFishDetails(card)
@@ -120,6 +126,8 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
         if (card.imageURLs != null && card.imageURLs.size >= 1)
         {
             mainImageView.loadURL(card.imageURLs.get(0))
+        } else {
+            supportStartPostponedEnterTransition()
         }
 
 
@@ -171,6 +179,7 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
     fun ImageView.loadURL(url: String) {
         Glide.with(context)
                 .load(url)
+                //.apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.DATA)) todo may slightly increase performance of transition animation
                 .listener(object: RequestListener<Drawable>{
                     override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                         supportStartPostponedEnterTransition()

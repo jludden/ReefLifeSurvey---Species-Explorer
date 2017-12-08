@@ -18,8 +18,8 @@ import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 
 import me.jludden.reeflifesurvey.data.DataRepository;
-import me.jludden.reeflifesurvey.data.SurveySiteList;
-import me.jludden.reeflifesurvey.data.SurveySiteList.SurveySite;
+import me.jludden.reeflifesurvey.data.model.SurveySiteList;
+import me.jludden.reeflifesurvey.data.model.SurveySiteList.SurveySite;
 import me.jludden.reeflifesurvey.data.SurveySiteType;
 import me.jludden.reeflifesurvey.MainActivity;
 import me.jludden.reeflifesurvey.R;

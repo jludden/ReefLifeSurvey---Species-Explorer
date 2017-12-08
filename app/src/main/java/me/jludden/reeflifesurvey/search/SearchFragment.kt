@@ -14,9 +14,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.squareup.picasso.Picasso
-import me.jludden.reeflifesurvey.data.SearchResult
+import me.jludden.reeflifesurvey.data.model.SearchResult
 import kotlinx.android.synthetic.main.activity_search_results_item.view.*
-import me.jludden.reeflifesurvey.data.SearchResultType
+import me.jludden.reeflifesurvey.data.model.SearchResultType
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.detailed.DetailsActivity
 import me.jludden.reeflifesurvey.detailed.DetailsActivity.Companion.REQUEST_CODE

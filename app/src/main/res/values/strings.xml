@@ -35,6 +35,10 @@ Working collaboratively with government and management agencies, professional sc
     <string name="cancel">CANCEL</string>
     <string name="del_favorite_sites_message">Delete all favorited sites?</string>
     <string name="del_favorite_species_message">Delete all favorited species?</string>
+    <string name="del_offline_sites">Delete downloaded sites</string>
+    <string name="clear_offline_sites_final_prompt">Are you sure you want to delete %1$d images found in %2$s?</string>
+    <string name="notification_download_starting">Downloading… (%1$d species)</string>
+    <string name="notification_download_complete">Download complete (%1$d images of %2$d species)</string>
 
 
 </resources>

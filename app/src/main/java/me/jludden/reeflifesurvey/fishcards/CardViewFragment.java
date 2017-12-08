@@ -25,13 +25,12 @@ import org.jetbrains.annotations.NotNull;
 
 import me.jludden.reeflifesurvey.data.DataRepository;
 import me.jludden.reeflifesurvey.data.InfoCardLoader;
-import me.jludden.reeflifesurvey.data.SharedPreferencesUtils;
-import me.jludden.reeflifesurvey.data.StorageUtils;
-import me.jludden.reeflifesurvey.data.SurveySiteList;
+import me.jludden.reeflifesurvey.data.utils.StorageUtils;
+import me.jludden.reeflifesurvey.data.model.SurveySiteList;
 import me.jludden.reeflifesurvey.data.SurveySiteType;
 import me.jludden.reeflifesurvey.R;
-import me.jludden.reeflifesurvey.data.InfoCard;
-import me.jludden.reeflifesurvey.data.InfoCard.CardDetails;
+import me.jludden.reeflifesurvey.data.model.InfoCard;
+import me.jludden.reeflifesurvey.data.model.InfoCard.CardDetails;
 
 import java.util.ArrayList;
 import java.util.List;

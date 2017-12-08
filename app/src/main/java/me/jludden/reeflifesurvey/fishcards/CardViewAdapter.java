@@ -12,20 +12,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-import me.jludden.reeflifesurvey.data.InfoCard;
+import me.jludden.reeflifesurvey.data.model.InfoCard;
 import me.jludden.reeflifesurvey.BuildConfig;
 import me.jludden.reeflifesurvey.R;
-import me.jludden.reeflifesurvey.data.SharedPreferencesUtils;
-import me.jludden.reeflifesurvey.data.StorageUtils;
-import me.jludden.reeflifesurvey.data.StoredImageLoader;
+import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils;
+import me.jludden.reeflifesurvey.data.utils.StoredImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static me.jludden.reeflifesurvey.fishcards.CardViewFragment.TAG;
-import static me.jludden.reeflifesurvey.data.SharedPreferencesUtils.setUpFavoritesButton;
+import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.setUpFavoritesButton;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link InfoCard.CardDetails} and makes a call to the
@@ -129,18 +129,25 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             final InfoCard.CardDetails cardDetails = mCardList.get(realPosition);
-            // Log.d("jludden.reeflifesurvey"  , "CardViewAdapter onBind FishCardVH. CardListSize: "+ mCardList.size()+ " HiddenListSize: "+mHiddenList.size()+" adapter pos: "+ position + " datasource pos: "+position);
+             Log.d("jludden.reeflifesurvey"  , "CardViewAdapter onBind FishCardVH. CardListSize: "+ mCardList.size()+ " HiddenListSize: "+mHiddenList.size()+" adapter pos: "+ position + " datasource pos: "+position);
 
 
             //todo maybe i can refactor this into a CardDetails method
             if(cardDetails.getOffline()) {
                 vhItem.mImageView.setImageBitmap(
                         mStoredImageLoader.loadPrimaryCardImage(cardDetails));
+
+
+              //  glide.load(mStoredImageLoader.loadPrimaryCardImage(cardDetails))
+                //        .into(vhItem.mImageView);
+//                glide.load(mStoredImageLoader.loadImageFromStorage(cardDetails.id)) //todo will not work in future
+//                        .into(vhItem.mImageView);
             }
             else {
                 glide
                         .load(cardDetails.getPrimaryImageURL())
                         .apply(mGlideRequestOptions)
+                            //.diskCacheStrategy(DiskCacheStrategy.DATA)) may slightly increase performance when loading details activity transition
                         .transition(withCrossFade())
                         .into(vhItem.mImageView);
             }

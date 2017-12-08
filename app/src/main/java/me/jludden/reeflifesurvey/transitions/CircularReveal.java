@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 
+import me.jludden.reeflifesurvey.customviews.utils.AnimUtils;
 import me.jludden.reeflifesurvey.R;
 
 

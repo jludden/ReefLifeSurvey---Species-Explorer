@@ -28,6 +28,11 @@
         app:showAsAction="never"
         android:title="@string/del_favorite_species"/>
 
+    <item android:id="@+id/settings_opt_del_offline_sites"
+        android:icon="@drawable/ic_store_offline"
+        app:showAsAction="never"
+        android:title="@string/del_offline_sites"/>
+
     <item android:id="@+id/settings_opt_about"
         android:icon="@drawable/ic_menu_share"
         app:showAsAction="never"

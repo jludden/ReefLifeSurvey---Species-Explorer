@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.data;
+package me.jludden.reeflifesurvey.data.model;
 
 import android.app.Activity;
 import android.os.Parcel;
@@ -12,7 +12,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
-import static me.jludden.reeflifesurvey.data.SharedPreferencesUtils.getPref;
+import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.getPref;
 
 /**
  * Helper class for providing sample cardName for user interfaces created by
@@ -80,7 +80,7 @@ public class InfoCard {
      * With that in mind, try not to save any images or drawables here.
      * Those can be loaded and garbage collected by the view adapter
      */
-    public static class CardDetails implements Parcelable, Comparable, SearchResultable{
+    public static class CardDetails implements Parcelable, Comparable, SearchResultable {
         private static final String TAG = "InfoCard.CardDetails";
         public final String id;
         public String cardName;

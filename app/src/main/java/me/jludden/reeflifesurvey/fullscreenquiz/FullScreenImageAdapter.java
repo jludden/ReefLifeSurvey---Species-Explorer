@@ -24,10 +24,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
-import me.jludden.reeflifesurvey.data.InfoCard;
+import me.jludden.reeflifesurvey.data.model.InfoCard;
 import me.jludden.reeflifesurvey.R;
 
 

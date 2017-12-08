@@ -8,14 +8,15 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 
-import com.bumptech.glide.Glide;
-
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
+import me.jludden.reeflifesurvey.data.model.SurveySiteList;
+import me.jludden.reeflifesurvey.data.utils.LoaderUtils;
+import me.jludden.reeflifesurvey.data.utils.StorageUtils;
 import me.jludden.reeflifesurvey.fishcards.CardViewFragment;
-import me.jludden.reeflifesurvey.data.InfoCard.CardDetails;
+import me.jludden.reeflifesurvey.data.model.InfoCard.CardDetails;
 import me.jludden.reeflifesurvey.R;
-import me.jludden.reeflifesurvey.data.SurveySiteList.SurveySite;
+import me.jludden.reeflifesurvey.data.model.SurveySiteList.SurveySite;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -35,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import static me.jludden.reeflifesurvey.BuildConfig.DEBUG;
-import static me.jludden.reeflifesurvey.data.LoaderUtils.isOnline;
+import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.isOnline;
 
 /**
  * Created by Jason on 5/1/2017.

@@ -2,6 +2,8 @@ package me.jludden.reeflifesurvey.search
 
 import io.reactivex.Observable
 import me.jludden.reeflifesurvey.data.*
+import me.jludden.reeflifesurvey.data.model.SearchResult
+import me.jludden.reeflifesurvey.data.model.SearchResultable
 
 /**
  * Created by Jason on 11/12/2017.

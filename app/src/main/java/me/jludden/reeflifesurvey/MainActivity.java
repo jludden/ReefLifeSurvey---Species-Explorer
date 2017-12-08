@@ -5,9 +5,11 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,6 +21,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -38,17 +41,19 @@ import android.widget.ToggleButton;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.squareup.haha.perflib.Main;
 
-import me.jludden.reeflifesurvey.data.SharedPreferencesUtils;
+import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils;
+import me.jludden.reeflifesurvey.data.utils.StorageUtils;
 import me.jludden.reeflifesurvey.detailed.DetailsActivity;
 import me.jludden.reeflifesurvey.fishcards.CardViewFragment;
 import me.jludden.reeflifesurvey.fishcards.CardViewFragment.CardViewSettings;
 
 import me.jludden.reeflifesurvey.fullscreenquiz.FullScreenImageActivity;
-import me.jludden.reeflifesurvey.data.InfoCard;
+import me.jludden.reeflifesurvey.data.model.InfoCard;
 import me.jludden.reeflifesurvey.customviews.BottomSheet;
 import me.jludden.reeflifesurvey.search.SearchActivity;
-import me.jludden.reeflifesurvey.data.SurveySiteList;
+import me.jludden.reeflifesurvey.data.model.SurveySiteList;
 import me.jludden.reeflifesurvey.mapsites.MapViewFragment;
 
 import org.jetbrains.annotations.NotNull;
@@ -362,14 +367,25 @@ public class MainActivity extends AppCompatActivity implements
                 hideClutter();
                 return true;
             case R.id.settings_opt_del_favorite_sites:
-                showAlertDialog(this, R.string.del_favorite_sites_message);
-                //todo
+                showAlertDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) { // User clicked OK button;
+                        SharedPreferencesUtils.clearFavSites(getApplicationContext());
+                    }
+                });
                 return true;
             case R.id.settings_opt_del_favorite_species:
-                Context context = getApplicationContext();
-
-                showAlertDialog(this, R.string.del_favorite_species_message);
-                //todo
+                showAlertDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) { // User clicked OK button;
+                        SharedPreferencesUtils.clearFavSpecies(getApplicationContext());
+                    }
+                });
+                return true;
+            case R.id.settings_opt_del_offline_sites: //todo probably refactor to download settings activity
+                showAlertDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) { // User clicked OK button;
+                        StorageUtils.Companion.clearOfflineSites(MainActivity.this);
+                    }
+                });
                 return true;
             case R.id.settings_opt_about:
                 options =  ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
@@ -913,19 +929,15 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Shows the dialog when the restart button is clicked
      * Start new game, restart game, or cancel dialog
-     * @param activity
+     * @param activity current activity
+     * @param message
+     * @param onPositiveClick
      */
-    void showAlertDialog(Activity activity, final int message) {
+    public static void showAlertDialog(Activity activity, String message, DialogInterface.OnClickListener onPositiveClick) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(message)
                 .setTitle(R.string.app_name);
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User clicked OK button;
-                if(message == R.string.del_favorite_sites_message) SharedPreferencesUtils.clearFavSites(getApplicationContext());
-                if(message == R.string.del_favorite_species_message) SharedPreferencesUtils.clearFavSpecies(getApplicationContext());
-            }
-        });
+        builder.setPositiveButton(R.string.ok, onPositiveClick);
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User cancelled the dialog
@@ -935,4 +947,5 @@ public class MainActivity extends AppCompatActivity implements
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
 }

@@ -5,10 +5,12 @@ import android.util.Log
 import io.reactivex.Observable
 import me.jludden.reeflifesurvey.data.InfoCardLoader.parseSpeciesDetailsHelper
 import me.jludden.reeflifesurvey.R
-import me.jludden.reeflifesurvey.data.InfoCard.CardDetails
+import me.jludden.reeflifesurvey.data.model.InfoCard.CardDetails
 import org.json.JSONObject
 import kotlin.collections.HashMap
 import me.jludden.reeflifesurvey.data.SurveySiteType.*
+import me.jludden.reeflifesurvey.data.model.SurveySiteList
+import me.jludden.reeflifesurvey.data.utils.LoaderUtils
 import java.io.InputStream
 import java.util.ArrayList
 

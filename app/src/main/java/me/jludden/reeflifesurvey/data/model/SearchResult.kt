@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey.data
+package me.jludden.reeflifesurvey.data.model
 
 import android.os.Parcel
 import android.os.Parcelable
