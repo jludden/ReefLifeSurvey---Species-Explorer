@@ -9,13 +9,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.customviews.BottomSheet
@@ -38,7 +32,8 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
         setContentView(R.layout.activity_details)
 
         //todo set support postpone enter transition, but it can be very slow
-//        supportPostponeEnterTransition() //postpone transition until the image is loaded
+        //currently only postponing transition for cardview -> details
+        // supportPostponeEnterTransition() //postpone transition until the image is loaded
         dataRepo = DataRepository.getInstance(applicationContext)
 
 
@@ -131,7 +126,7 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
         }
 
 
-        val additionalImages = findViewById(R.id.details_additional_images) as LinearLayout
+        val additionalImages = findViewById<LinearLayout>(R.id.details_additional_images)
         if (card.imageURLs == null)
         {
             Log.d(TAG, "DetailsviewAdapter card details no images to load")
@@ -177,7 +172,7 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
         }
 
     fun ImageView.loadURL(url: String) {
-        Glide.with(context)
+      /*  Glide.with(context)
                 .load(url)
                 //.apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.DATA)) todo may slightly increase performance of transition animation
                 .listener(object: RequestListener<Drawable>{
@@ -193,13 +188,22 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
 
                 })
                 .into(this)
-                .onLoadFailed(getDrawable(R.drawable.ic_menu_camera))
+                .onLoadFailed(getDrawable(R.drawable.ic_menu_camera))*/
 
 
-        /*    Picasso.with(context)
+            Picasso.with(context)
             .load(url)
             .error(R.drawable.ic_menu_camera)
-            .into(this)*/
+            .into(this, object: Callback {
+                override fun onSuccess() {
+                    supportStartPostponedEnterTransition()
+                }
+
+                override fun onError() {
+                    supportStartPostponedEnterTransition()
+                }
+            })
+
 
         /*    Glide.with(context)
                     .load(url)

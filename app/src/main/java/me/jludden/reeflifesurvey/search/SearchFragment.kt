@@ -182,9 +182,11 @@ class SearchFragment : Fragment(), SearchContract.View {
         }
 
         fun ImageView.loadSearchResultImage(url: String, type: Enum<SearchResultType>){
-            if(type == SearchResultType.SurveySiteLocation) loadRes(R.mipmap.ic_place)
-            else if(url == "") loadRes(R.drawable.ic_menu_camera)
-            else loadURL(url)
+            when {
+                type == SearchResultType.SurveySiteLocation -> loadRes(R.mipmap.ic_place)
+                url == "" -> loadRes(R.drawable.ic_menu_camera)
+                else -> loadURL(url)
+            }
         }
 
         fun ImageView.loadRes(resId: Int) {

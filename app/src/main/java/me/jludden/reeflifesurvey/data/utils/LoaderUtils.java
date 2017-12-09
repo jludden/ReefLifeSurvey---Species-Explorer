@@ -6,10 +6,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.RawRes;
 import android.util.Log;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.FutureTarget;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -262,65 +258,7 @@ public class LoaderUtils {
         return siteList;
     }
 
-    /**
-     * One stop function for downloading one or more images using Glide
-     * This is only for downloading them on a background thread.
-     *
-     * @param params
-     * @return
-     */
-    public List<Drawable> downloadImages(Context context, String... params) {
-        // fire everything into Glide queue
-        FutureTarget<Drawable>[] requests = queueGlideRequests(context, params);
 
-        // wait for each item
-        List<Drawable> result = waitGlideResults(requests);
-        return result;
-    }
-
-    /**
-     * Method to start requesting images to load from Glide
-     *
-     * @param params image urls to load
-     * @return array of future target drawables
-     */
-    public FutureTarget<Drawable>[] queueGlideRequests(Context context, String... params) {
-        FutureTarget<Drawable>[] requests = new FutureTarget[params.length];
-        for (int i = 0; i < params.length; i++) {
-            if (isCancelled()) {
-                break;
-            }
-            requests[i] = Glide.with(context)
-                    .load(params[i])
-                    .submit(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-            ;
-        }
-        return requests;
-    }
-
-    //TODO enable cancelling
-    private boolean isCancelled() {
-        return false;
-    }
-
-    /**
-     * Method to wait for images to load from Glide, after they have already been requested
-     *
-     * @param requests array of submitted future target requests
-     * @return list of drawables, now fully loaded
-     */
-    public static List<Drawable> waitGlideResults(FutureTarget<Drawable>[] requests) {
-        List<Drawable> result = new ArrayList<>();
-        for (int i = 0; i < requests.length; i++) {
-//            if (isCancelled()) todo
-            try {
-                result.add(requests[i].get(10, TimeUnit.SECONDS));
-            } catch (Exception e) {
-                //   result.failures.put(params[i], e);
-            }
-        }
-        return result;
-    }
 
     /**
      * Downloads a string from a URL with no parameters needed
@@ -336,25 +274,6 @@ public class LoaderUtils {
                 .build();
         Response response = client.newCall(request).execute();
         return response.body().string();
-    }
-
-    /**
-     * Loads a bitmap image from a url
-     * PROBABLY WANT TO USE GLIDE INSTEAD
-     *
-     * @param source url to load image from
-     * @return
-     * @throws MalformedURLException
-     */
-    public static Bitmap getBitmapFromURL(String source) throws IOException {
-        Bitmap myBitmap;
-        URL url = new URL(source);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setDoInput(true);
-        connection.connect();
-        InputStream input = connection.getInputStream();
-        myBitmap = BitmapFactory.decodeStream(input);
-        return myBitmap;
     }
     //endregion
 }

@@ -10,10 +10,8 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
+import com.squareup.picasso.Picasso;
+
 import me.jludden.reeflifesurvey.data.model.InfoCard;
 import me.jludden.reeflifesurvey.BuildConfig;
 import me.jludden.reeflifesurvey.R;
@@ -22,8 +20,6 @@ import me.jludden.reeflifesurvey.data.utils.StoredImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static me.jludden.reeflifesurvey.fishcards.CardViewFragment.TAG;
 import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.setUpFavoritesButton;
 
@@ -38,8 +34,10 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private List<InfoCard.CardDetails> mCardList = new ArrayList<>(); //visible cards, the Adapters backing data source
     private List<InfoCard.CardDetails> mAllCardList = new ArrayList<>(); //All cards, including any hidden / filtered ones
     private List<String> mHiddenList = new ArrayList<>(); //list of hidden cards (just their string IDs) TODO delete in favor of ALL + SHOWN model
-    private RequestManager glide;
-    private RequestOptions mGlideRequestOptions;
+    //private RequestManager glide;
+    private Picasso picasso;
+    //private RequestOptions mGlideRequestOptions;
+
     private RecyclerView mRecyclerView;
     private CardViewFragment mCardViewFragment;
     private StoredImageLoader mStoredImageLoader;
@@ -50,8 +48,9 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     //todo add param for listener
     public CardViewAdapter(CardViewFragment parent, RecyclerView listView, CardViewFragment.OnCardViewFragmentInteractionListener listener) {
-        this.glide = Glide.with(parent); //cache the Glide RequestManager object
-        this.mGlideRequestOptions = new RequestOptions().placeholder(R.drawable.ic_menu_camera); //todo change placeholder image
+       // this.glide = Glide.with(parent); //cache the Glide RequestManager object
+        this.picasso = Picasso.with(parent.getContext().getApplicationContext());
+        //this.mGlideRequestOptions = new RequestOptions().placeholder(R.drawable.ic_menu_camera); //todo change placeholder image
 
         this.mHeader = new CardViewHeader("hi this is a header");
         //mListener = listener;
@@ -144,12 +143,22 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 //                        .into(vhItem.mImageView);
             }
             else {
-                glide
+         /*       glide
                         .load(cardDetails.getPrimaryImageURL())
                         .apply(mGlideRequestOptions)
                             //.diskCacheStrategy(DiskCacheStrategy.DATA)) may slightly increase performance when loading details activity transition
                         .transition(withCrossFade())
-                        .into(vhItem.mImageView);
+                        .into(vhItem.mImageView);*/
+
+                if(cardDetails.getPrimaryImageURL().equals("")){
+                    picasso.load(R.drawable.ic_menu_camera).into(vhItem.mImageView);
+                } else {
+
+                    picasso
+                            .load(cardDetails.getPrimaryImageURL())
+                            .placeholder(R.drawable.ic_menu_camera)
+                            .into(vhItem.mImageView);
+                }
             }
 
             vhItem.mOverlayView.setText(cardDetails.cardName); //picture overlay text
@@ -293,7 +302,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         //((FishCardViewHolder) holder).mImageView);
         if(holder instanceof FishCardViewHolder) {
             final FishCardViewHolder vhItem = (FishCardViewHolder) holder;
-            glide.clear(vhItem.mImageView);
+            //glide.clear(vhItem.mImageView);
             vhItem.mFavoriteBtn.setButtonDrawable(SharedPreferencesUtils.FAVORITES_OUTLINE);
         }
     }

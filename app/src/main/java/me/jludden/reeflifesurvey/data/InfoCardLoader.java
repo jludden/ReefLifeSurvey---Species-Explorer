@@ -117,7 +117,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
         super(context);
         mPassedInSurveySiteCode = siteCode;
         mCardType = cardType;
-        if(DEBUG) Log.d(TAG  , "CardInfoLoader Created. Card Type to load: " + cardType);
+        if(DEBUG) Log.d(TAG  , "InfoCardLoader Created. Card Type to load: " + cardType);
 
 //        if(!isOnline()) {} show snackbar
     }
@@ -127,7 +127,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
      */
     @Override
     protected void onStartLoading() {
-        Log.d(TAG  , "CardInfoLoader onStartLoading called. takecontentchanged: " + takeContentChanged());
+        Log.d(TAG  , "InfoCardLoader onStartLoading called. takecontentchanged: " + takeContentChanged());
         if (takeContentChanged() || mData == null) {
             forceLoad();
         }
@@ -161,7 +161,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
     @Override
     public List<CardDetails> loadInBackground() {
 
-        Log.d(TAG  , "CardInfoLoader loadInBackground called "+isOnline()+"_"+(mData == null || mData.size() <= 0)+"_"+(mPassedInSurveySiteCode.equals("")));
+        Log.d(TAG  , "InfoCardLoader loadInBackground called "+isOnline()+"_"+(mData == null || mData.size() <= 0)+"_"+(mPassedInSurveySiteCode.equals("")));
 
         //no internet, no passed in site - load downloaded
         if(!isOnline() && (mData == null || mData.size() <= 0) && (mPassedInSurveySiteCode.equals(""))) {

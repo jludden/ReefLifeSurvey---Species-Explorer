@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements
             new FragmentManager.OnBackStackChangedListener() {
                 @Override
                 public void onBackStackChanged() {
-                    if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+                    if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // show back button
                     } else {
                         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -263,7 +263,8 @@ public class MainActivity extends AppCompatActivity implements
 
         //start the home fragment
         hideClutter();
-        launchUIFragment(new HomeFragment(), HomeFragment.TAG, true);
+        launchUIFragment(new HomeFragment(), HomeFragment.TAG, true, false);
+
     }
 
     @Override
@@ -531,20 +532,19 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void launchUIFragment(Fragment newFragment, String tag){
-        launchUIFragment(newFragment, tag, false);
+        launchUIFragment(newFragment, tag, false, true);
     }
 
-    private void launchUIFragment(Fragment newFragment, String tag, boolean noAnim) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        android.support.v4.app.FragmentTransaction tx = fragmentManager.beginTransaction();
+    private void launchUIFragment(Fragment newFragment, String tag, boolean noAnim, boolean addToBackstack) {
+        android.support.v4.app.FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
         if(!noAnim) {
             tx.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
-                R.anim.enter_from_left, R.anim.exit_to_right);
-        }
-        tx
-            .replace(R.id.content_frame, newFragment, tag)
-            .addToBackStack(null)
-            .commit();
+                R.anim.enter_from_left, R.anim.exit_to_right); }
+
+        tx.replace(R.id.content_frame, newFragment, tag);
+        if(addToBackstack) { tx.addToBackStack(null); }
+
+        tx.commit();
     }
 
   /*  @Override

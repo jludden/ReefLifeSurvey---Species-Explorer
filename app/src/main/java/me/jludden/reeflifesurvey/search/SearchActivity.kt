@@ -9,6 +9,7 @@ import android.widget.SearchView
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import me.jludden.reeflifesurvey.R
 import java.util.concurrent.TimeUnit
@@ -22,6 +23,10 @@ import me.jludden.reeflifesurvey.data.DataRepository
  *
  */
 class SearchActivity : AppCompatActivity() {
+
+    private val compositeSubscription = CompositeDisposable()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
@@ -70,12 +75,13 @@ class SearchActivity : AppCompatActivity() {
         search_view.setOnQueryTextListener(searchViewListener)*/
 
 
-        Observable
+        compositeSubscription.add(
+            Observable
                 .create(ObservableOnSubscribe<String> { subscriber ->
                    search_view.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                        override fun onQueryTextSubmit(query: String): Boolean {
                            searchPresenter.onQueryTextSubmit(query)
-                           return true;
+                           return true
                        }
 
                        override fun onQueryTextChange(query: String): Boolean {
@@ -88,10 +94,15 @@ class SearchActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ query -> searchPresenter.onQueryTextChange(query)})
+        )
 
     }
 
 
+    override fun onDestroy() {
+        compositeSubscription.clear()
+        super.onDestroy()
+    }
 
     /**
      * show the keyboard
