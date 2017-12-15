@@ -39,6 +39,11 @@ Working collaboratively with government and management agencies, professional sc
     <string name="clear_offline_sites_final_prompt">Are you sure you want to delete %1$d images found in %2$s?</string>
     <string name="notification_download_starting">Downloading… (%1$d species)</string>
     <string name="notification_download_complete">Download complete (%1$d images of %2$d species)</string>
+    <string name="storage_location_dialog_title">Choose storage location</string>
+    <string name="storage_location_dialog_internal_loc">Internal</string>
+    <string name="storage_location_dialog_external_loc">SD Card</string>
+    <string name="storage_location_dialog_space_remaining_message">%1$d MB remaining</string>
+
 
 
 </resources>

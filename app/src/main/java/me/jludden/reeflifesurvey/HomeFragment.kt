@@ -35,40 +35,6 @@ class HomeFragment : Fragment() {
 
         val root = inflater.inflate(R.layout.home_fragment, container, false)
 
-
-/*
-
-
-        (root.findViewById(R.id.home_background) as ImageView).setImageDrawable(getDrawable(context,R.drawable.whale_portrait))
-*/
-
-
-
-
-        /*with(root){
-
-        }*/
-//
-  /*  Glide
-            .with(this)
-            .load(
-                    this.resources.getIdentifier("whale_portrait", "drawable", activity.packageName)
-                    //"https://images.reeflifesurvey.com/0/species_17_576b40231c6c2.w1300.h866.JPG"
-            )
-            //.into(home_background)
-            .into(root.findViewById(R.id.home_background) as ImageView)*/
-//
-//
-//        Picasso.with(context)
-//                .load(
-//                        this.resources.getIdentifier("whale_portrait", "drawable", activity.packageName)
-//                        //"https://images.reeflifesurvey.com/0/species_17_576b40231c6c2.w1300.h866.JPG"
-//                )
-                //.into(home_background)
-//                .fit()
-//                .into(root.findViewById(R.id.home_background) as ImageView)
-
-
         with(root) {
             findViewById<Button>(R.id.button_launch_browse_species).setOnClickListener({
                 (activity as MainActivity).launchNewFragment(CardViewFragment::class.java)

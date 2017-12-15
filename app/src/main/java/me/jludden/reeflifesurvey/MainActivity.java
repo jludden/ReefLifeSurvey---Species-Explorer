@@ -5,11 +5,8 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,7 +18,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -41,7 +37,6 @@ import android.widget.ToggleButton;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.squareup.haha.perflib.Main;
 
 import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils;
 import me.jludden.reeflifesurvey.data.utils.StorageUtils;
@@ -89,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        /*Caused by: java.lang.IllegalStateException: This Activity already has an action bar supplied by the window decor. Do not request Window.FEATURE_SUPPORT_ACTION_BAR and set windowActionBar to false in your theme to use a Toolbar instead.*/
         setSupportActionBar(toolbar); //todo could this be the collapsing toolbar?
 
 
@@ -368,21 +365,21 @@ public class MainActivity extends AppCompatActivity implements
                 hideClutter();
                 return true;
             case R.id.settings_opt_del_favorite_sites:
-                showAlertDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
+                showOkCancelDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) { // User clicked OK button;
                         SharedPreferencesUtils.clearFavSites(getApplicationContext());
                     }
                 });
                 return true;
             case R.id.settings_opt_del_favorite_species:
-                showAlertDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
+                showOkCancelDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) { // User clicked OK button;
                         SharedPreferencesUtils.clearFavSpecies(getApplicationContext());
                     }
                 });
                 return true;
             case R.id.settings_opt_del_offline_sites: //todo probably refactor to download settings activity
-                showAlertDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
+                showOkCancelDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) { // User clicked OK button;
                         StorageUtils.Companion.clearOfflineSites(MainActivity.this);
                     }
@@ -442,8 +439,6 @@ public class MainActivity extends AppCompatActivity implements
 //            getSupportActionBar().setTitle(title);
 //            getSupportActionBar().setSubtitle(subtitle);
             AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
-            toolbar.setExpanded(true,true);
-
             //mFAB.show();
             launchUIFragment(newFragment, tag);
 
@@ -867,13 +862,6 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 break;
             case(R.id.toolbar_button_store_offline):
-               /*
-                Old Load all button code:
-                CardViewSettings.LOAD_ALL = isChecked;
-                if (viewFragment != null && viewFragment.isVisible()) {
-                    viewFragment.onLoadMore(false);
-                }*/
-
                 if (viewFragment != null && viewFragment.isVisible()) {
                     viewFragment.storeInLocal();
                 }
@@ -927,13 +915,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Shows the dialog when the restart button is clicked
-     * Start new game, restart game, or cancel dialog
+     * Shows
      * @param activity current activity
      * @param message
      * @param onPositiveClick
      */
-    public static void showAlertDialog(Activity activity, String message, DialogInterface.OnClickListener onPositiveClick) {
+    public static void showOkCancelDialog(Activity activity, String message, DialogInterface.OnClickListener onPositiveClick) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(message)
                 .setTitle(R.string.app_name);

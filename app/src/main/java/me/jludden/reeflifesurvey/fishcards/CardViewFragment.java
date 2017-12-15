@@ -18,8 +18,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ToggleButton;
+
+import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -324,30 +327,20 @@ public class CardViewFragment extends Fragment implements
 
         Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onLoadFinished loaderid: "+loader.getId()+" data length: "+data.size() + " adapter item count increased from "+iCountPrev+" to "+iCountAfter);
 
-
-        // Hide it (with animation):
+        // remove progress bar
         animateView(mProgressBar, View.GONE, 0, 200);
-
-        //try to pass data back to the main activity
-        //edit - this can be done better by using a retained, headless fragment
-//        Intent intent = new Intent(getActivity().getBaseContext(),
-//                MainActivity.class);
-//        intent.putExtra("cardInfo", data.get(0)); //TODO put the whole list?
-       // getActivity().startActivity(intent); TODO can i pass the data without starting the activity again?
-        // (MainActivity) getActivity().setCardDetails(data)
     }
 
     /**
      * Store the current configuration of sites and all their relevant fish images to disk
-     * todo should this really be in this class? we really only need the passed in survey site code... get it from loader? store it somewhere static? main activity?
+     * would like to one day refactor this so we weren't relying on the already loaded card list
      */
     public void storeInLocal() {
 
-
-       /* if(!mLoadedAll) {
+        if(!mLoadedAll) {
             Log.e(TAG, "storeInLocal: not all loaded" );
             return; //todo
-        }*/
+        }
 
         //todo refactor. this logic in both infocardloader and cardviewfragment
         List<String> siteCodes;
@@ -358,10 +351,10 @@ public class CardViewFragment extends Fragment implements
         }
 
         //todo below here, everything should be in a different routine
-        StorageUtils.Companion.storeSites(
-          mViewAdapter.getCardList(), siteCodes, getContext());
+        StorageUtils.Companion.promptToSaveOffline(
+                mViewAdapter.getCardList(), siteCodes, getActivity());
 
-//        StorageUtils.Companion.storeSites(siteCodes, getContext());
+//        StorageUtils.Companion.promptToSaveOffline(siteCodes, getContext());
     }
 
 
@@ -398,6 +391,8 @@ public class CardViewFragment extends Fragment implements
         //todo this is just adding favorites to toolbar
         //  update to add th actual sites being searched
         addSiteLocationsToToolbar(sites.getFavoritedSiteCodes());
+
+        addStaticMapToToolbar(sites);
     }
 
     /**
@@ -428,6 +423,31 @@ public class CardViewFragment extends Fragment implements
             siteButton.setOnCheckedChangeListener(this);
             toolbarLayout.addView(siteButton);
         }
+    }
+
+    public void addStaticMapToToolbar(SurveySiteList sites) {
+        Log.d(TAG, "launchNewCardViewFragment: loading map url");
+
+       /* for(String code : sites.getFavoritedSiteCodes()){
+            sites.
+        }
+        siteCodeList.*/
+
+
+        //loading static map
+        //fixed size to fit in expandable toolbar (TODO)
+        //add markers + label:CODE
+        final ImageView topImage = getActivity().findViewById(R.id.collapsing_toolbar_image);
+        String mapsURL = "https://maps.googleapis.com/maps/api/staticmap?\n" +
+                "size=400x200\n" +
+                "&maptype=terrain\n" +
+                "&markers=color:blue%7Clabel:S%7C40.702147,-74.015794\n" +
+                "&markers=color:green%7Clabel:G%7C40.711614,-74.012318\n" +
+                "&markers=color:red%7Clabel:C%7C40.718217,-73.998284\n" +
+                "&key=" + getString(R.string.google_maps_key);
+
+
+        Picasso.with(getContext()).load(mapsURL).into(topImage);
     }
 
     @Override

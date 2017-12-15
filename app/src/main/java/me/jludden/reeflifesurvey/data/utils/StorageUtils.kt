@@ -1,17 +1,23 @@
 package me.jludden.reeflifesurvey.data.utils
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.NotificationManager
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.DialogInterface
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.os.Environment
+import android.os.StatFs
 import android.support.v7.app.NotificationCompat
 import com.squareup.picasso.Picasso
 import android.util.Log
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.TextView
 import io.reactivex.Observable
 import me.jludden.reeflifesurvey.MainActivity
 import me.jludden.reeflifesurvey.R
@@ -40,7 +46,9 @@ class StorageUtils{
 
         val PROGRESS_BAR_NOTIFICATION_ID: Int = 123
 
-        val writeToExternal = false //todo every reference to this needs to be checked
+        var writeToExternal = false //todo every reference to this needs to be checked
+
+        val SIZE_KB : Long = 1024
 
         /*
         * UTIL
@@ -52,6 +60,7 @@ class StorageUtils{
         }
 
         fun canWriteToExternalStorage(): Boolean {
+          //  return false
             return Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()
         }
 
@@ -72,6 +81,12 @@ class StorageUtils{
 
 
         /**
+         * Begins the workflow of storing sites and fish species images offline
+         *
+         *  first, determine the storage space available on local and external sd
+         *  then, prompt the user for confirmation and to select the storage location if multiple
+         *
+         *
          * Stores a list of fish species images
          *  to sd card or local storage
          *
@@ -80,12 +95,87 @@ class StorageUtils{
          *
          * todo param or choice - do we store one image per fish, or all images?
          *
+         * todo calculate the expected amount of storage space needed?
+         *
+         * todo show gb/mb/kb instead of just mb
          */
-        fun storeSites(cardList: List<CardDetails>, siteCodes: List<String>, context: Context) {
+        fun promptToSaveOffline(cardList: List<CardDetails>, siteCodes: List<String>, context: Activity) {
+
+            val builder = AlertDialog.Builder(context)
+            builder
+                    .setTitle(context.getString(R.string.storage_location_dialog_title)) //todo
+                    .setView(R.layout.storage_location_dialog)
+            builder.setPositiveButton(R.string.ok) { _, _ ->
+                //user accepted
+                storeSites(cardList, siteCodes, context)
+            }
+            builder.setNegativeButton(R.string.cancel) { dialog, id ->
+                // User cancelled the dialog
+            }
+
+            val dialog = builder.create()
+            dialog.show()
 
             //todo
-            if(canWriteToExternalStorage()) Log.d(TAG, "CAN WRITE TO EXTERNAL STORAGE")
+            val cw = ContextWrapper(context)
+            val folderName = "images"
+            val extButton = dialog.findViewById<RadioButton>(R.id.storage_ext_button)
+            extButton.setOnClickListener({
+                writeToExternal = true
+                    Log.d(TAG, "ON RADIO CLICK writeToExt: $writeToExternal")})
+            val localButton = dialog.findViewById<RadioButton>(R.id.storage_local_button)
+            localButton.setOnClickListener({ writeToExternal = false
+                Log.d(TAG, "ON RADIO CLICK writeToExt: $writeToExternal")})
 
+            dialog.findViewById<TextView>(R.id.storage_local_remaining_space).text =
+                    context.getString(R.string.storage_location_dialog_space_remaining_message,
+                            calcSpaceRemaining(cw.getDir(folderName, Context.MODE_PRIVATE).absolutePath))
+
+            if(canWriteToExternalStorage()){
+                    Log.d(TAG, "CAN WRITE TO EXTERNAL STORAGE " +
+                        "\n local 1 ${calcSpaceRemaining(Environment.getDataDirectory().path)}" +
+                        "\n local 2 ${calcSpaceRemaining(Environment.getDataDirectory().absolutePath)}" +
+                        "\n local 3 ${calcSpaceRemaining(cw.getDir(folderName, Context.MODE_PRIVATE).absolutePath)}" +
+                        "\n local 4 ${calcSpaceRemaining(context.filesDir.absolutePath)}" +
+                        "\n local 5 ${calcSpaceRemaining(context.filesDir.path)}" +
+                        "\n ext 1 ${calcSpaceRemaining(Environment.getExternalStorageDirectory().path)} " +
+                        "\n ext 2 ${calcSpaceRemaining(cw.getExternalFilesDir(folderName).absolutePath)}" +
+                        "\n ext 3 ${calcSpaceRemaining(context.getExternalFilesDir(null).path)}" +
+                        "\n ext 4 ${calcSpaceRemaining(context.getExternalFilesDir(null).absolutePath)}" +
+                        "\n ext 5 ${calcSpaceRemaining(context.getExternalFilesDir(folderName).path)}" +
+                        "\n ext 6 ${calcSpaceRemaining(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath)}" +
+                        "\n ext 6 ${calcSpaceRemaining(context.externalMediaDirs?.get(0)?.absolutePath!!)} " )
+                extButton.isChecked = true
+                writeToExternal = true
+                dialog.findViewById<TextView>(R.id.storage_ext_remaining_space).text =
+                        context.getString(R.string.storage_location_dialog_space_remaining_message,
+                                calcSpaceRemaining(Environment.getExternalStorageDirectory().path))
+//                              calcSpaceRemaining(cw.getExternalFilesDir(folderName).absolutePath))
+            } else {
+                extButton.isEnabled = false
+                localButton.isChecked = true
+                writeToExternal = false
+            }
+        }
+
+        //returns the disk size
+        fun calcDiskSize(path: String) : Long {
+            val stat = StatFs(path)
+            val bytesAvailable = stat.blockSizeLong * stat.blockCountLong
+            return bytesAvailable / (SIZE_KB * SIZE_KB)
+        }
+
+        //returns space remaining in MB
+        fun calcSpaceRemaining(path: String) : Long {
+            val stat = StatFs(path)
+            val bytesAvailable = stat.blockSizeLong * stat.availableBlocksLong
+            return bytesAvailable / (SIZE_KB * SIZE_KB)
+        }
+
+        /**
+         * Launches a background task to save the sites
+         */
+        private fun storeSites(cardList: List<CardDetails>, siteCodes: List<String>, context: Context) {
             val cw = ContextWrapper(context)
             val folderName = "images"
             val path : String
@@ -183,7 +273,7 @@ class StorageUtils{
 
             //delete images
             val message = activity.resources.getString(R.string.clear_offline_sites_final_prompt, imageFiles.size, path)
-            MainActivity.showAlertDialog(activity, message) { _, _ ->
+            MainActivity.showOkCancelDialog(activity, message) { _, _ ->
                 Log.d(TAG, "DELETING OFFLINE SITES IN $path! (${imageFiles.size} sites)" )
                 imageFiles.forEach {
                     it.delete()
@@ -337,7 +427,11 @@ class StoredImageLoader(context: Context){
 
     }
 
-    fun loadPrimaryCardImage(card: CardDetails): Bitmap {
+    fun loadPrimaryCardImage(card: CardDetails): Bitmap? {
+        return loadImageFromStorage(card.getFileName(0))
+    }
+
+    fun loadPrimaryCardImageWithPlaceholder(card: CardDetails): Bitmap {
         val image = loadImageFromStorage(card.getFileName(0))
         return image ?: placeholderImage
     }

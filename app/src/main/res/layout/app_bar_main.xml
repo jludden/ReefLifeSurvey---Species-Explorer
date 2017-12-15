@@ -33,9 +33,11 @@
                 app:layout_collapseMode="parallax">
 
                <ImageView
+                    android:id="@+id/collapsing_toolbar_image"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    app:srcCompat="@color/colorPrimary" />
+                    android:layout_height="200dp"
+                    />
+                <!--app:srcCompat="@color/colorPrimary"-->
                 <!--app:srcCompat="@drawable/rls_logo_horizontal"/>-->
 
                 <include layout="@layout/app_bar_tools" />
@@ -46,6 +48,7 @@
                 android:id="@+id/toolbar"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_width="match_parent"
+                android:background="@color/colorPrimary"
                 android:theme="@style/AppTheme.AppBarOverlay"
                 app:layout_collapseMode="pin"/>
 

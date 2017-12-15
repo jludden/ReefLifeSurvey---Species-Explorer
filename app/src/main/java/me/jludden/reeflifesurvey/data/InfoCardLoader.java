@@ -164,19 +164,19 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
         Log.d(TAG  , "InfoCardLoader loadInBackground called "+isOnline()+"_"+(mData == null || mData.size() <= 0)+"_"+(mPassedInSurveySiteCode.equals("")));
 
         //no internet, no passed in site - load downloaded
+        //todo this is totally unnecessary, no part of this loading code needs to be online anyway
         if(!isOnline() && (mData == null || mData.size() <= 0) && (mPassedInSurveySiteCode.equals(""))) {
             Log.d(TAG, "InfoCardLoader: No Internet Detected and no passed in site - showing all downloaded");
             loadOffline();
+            return mData; //todo couldn't there be a timing issue with the stream
         }
 
 
-
-        if(mData == null) {
+        if (mData == null) {
             mData = new ArrayList<>(NUM_LOAD_PER_ITER);
-        }
-        else {
-        // TODO jank - loader manager won't call load finished if the data reference is the same?
-        // TODO UPDATE 8/12 seems fine UPDATE 10/12 it will mostly work with the adapter, but loadfinished is definitely not called
+        } else {
+            // TODO jank - loader manager won't call load finished if the data reference is the same?
+            // TODO UPDATE 8/12 seems fine UPDATE 10/12 it will mostly work with the adapter, but loadfinished is definitely not called
             ArrayList<CardDetails> tempList = new ArrayList<>();
             tempList.addAll(mData);
             mData = tempList;
@@ -184,31 +184,32 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
 
         try {
 
-          //  getBasetripCountries();
-                loadFishCardsIncremental(); //Load more fish cards into mData
+            //  getBasetripCountries();
+            loadFishCardsIncremental(); //Load more fish cards into mData
 
 
             //loadFishCardsIncrementalTWO(); TODO
             //  mCardDict - dictionary of id, fishCard to check against
             //  return mCardDict.Values() or whatever
 
-            /*
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-                if (mCardType == CardViewFragment.CardType.Countries) {
-                    USE_GLIDE_FOR_IMAGES = false; //still using old bitmap loading
-                    mData.add(getBasetripDetails("indonesia")),mData.add(getBasetripDetails("argentina")),mData.add(getBasetripDetails("russia"));
-                } else {
-                    USE_GLIDE_FOR_IMAGES = true;
-                    mData = getFishCards(mData); //Load fish cards
-                }
-            }*/
+        /*
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            if (mCardType == CardViewFragment.CardType.Countries) {
+                USE_GLIDE_FOR_IMAGES = false; //still using old bitmap loading
+                mData.add(getBasetripDetails("indonesia")),mData.add(getBasetripDetails("argentina")),mData.add(getBasetripDetails("russia"));
+            } else {
+                USE_GLIDE_FOR_IMAGES = true;
+                mData = getFishCards(mData); //Load fish cards
+            }
+        }*/
         } catch (IOException e) {
-            Log.e("jludden.reeflifesurvey" , "IOException: " + e.toString());
+            Log.e("jludden.reeflifesurvey", "IOException: " + e.toString());
         } catch (JSONException e) {
-            Log.e("jludden.reeflifesurvey" , "JSONException: " + e.toString());
+            Log.e("jludden.reeflifesurvey", "JSONException: " + e.toString());
         }
 
         return mData;
+
     }
 
 

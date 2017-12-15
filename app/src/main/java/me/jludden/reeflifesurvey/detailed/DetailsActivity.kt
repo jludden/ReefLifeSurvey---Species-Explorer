@@ -97,6 +97,9 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
         //set up favorites star button
         setUpFavoritesButton(card, favoriteBtn, this)
 
+        //set up toolbar
+        supportActionBar?.title = card.cardName
+
 
        /* glide
             .load(card.imageURL)

@@ -1,5 +1,6 @@
 package me.jludden.reeflifesurvey.fishcards;
 
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,18 +47,14 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private static final int TYPE_HEADER = 0;
     public static final int TYPE_ITEM = 1;
 
-    //todo add param for listener
     public CardViewAdapter(CardViewFragment parent, RecyclerView listView, CardViewFragment.OnCardViewFragmentInteractionListener listener) {
        // this.glide = Glide.with(parent); //cache the Glide RequestManager object
         this.picasso = Picasso.with(parent.getContext().getApplicationContext());
-        //this.mGlideRequestOptions = new RequestOptions().placeholder(R.drawable.ic_menu_camera); //todo change placeholder image
-
-        this.mHeader = new CardViewHeader("hi this is a header");
+        this.mHeader = new CardViewHeader("hi this is a header"); //todo
         //mListener = listener;
         this.mRecyclerView = listView;
         this.mCardViewFragment = parent;
         this.mListener = listener;
-
         this.mStoredImageLoader = new StoredImageLoader(parent.getContext().getApplicationContext());
 
         //setHasStableIds(true);//todo not sure what this does testing it out
@@ -132,9 +129,18 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
 
             //todo maybe i can refactor this into a CardDetails method
+            boolean loadedSuccessfully = false;
             if(cardDetails.getOffline()) {
-                vhItem.mImageView.setImageBitmap(
-                        mStoredImageLoader.loadPrimaryCardImage(cardDetails));
+
+                Bitmap img = mStoredImageLoader.loadPrimaryCardImage(cardDetails);
+
+                if(img != null) {
+
+                    vhItem.mImageView.setImageBitmap(
+                            mStoredImageLoader.loadPrimaryCardImage(cardDetails));
+
+                    loadedSuccessfully = true;
+                }
 
 
               //  glide.load(mStoredImageLoader.loadPrimaryCardImage(cardDetails))
@@ -142,7 +148,9 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 //                glide.load(mStoredImageLoader.loadImageFromStorage(cardDetails.id)) //todo will not work in future
 //                        .into(vhItem.mImageView);
             }
-            else {
+
+            //even if offline, picasso may have it cached
+            if(!loadedSuccessfully) {
          /*       glide
                         .load(cardDetails.getPrimaryImageURL())
                         .apply(mGlideRequestOptions)
@@ -153,7 +161,6 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 if(cardDetails.getPrimaryImageURL().equals("")){
                     picasso.load(R.drawable.ic_menu_camera).into(vhItem.mImageView);
                 } else {
-
                     picasso
                             .load(cardDetails.getPrimaryImageURL())
                             .placeholder(R.drawable.ic_menu_camera)
@@ -213,7 +220,6 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     }
 
-    //todo some type of filter interface? or bitmap?
     //hides cards from the adapter
     public void applyFilter() {
         Log.d(TAG,"apply filter Adapter. getItemCount: "+getItemCount()+" cardlistsize: "+mCardList.size());
