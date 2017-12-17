@@ -1,9 +1,11 @@
 package me.jludden.reeflifesurvey.search
 
 import android.app.Activity
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.SearchView
 import io.reactivex.Observable
@@ -16,6 +18,9 @@ import java.util.concurrent.TimeUnit
 
 import kotlinx.android.synthetic.main.activity_search.*
 import me.jludden.reeflifesurvey.data.DataRepository
+import android.content.Context.INPUT_METHOD_SERVICE
+
+
 
 
 /**
@@ -43,14 +48,14 @@ class SearchActivity : AppCompatActivity() {
         //Create Presenter
         val searchPresenter = SearchPresenter(
                 DataRepository.getInstance(applicationContext),
+                compositeSubscription,
                 searchFragment
         )
 
 
         //todo im still handlling on stuff here when it should be in view/presenter
-        searchback.setOnClickListener()
-        {
-            searchback.setBackground(null)
+        searchback.setOnClickListener {
+            searchback.background = null
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 finishAfterTransition()
             } else{
@@ -80,7 +85,8 @@ class SearchActivity : AppCompatActivity() {
                 .create(ObservableOnSubscribe<String> { subscriber ->
                    search_view.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                        override fun onQueryTextSubmit(query: String): Boolean {
-                           searchPresenter.onQueryTextSubmit(query)
+                           //searchPresenter.onQueryTextSubmit(query)
+                           hideKeyboard(search_view)
                            return true
                        }
 
@@ -98,22 +104,26 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
+    fun showKeyboard() {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+    }
+
+    fun hideKeyboard(v: View) {
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
+    }
 
     override fun onDestroy() {
         compositeSubscription.clear()
         super.onDestroy()
     }
 
-    /**
-     * show the keyboard
-     */
     override fun onEnterAnimationComplete() {
         search_view.requestFocus()
-        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.toggleSoftInputFromWindow(search_view.getWindowToken(),0,0);
     }
 
     companion object {
-        const val REQUEST_CODE = 78532
+        const val REQUEST_CODE = 1324
     }
 }

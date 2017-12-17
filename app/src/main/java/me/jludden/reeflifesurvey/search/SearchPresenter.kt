@@ -1,6 +1,7 @@
 package me.jludden.reeflifesurvey.search
 
 import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
 import me.jludden.reeflifesurvey.data.*
 import me.jludden.reeflifesurvey.data.model.SearchResult
 import me.jludden.reeflifesurvey.data.model.SearchResultable
@@ -11,8 +12,9 @@ import me.jludden.reeflifesurvey.data.model.SearchResultable
 
 
 class SearchPresenter(
-        val dataRepository: DataRepository,
-        val searchView: SearchContract.View)
+        private val dataRepository: DataRepository,
+        private val compositeSubscription: CompositeDisposable,
+        private val searchView: SearchContract.View)
     : SearchContract.Presenter {
 
     init {
@@ -21,11 +23,6 @@ class SearchPresenter(
 
     override fun start() {
         //setupSearchView()
-    }
-
-    override fun onQueryTextSubmit(query: String?) {
-        searchView.clearSearchResults()
-        //TODO not really sure what to do here because i am already querying on text change
     }
 
     override fun onQueryTextChange(query: String?) {
@@ -46,9 +43,9 @@ class SearchPresenter(
         val resultsObservable: Observable<SearchResult> = matchesQuery
                 .map({ res -> res.createResult(query) })
 
-        resultsObservable
-                .subscribe({ res -> searchView.addSearchResult(res) })
-
+        //subscribe in the SearchView and add it to the composite so it will be cleaned up later
+        compositeSubscription.add(
+                resultsObservable.subscribe({ res -> searchView.addSearchResult(res) }))
     }
 
     override fun onItemClicked(searchResult: SearchResult) {

@@ -50,6 +50,7 @@
             <!--</intent-filter>-->
         </activity>
 
+        <!-- android:windowSoftInputMode="stateVisible"-->
         <activity
             android:name=".search.SearchActivity"
             android:parentActivityName="me.jludden.reeflifesurvey.MainActivity"

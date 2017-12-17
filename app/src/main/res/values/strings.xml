@@ -29,8 +29,8 @@ Working collaboratively with government and management agencies, professional sc
 
     <!--Strings for AboutLibraries lib-->
     <string name="aboutLibraries_description_showIcon">true</string>
-    <string name="aboutLibraries_description_showVersion">true</string>
-    <string name="aboutLibraries_description_text">This application would not be possible without the following Android libraries. In addition, special thanks to Nick Butcher and the Plaid application, as well as Google Android Architecture Blueprints</string>
+    <string name="aboutLibraries_description_showVersion">false</string>
+    <string name="aboutLibraries_description_text"><![CDATA[<font color="#f2f2f2">This application would not be possible without the following Android libraries. In addition, special thanks to Nick Butcher and the Plaid application, as well as Google Android Architecture Blueprints</font>]]></string>
     <string name="ok">OK</string>
     <string name="cancel">CANCEL</string>
     <string name="del_favorite_sites_message">Delete all favorited sites?</string>

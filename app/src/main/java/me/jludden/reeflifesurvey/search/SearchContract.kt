@@ -23,8 +23,6 @@ class SearchContract {
 
         fun onQueryTextChange(query: String?)
 
-        fun onQueryTextSubmit(query: String?)
-
         fun onItemClicked(searchResult: SearchResult)
 
     }
