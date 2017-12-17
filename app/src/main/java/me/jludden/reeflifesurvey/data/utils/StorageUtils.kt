@@ -5,18 +5,15 @@ import android.app.AlertDialog
 import android.app.NotificationManager
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.DialogInterface
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.os.Environment
 import android.os.StatFs
-import android.support.v7.app.NotificationCompat
 import com.squareup.picasso.Picasso
 import android.util.Log
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
 import io.reactivex.Observable
 import me.jludden.reeflifesurvey.MainActivity
@@ -26,7 +23,8 @@ import java.io.*
 import me.jludden.reeflifesurvey.data.model.InfoCard.CardDetails
 import me.jludden.reeflifesurvey.data.SurveySiteType
 import me.jludden.reeflifesurvey.data.model.InfoCard
-import me.jludden.reeflifesurvey.data.utils.StorageUtils.Companion.PROGRESS_BAR_NOTIFICATION_ID
+import me.jludden.reeflifesurvey.data.utils.StorageUtils.Companion.NOTIFICATION_CHANNEL_ID
+import me.jludden.reeflifesurvey.data.utils.StorageUtils.Companion.NOTIFICATION_ID
 import me.jludden.reeflifesurvey.data.utils.StorageUtils.Companion.writeToExternal
 import java.lang.ref.WeakReference
 
@@ -44,7 +42,9 @@ class StorageUtils{
 
         val TAG : String = "offlineUtils"
 
-        val PROGRESS_BAR_NOTIFICATION_ID: Int = 123
+
+        val NOTIFICATION_ID: Int = 8856
+        val NOTIFICATION_CHANNEL_ID: String = "RLS_DOWNLOADER"
 
         var writeToExternal = false //todo every reference to this needs to be checked
 
@@ -304,7 +304,7 @@ class SaveToStorageTask(private val root: String, private val speciesToDownload:
     : AsyncTask<CardDetails, Int, Boolean>() {
 
     private val contextRef: WeakReference<Context> = WeakReference(context)
-    private val notificationBuilder = NotificationCompat.Builder(context)
+    private val notificationBuilder = android.support.v4.app.NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private var imageCount = 0
     private var speciesCount = 0
@@ -372,7 +372,7 @@ class SaveToStorageTask(private val root: String, private val speciesToDownload:
         val context : Context? = contextRef.get()
         if(context != null) {
             setupProgressBarNotification(context.resources)
-            notificationManager.notify(PROGRESS_BAR_NOTIFICATION_ID, notificationBuilder.build())
+            notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
         }
     }
 
@@ -380,7 +380,7 @@ class SaveToStorageTask(private val root: String, private val speciesToDownload:
         for(progress in values) {
             if(progress != null) {
                 notificationBuilder.setProgress(speciesToDownload, progress, false)
-                notificationManager.notify(PROGRESS_BAR_NOTIFICATION_ID, notificationBuilder.build())
+                notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
             }
         }
 
@@ -395,7 +395,7 @@ class SaveToStorageTask(private val root: String, private val speciesToDownload:
 
         notificationBuilder.setContentText(message)
         notificationBuilder.setProgress(0, 0, false) //removes progress bar
-        notificationManager.notify(PROGRESS_BAR_NOTIFICATION_ID, notificationBuilder.build())
+        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
     }
 
 

@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements
 
 
     private static final String TAG = "MainActivity";
-    private static final int SEARCH_ACTIVITY_RETURN_CODE = 0;
     private FloatingActionButton mFAB, mBottomSheetButton;
     private FloatingActionButton[] mFABmenu;
     private boolean mFabMenuVisible = false;
@@ -136,10 +135,18 @@ public class MainActivity extends AppCompatActivity implements
                 launchFullScreenQuizModeActivity();
             }
         });
+        ((Button) findViewById(R.id.toolbar_button_store_offline)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CardViewFragment viewFragment = (CardViewFragment) getSupportFragmentManager().findFragmentByTag(CardViewFragment.TAG);
+                if (viewFragment != null && viewFragment.isVisible()) {
+                    viewFragment.storeInLocal();
+                }
+            }
+        });
 
         ToggleButton mToolbarButton_starred = (ToggleButton) findViewById(R.id.toolbar_button_filter_favorites);
         mToolbarButton_starred.setOnCheckedChangeListener(this);
-        ((ToggleButton) findViewById(R.id.toolbar_button_store_offline)).setOnCheckedChangeListener(this);
 
         mBottomSheetButton = (FloatingActionButton) findViewById(R.id.bottom_sheet_fab);
         mBottomSheetButton.setOnClickListener(new View.OnClickListener() {
@@ -270,15 +277,12 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
-   /* @Override
+    @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }*/
+        AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
+        toolbar.setExpanded(false,true);
+        super.onBackPressed();
+    }
 
     @Override
     protected void onPause(){
@@ -359,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements
 //                startActivity(new Intent(this, SearchActivity.class), options);
                 Log.d(TAG,"STARTING SEARCH ACTIVITY");
 
-                startActivityForResult(new Intent(this, SearchActivity.class), SEARCH_ACTIVITY_RETURN_CODE, options);
+                startActivityForResult(new Intent(this, SearchActivity.class), SearchActivity.REQUEST_CODE, options);
                 return true;
             case R.id.settings_opt_hide_menus:
                 hideClutter();
@@ -405,8 +409,15 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == SEARCH_ACTIVITY_RETURN_CODE){
-            Log.d(TAG,"main activity onactivity result FROM SEARCH ACTIVITY");
+        switch(requestCode){
+            case(SearchActivity.REQUEST_CODE):
+                Log.d(TAG,"main activity onactivity result FROM SEARCH ACTIVITY");
+                break;
+            case(DetailsActivity.REQUEST_CODE):
+                Log.d(TAG, "main activity onactivity result FROM DETAIL ACTIVITY");
+                CardViewFragment viewFragment = (CardViewFragment) getSupportFragmentManager().findFragmentByTag(CardViewFragment.TAG);
+                if(viewFragment != null) viewFragment.mRecyclerView.getAdapter().notifyDataSetChanged(); //possibly update favorites icon
+                break;
         }
     }
 
@@ -861,11 +872,11 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 }
                 break;
-            case(R.id.toolbar_button_store_offline):
+/*            case(R.id.toolbar_button_store_offline):
                 if (viewFragment != null && viewFragment.isVisible()) {
                     viewFragment.storeInLocal();
                 }
-                break;
+                break;*/
             default: //handle survey site location button pressed
                 Log.d(TAG,"unhandled toggle button (#"+buttonView.getId()+") pressed: "+buttonView.getText());
 

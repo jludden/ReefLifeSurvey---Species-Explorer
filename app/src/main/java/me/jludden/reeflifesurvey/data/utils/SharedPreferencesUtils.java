@@ -31,38 +31,45 @@ public class SharedPreferencesUtils {
 
     private static final String TAG = "SharedPreferenceUtils";
 
-    //private static final int FAVORITES_OUTLINE = R.drawable.ic_star_border;
-    //private static final int FAVORITES_SELECTED = R.drawable.ic_star_selected;
-    public static final int FAVORITES_OUTLINE = R.drawable.ic_favorite_heart_outline;
+    public static final int FAVORITES_OUTLINE = R.drawable.ic_favorite_heart_outline_trim;
+    public static final int FAVORITES_OUTLINE_WHITE = R.drawable.ic_favorite_heart_outline_trim_white;
     public static final int FAVORITES_SELECTED = R.drawable.ic_favorite_heart_filled_trim;
 
+
+
+    public static void setUpFavoritesButton(final InfoCard.CardDetails cardDetails, final CheckBox favoriteBtn, final Activity activity) {
+        setUpFavoritesButton(cardDetails, favoriteBtn, activity, false);
+    }
+
     //set up the favorites button initial state and onclick listener
-    public static void setUpFavoritesButton(final InfoCard.CardDetails cardDetails, final CheckBox mFavoriteBtn, final Activity activity){
+    public static void setUpFavoritesButton(final InfoCard.CardDetails cardDetails, final CheckBox favoriteBtn, final Activity activity, final Boolean useWhiteOutline){
         if(cardDetails.getFavorited(activity)) {
-            mFavoriteBtn.setButtonDrawable(FAVORITES_SELECTED); //todo check the SharedPreferences cache
+            favoriteBtn.setButtonDrawable(FAVORITES_SELECTED); //todo check the SharedPreferences cache
+        } else {
+            favoriteBtn.setButtonDrawable(useWhiteOutline? FAVORITES_OUTLINE_WHITE : FAVORITES_OUTLINE);
         }
 
         //set up favorites star button
-        mFavoriteBtn.setOnClickListener(new View.OnClickListener()
+        favoriteBtn.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick (View v){
-            onFavoritesButtonClick(cardDetails, mFavoriteBtn, activity);
+            onFavoritesButtonClick(cardDetails, favoriteBtn, activity, useWhiteOutline);
         }
         });
     }
 
     //set up the on click listener for a favorites button
     //todo unhappy about direct refernces to carddetails.favorited
-    public static void onFavoritesButtonClick(final InfoCard.CardDetails cardDetails, final CheckBox mFavoriteBtn, final Activity activity) {
+    public static void onFavoritesButtonClick(final InfoCard.CardDetails cardDetails, final CheckBox favoriteBtn, final Activity activity, final Boolean useWhiteOutline) {
         Log.d(TAG, "Favorites Button onClick. now favorited: " + !cardDetails.favorited);
 
         if (cardDetails.favorited) {
-            mFavoriteBtn.setButtonDrawable(FAVORITES_OUTLINE);
+            favoriteBtn.setButtonDrawable(useWhiteOutline? FAVORITES_OUTLINE_WHITE : FAVORITES_OUTLINE);
             cardDetails.favorited = false;
         } else {
             cardDetails.favorited = true;
-            mFavoriteBtn.setButtonDrawable(FAVORITES_SELECTED);
+            favoriteBtn.setButtonDrawable(FAVORITES_SELECTED);
         }
         savePref(cardDetails.id, InfoCard.PREF_FAVORITED, cardDetails.favorited, activity);
     }

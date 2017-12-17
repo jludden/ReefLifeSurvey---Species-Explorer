@@ -181,8 +181,6 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 public void onClick(View v) {
                     Log.d(TAG, "Card onClick - Launching new fragment");
 
-
-
                     mListener.onFishDetailsRequested(mCardList.get(realPosition),vhItem.mImageView);
                 }
             });

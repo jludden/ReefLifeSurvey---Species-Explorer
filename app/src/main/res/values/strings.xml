@@ -42,8 +42,15 @@ Working collaboratively with government and management agencies, professional sc
     <string name="storage_location_dialog_title">Choose storage location</string>
     <string name="storage_location_dialog_internal_loc">Internal</string>
     <string name="storage_location_dialog_external_loc">SD Card</string>
-    <string name="storage_location_dialog_space_remaining_message">%1$d MB remaining</string>
-
+    <string name="storage_location_dialog_space_remaining_message">%1$d MB available for RLS application</string>
+    <string name="toolbar_button_quiz">Quiz</string>
+    <string name="toolbar_button_download_offline">Download</string>
+    <string name="toolbar_button_favorites_filter">Favorites</string>
+    <string name="scientific_name_label">Scientific Name</string>
+    <string name="common_names_label">Common Names</string>
+    <string name="launch_in_website">Open in browser</string>
+    <string name="image_primary_content_description">image of the fish</string>
+    <string name="species_favorite_button">add species to favorites</string>
 
 
 </resources>

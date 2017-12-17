@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/favorite_btn"
+        android:title="@string/species_favorite_button"
+        app:showAsAction="ifRoom"
+        app:actionViewClass="android.widget.CheckBox"/>
+
+    <item android:id="@+id/link_btn"
+        android:icon="@drawable/ic_open_in_browser"
+        app:showAsAction="never"
+        android:title="@string/launch_in_website"/>
+
+</menu>

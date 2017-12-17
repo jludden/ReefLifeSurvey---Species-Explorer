@@ -112,4 +112,8 @@ class SearchActivity : AppCompatActivity() {
         val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.toggleSoftInputFromWindow(search_view.getWindowToken(),0,0);
     }
+
+    companion object {
+        const val REQUEST_CODE = 78532
+    }
 }

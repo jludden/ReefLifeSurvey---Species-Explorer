@@ -4,8 +4,12 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.support.design.widget.AppBarLayout
+import android.support.transition.Visibility
 import android.support.v7.app.AppCompatActivity
+import android.transition.Transition
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
@@ -25,6 +29,9 @@ import me.jludden.reeflifesurvey.data.model.SurveySiteList
  */
 class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractionListener {
     private lateinit var dataRepo: DataRepository
+    private var speciesCard: InfoCard.CardDetails? = null
+    private lateinit var favoriteBtn: CheckBox
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +41,19 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
         //todo set support postpone enter transition, but it can be very slow
         //currently only postponing transition for cardview -> details
         // supportPostponeEnterTransition() //postpone transition until the image is loaded
+
+        //popping in the favorite button after the view loads for a little extra flair
+        window.enterTransition.addListener(object : Transition.TransitionListener {
+            override fun onTransitionEnd(transition: Transition) {
+                favoriteBtn.animate().alpha(1.0f)
+                window.enterTransition.removeListener(this)
+            }
+            override fun onTransitionResume(transition: Transition) { }
+            override fun onTransitionPause(transition: Transition) { }
+            override fun onTransitionCancel(transition: Transition) { }
+            override fun onTransitionStart(transition: Transition) { }
+        })
+
         dataRepo = DataRepository.getInstance(applicationContext)
 
 
@@ -77,37 +97,32 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
 
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.getItemId()
-        if (id == android.R.id.home) {
-            onBackPressed()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-
     fun setupFishDetails(card: InfoCard.CardDetails) {
-        val mainImageView = findViewById(R.id.details_image_main) as ImageView
-        val textView = findViewById(R.id.details_text) as TextView
-        val favoriteBtn = findViewById(R.id.favorite_btn) as CheckBox //star to favorite the fish
-        val linkBtn = findViewById(R.id.link_btn) as ImageButton
+        val mainImageView = findViewById<ImageView>(R.id.details_image_main)
+        val textView = findViewById<TextView>(R.id.details_text)
+       // val linkBtn = findViewById<Button>(R.id.link_btn)
+        val scientificNames = findViewById<TextView>(R.id.details_label_scientific)
+        val commonNames = findViewById<TextView>(R.id.details_label_common)
 
+        speciesCard = card
+        scientificNames.text = card.cardName
+        commonNames.text = card.commonNames
 
-        //set up favorites star button
-        setUpFavoritesButton(card, favoriteBtn, this)
+        //set up favorites button
+        //  val favoriteBtn = findViewById<CheckBox>(R.id.favorite_btn)
+        //setUpFavoritesButton(card, favoriteBtn, this)
 
         //set up toolbar
         supportActionBar?.title = card.cardName
+        /*val toolbarView = findViewById<View>(R.id.app_bar) as AppBarLayout
 
 
-       /* glide
-            .load(card.imageURL)
-            .into(mainImageView);*/
+        findViewById<ImageButton>(R.id.favorite_btn)*/
+//        android.support.v7.widget.AppCompatCheckBox
+//        android.widget.CheckBox
 
         val newText = StringBuilder(
-                card.cardName + "\n" +
-                card.commonNames + "\n" +
+                "\n \n \n \n \n \n" +
                 "Num sightings " + card.numSightings + "\n" +
                 "Found in " + card.FoundInSites.size() + " sites" + "\n")
 
@@ -164,13 +179,13 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
 
         textView.setText(newText.toString())
 
-        linkBtn.setOnClickListener {
+        /*linkBtn.setOnClickListener {
             val url = card.reefLifeSurveyURL
             if (url.startsWith("http://") || url.startsWith("https://")) {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 startActivity(intent)
             }
-        }
+        }*/
 
         }
 
@@ -218,6 +233,40 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
     override fun onImageSliderClick(card: InfoCard.CardDetails, sharedElement: View) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.details_toolbar, menu)
+
+        favoriteBtn = menu.findItem(R.id.favorite_btn).actionView as CheckBox
+        favoriteBtn.alpha = 0.0f
+
+        if(speciesCard == null) {
+            favoriteBtn.visibility = View.GONE
+        } else {
+            setUpFavoritesButton(speciesCard, favoriteBtn, this, true)
+        }
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+             android.R.id.home -> {
+                 onBackPressed()
+                 return true
+             }
+            R.id.link_btn -> {
+                val url = speciesCard?.reefLifeSurveyURL
+                if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    startActivity(intent)
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     companion object {
         const val TAG: String = "DetailsActivity"
         const val REQUEST_CODE = 12345

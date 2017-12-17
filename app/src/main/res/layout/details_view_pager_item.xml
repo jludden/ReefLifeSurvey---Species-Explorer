@@ -1,61 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-
-    <ImageView
-        android:id="@+id/details_image_main"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:transitionName="@string/transition_launch_details"
-        app:srcCompat="@drawable/ic_menu_camera"
-        android:contentDescription="image of the fish" />
-
-<!--
-    <com.daimajia.slider.library.SliderLayout
-        android:id="@+id/details_image_carousel"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:transitionName="transition_search_back"/>
--->
-
-    <!--layout to show additional images-->
-    <HorizontalScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <LinearLayout
-            android:id="@+id/details_additional_images"
+
+        <ImageView
+            android:id="@+id/details_image_main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-        </LinearLayout>
-    </HorizontalScrollView>
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:transitionName="@string/transition_launch_details"
+            android:contentDescription="@string/image_primary_content_description" />
 
-    <!--row of buttons beneath the main image-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <CheckBox
+
+        <!--layout to show additional images-->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/details_image_main"
+            android:id="@+id/details_additional_images_scrollview">
+            <LinearLayout
+                android:id="@+id/details_additional_images"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!--            android:layout_alignBaseline="@+id/details_additional_images_scrollview"
+            android:layout_alignBottom="@+id/details_additional_images_scrollview"-->
+    <!--    <CheckBox
             android:id="@+id/favorite_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:button="@drawable/ic_star_border" />
+            android:layout_alignBaseline="@+id/details_image_main"
+            android:layout_alignBottom="@+id/details_image_main"
+            android:layout_alignParentEnd="true"
+            android:button="@drawable/ic_favorite_heart_outline"
+            android:paddingEnd="8dp"
+            android:paddingStart="2dp"
+            android:paddingTop="12dp" />-->
 
-        <ImageButton
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:id="@+id/details_scientific_name"
+            android:layout_below="@id/details_additional_images_scrollview"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".3"
+                android:text="@string/scientific_name_label"
+                android:textAppearance="@android:style/TextAppearance.Material.Title"
+                />
+
+            <TextView
+                android:id="@+id/details_label_scientific"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".7"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:id="@+id/details_common_name"
+            android:layout_below="@id/details_scientific_name"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".3"
+                android:text="@string/common_names_label"
+                android:textAppearance="@android:style/TextAppearance.Material.Title"/>
+
+            <TextView
+                android:id="@+id/details_label_common"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".7"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"  />
+
+        </LinearLayout>
+
+
+  <!--      <Button
             android:id="@+id/link_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_open_in_browser"
-            />
-    </LinearLayout>
+            android:layout_below="@id/details_common_name"
+            android:layout_alignParentRight="true"
+            android:text="@string/launch_in_website"
+            android:drawableLeft="@drawable/ic_open_in_browser"/>-->
 
-    <TextView
-        android:id="@+id/details_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="hello this is textview"/>
+        <TextView
+            android:id="@+id/details_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/details_common_name"
+            android:text="hello this is textview"/>
 
-</LinearLayout>
+    </RelativeLayout>
+</ScrollView>

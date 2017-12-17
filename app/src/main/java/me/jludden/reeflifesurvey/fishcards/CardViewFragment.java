@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ToggleButton;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
@@ -62,7 +63,7 @@ public class CardViewFragment extends Fragment implements
     private CardType mCardType;
     private String mParam2;
     private FloatingActionButton mFloatingActionButton;
-    private RecyclerView mRecyclerView;
+    public RecyclerView mRecyclerView;
     private CardViewAdapter mViewAdapter;
     private LinearLayoutManager mLayoutManager;
     private OnCardViewFragmentInteractionListener mListener;
@@ -125,6 +126,17 @@ public class CardViewFragment extends Fragment implements
 
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnCardViewFragmentInteractionListener) {
+            mListener = (OnCardViewFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnCardViewFragmentInteractionListener");
+        }
     }
 
     @Override
@@ -202,6 +214,9 @@ public class CardViewFragment extends Fragment implements
 
         });
 
+        DataRepository dataRepo = DataRepository.Companion.getInstance(getContext().getApplicationContext());
+        dataRepo.getSurveySites(SurveySiteType.CODES, this);
+
         return view;
     }
 
@@ -262,27 +277,6 @@ public class CardViewFragment extends Fragment implements
         super.onResume();
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-//    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFishDetailsRequested(uri);
-//        }
-//    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnCardViewFragmentInteractionListener) {
-            mListener = (OnCardViewFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnCardViewFragmentInteractionListener");
-        }
-
-        DataRepository dataRepo = DataRepository.Companion.getInstance(getContext().getApplicationContext());
-        dataRepo.getSurveySites(SurveySiteType.CODES, this);
-    }
-
     @Override
     public void onDetach() {
         super.onDetach();
@@ -319,13 +313,15 @@ public class CardViewFragment extends Fragment implements
      /*   for(CardDetails card : data){
             if(getPref(card.getId(),InfoCard.PREF_FAVORITED)) card.favorited = true;
         }*/
+        Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onLoadFinished - still need to apply filter and update adapter ");
+
         onFilterApplied(); //reapply any filters
 
         int iCountPrev = mViewAdapter.getItemCount();
         mViewAdapter.updateItems(data); //update items in the adapter
         int iCountAfter = mViewAdapter.getItemCount();
 
-        Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onLoadFinished loaderid: "+loader.getId()+" data length: "+data.size() + " adapter item count increased from "+iCountPrev+" to "+iCountAfter);
+        Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onLoadFinished and adapter updated. loaderid: "+loader.getId()+" data length: "+data.size() + " adapter item count increased from "+iCountPrev+" to "+iCountAfter);
 
         // remove progress bar
         animateView(mProgressBar, View.GONE, 0, 200);
@@ -344,7 +340,7 @@ public class CardViewFragment extends Fragment implements
 
         //todo refactor. this logic in both infocardloader and cardviewfragment
         List<String> siteCodes;
-        if (mPassedInSurveySiteCode == null) siteCodes = mSurveySiteList.getFavoritedSiteCodes();
+        if (mPassedInSurveySiteCode.equals("")) siteCodes = mSurveySiteList.getFavoritedSiteCodes();
         else {
             siteCodes = new ArrayList<>();
             siteCodes.add(mPassedInSurveySiteCode);
@@ -427,6 +423,23 @@ public class CardViewFragment extends Fragment implements
 
     public void addStaticMapToToolbar(SurveySiteList sites) {
         Log.d(TAG, "launchNewCardViewFragment: loading map url");
+        final ImageView topImage = getActivity().findViewById(R.id.collapsing_toolbar_image);
+
+        String siteCode;
+        LatLng pos;
+
+        if (!mPassedInSurveySiteCode.equals("")){ //TODO please refactor we shouldnt do this logic everywhere
+            siteCode = mPassedInSurveySiteCode;
+            pos = sites.getSitesForCode(siteCode).get(0).getPosition();
+        }
+        else {
+
+            List<String> favCodes = sites.getFavoritedSiteCodes();
+
+            if(sites.size() > 1){ //can't handle multiple sites yet
+                topImage.setImageDrawable(getActivity().getDrawable(R.drawable.rls_logo_horizontal_rev));
+                return;
+            }
 
        /* for(String code : sites.getFavoritedSiteCodes()){
             sites.
@@ -434,18 +447,27 @@ public class CardViewFragment extends Fragment implements
         siteCodeList.*/
 
 
+            siteCode = favCodes.get(0);
+            pos = sites.getSitesForCode(siteCode).get(0).getPosition();
+        }
+
         //loading static map
         //fixed size to fit in expandable toolbar (TODO)
         //add markers + label:CODE
-        final ImageView topImage = getActivity().findViewById(R.id.collapsing_toolbar_image);
+//        StringBuilder mapsURL = new StringBuilder();
         String mapsURL = "https://maps.googleapis.com/maps/api/staticmap?\n" +
                 "size=400x200\n" +
                 "&maptype=terrain\n" +
-                "&markers=color:blue%7Clabel:S%7C40.702147,-74.015794\n" +
-                "&markers=color:green%7Clabel:G%7C40.711614,-74.012318\n" +
-                "&markers=color:red%7Clabel:C%7C40.718217,-73.998284\n" +
-                "&key=" + getString(R.string.google_maps_key);
+                "&zoom=5\n" +
+                "&markers=color:red%7Clabel:" + siteCode + "%7C" + pos.latitude + "," + pos.longitude + "\n" +
 
+                "&key=" + getString(R.string.google_maps_key);
+/*                "&markers=color:blue%7Clabel:S%7C40.702147,-74.015794\n" +
+                "&markers=color:green%7Clabel:G%7C40.711614,-74.012318\n" +
+                "&markers=color:red%7Clabel:C%7C40.718217,-73.998284\n" +*/
+
+        Log.d(TAG, "launchNewCardViewFragment: loading map url. latlng: " + pos.latitude + "," + pos.longitude
+         + "\n full url: " + mapsURL);
 
         Picasso.with(getContext()).load(mapsURL).into(topImage);
     }
