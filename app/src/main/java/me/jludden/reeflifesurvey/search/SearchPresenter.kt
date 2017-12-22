@@ -12,7 +12,7 @@ import me.jludden.reeflifesurvey.data.model.SearchResultable
 
 
 class SearchPresenter(
-        private val dataRepository: DataRepository,
+        private val dataRepository: DataSource,
         private val compositeSubscription: CompositeDisposable,
         private val searchView: SearchContract.View)
     : SearchContract.Presenter {

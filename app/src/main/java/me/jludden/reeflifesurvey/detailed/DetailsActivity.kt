@@ -15,10 +15,12 @@ import android.view.View
 import android.widget.*
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import me.jludden.reeflifesurvey.Injection
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.customviews.BottomSheet
 import me.jludden.reeflifesurvey.data.*
 import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.setUpFavoritesButton
+import me.jludden.reeflifesurvey.data.DataSource.*
 import me.jludden.reeflifesurvey.data.model.InfoCard
 import me.jludden.reeflifesurvey.data.model.SearchResult
 import me.jludden.reeflifesurvey.data.model.SearchResultType
@@ -28,7 +30,7 @@ import me.jludden.reeflifesurvey.data.model.SurveySiteList
  * Created by Jason on 11/19/2017.
  */
 class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractionListener {
-    private lateinit var dataRepo: DataRepository
+    private lateinit var dataRepo: DataSource
     private var speciesCard: InfoCard.CardDetails? = null
     private lateinit var favoriteBtn: CheckBox
 
@@ -54,7 +56,7 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
             override fun onTransitionStart(transition: Transition) { }
         })
 
-        dataRepo = DataRepository.getInstance(applicationContext)
+        dataRepo = Injection.provideDataRepository(applicationContext)
 
 
         if(intent.hasExtra(SearchResult.INTENT_EXTRA)) {
@@ -63,7 +65,7 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
 
             if(searchResult.type == SearchResultType.FishSpecies) {
                 supportPostponeEnterTransition()
-                dataRepo.getFishCard(searchResult.id, object: DataRepository.LoadFishCardCallBack{
+                dataRepo.getFishCard(searchResult.id, object: LoadFishCardCallBack{
                     override fun onFishCardLoaded(card: InfoCard.CardDetails) {
                         setupFishDetails(card)
                     }
@@ -82,7 +84,7 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
             val card = intent.getParcelableExtra<InfoCard.CardDetails>(InfoCard.CardDetails.INTENT_EXTRA)
             //todo doesnt look like the card passed in had any data
             supportPostponeEnterTransition()
-            dataRepo.getFishCard(card.id, object: DataRepository.LoadFishCardCallBack{
+            dataRepo.getFishCard(card.id, object: LoadFishCardCallBack{
                 override fun onFishCardLoaded(card: InfoCard.CardDetails) {
                     setupFishDetails(card)
                 }

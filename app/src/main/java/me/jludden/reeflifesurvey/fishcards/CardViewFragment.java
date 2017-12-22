@@ -27,6 +27,7 @@ import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
+import me.jludden.reeflifesurvey.Injection;
 import me.jludden.reeflifesurvey.data.DataRepository;
 import me.jludden.reeflifesurvey.data.InfoCardLoader;
 import me.jludden.reeflifesurvey.data.utils.StorageUtils;
@@ -214,8 +215,7 @@ public class CardViewFragment extends Fragment implements
 
         });
 
-        DataRepository dataRepo = DataRepository.Companion.getInstance(getContext().getApplicationContext());
-        dataRepo.getSurveySites(SurveySiteType.CODES, this);
+        Injection.provideDataRepository(getContext().getApplicationContext()).getSurveySites(SurveySiteType.CODES, this);
 
         return view;
     }

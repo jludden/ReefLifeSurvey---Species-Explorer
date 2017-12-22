@@ -17,11 +17,8 @@ import me.jludden.reeflifesurvey.R
 import java.util.concurrent.TimeUnit
 
 import kotlinx.android.synthetic.main.activity_search.*
+import me.jludden.reeflifesurvey.Injection
 import me.jludden.reeflifesurvey.data.DataRepository
-import android.content.Context.INPUT_METHOD_SERVICE
-
-
-
 
 /**
  * Created by Jason on 11/9/2017.
@@ -47,7 +44,7 @@ class SearchActivity : AppCompatActivity() {
 
         //Create Presenter
         val searchPresenter = SearchPresenter(
-                DataRepository.getInstance(applicationContext),
+                Injection.provideDataRepository(applicationContext),
                 compositeSubscription,
                 searchFragment
         )
@@ -122,6 +119,13 @@ class SearchActivity : AppCompatActivity() {
     override fun onEnterAnimationComplete() {
         search_view.requestFocus()
     }
+
+/*
+    @VisibleForTesting
+    fun getCountingIdlingResource(): IdlingResource {
+        return EspressoIdlingResource.idlingResource
+    }
+*/
 
     companion object {
         const val REQUEST_CODE = 1324

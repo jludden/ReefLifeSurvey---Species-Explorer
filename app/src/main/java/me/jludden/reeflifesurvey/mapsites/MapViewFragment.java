@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 
+import me.jludden.reeflifesurvey.Injection;
 import me.jludden.reeflifesurvey.data.DataRepository;
 import me.jludden.reeflifesurvey.data.model.SurveySiteList;
 import me.jludden.reeflifesurvey.data.model.SurveySiteList.SurveySite;
@@ -117,8 +118,12 @@ public class MapViewFragment extends Fragment
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
-        DataRepository.Companion.getInstance(getContext().getApplicationContext())
+
+        Injection.provideDataRepository(context)
                 .getSurveySites(SurveySiteType.CODES,this);
+
+//        DataRepository.Companion.getInstance(getContext().getApplicationContext())
+//                .getSurveySites(SurveySiteType.CODES,this);
 
         String errMsg = "";
         if(context instanceof MapViewFragmentInteractionListener){

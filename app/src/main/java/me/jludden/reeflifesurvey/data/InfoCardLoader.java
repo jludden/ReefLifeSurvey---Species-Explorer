@@ -10,6 +10,7 @@ import android.util.Log;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
+import me.jludden.reeflifesurvey.Injection;
 import me.jludden.reeflifesurvey.data.model.SurveySiteList;
 import me.jludden.reeflifesurvey.data.utils.LoaderUtils;
 import me.jludden.reeflifesurvey.data.utils.StorageUtils;
@@ -320,9 +321,8 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
             speciesKey = mCardListIterator.next().id;
 
             //Log.d(TAG  , "getFishInCards Download full string: " + speciesKey + " : " + basicData.toString());
-        
-            DataRepository dataRepo = DataRepository.Companion.getInstance(getContext().getApplicationContext());
-            dataRepo.getFishCard(speciesKey, this);
+
+            Injection.provideDataRepository(getContext().getApplicationContext()).getFishCard(speciesKey, this);
             
             
          //   CardDetails cardDetails = mCardDict.get(speciesKey) ; // infocard shell already created - time to add details
@@ -355,8 +355,8 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
          * 2. Load favorite sites (
          * 3. Load all fish
          */
-        DataRepository dataRepo = DataRepository.Companion.getInstance(getContext().getApplicationContext());
-        dataRepo.getSurveySites(SurveySiteType.ALL_IDS, this);
+        Injection.provideDataRepository(getContext().getApplicationContext())
+                .getSurveySites(SurveySiteType.ALL_IDS, this);
         int i = 0;
         while(mSurveySitesList == null){ //todo handle failure to load
             try {

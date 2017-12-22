@@ -365,9 +365,9 @@ public class MainActivity extends AppCompatActivity implements
 
                 startActivityForResult(new Intent(this, SearchActivity.class), SearchActivity.REQUEST_CODE, options);
                 return true;
-            case R.id.settings_opt_hide_menus:
+/*            case R.id.settings_opt_hide_menus:
                 hideClutter();
-                return true;
+                return true;*/
             case R.id.settings_opt_del_favorite_sites:
                 showOkCancelDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) { // User clicked OK button;
@@ -748,16 +748,21 @@ public class MainActivity extends AppCompatActivity implements
         if(bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
-        final TextView launch_species = (TextView) findViewById(R.id.bottom_sheet_launch_species);
+        final Button launch_species = (Button) findViewById(R.id.bottom_sheet_launch_species);
         launch_species.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "Bottom Sheet Top TextView clicked.. hidden?: " + v.isShown());
+                Log.d(TAG, "Bottom Sheet Launch_Species clicked.. shown?: " + v.isShown());
+
+                launchNewCardViewFragment(siteInfo.getCode());
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                mBottomSheetButton.hide();
+
                 //todo refactor this
                 //todo this does not work properly if they are in details view
                 //if the detailsviewfragment is showing, and they click the top of bottom sheet,
                 //navigate them back to the mapview
-                MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
+                /*MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
                 if (mapFrag != null && !mapFrag.isVisible()) {
                     Log.d(TAG, "Bottom Sheet TEST1 PASSED");
                     mBottomSheetButton.setVisibility(View.VISIBLE);
@@ -768,14 +773,14 @@ public class MainActivity extends AppCompatActivity implements
                     hideClutter();
                     onBackPressed();
                 } else if (mapFrag != null) { //launch browse fish details for this site
-                    //AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
+                   //AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
                     //toolbar.setExpanded(true,true);
                     //addSiteLocationsToToolbar();
                     //mFAB.show();
                     launch_species.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_open_in_map, 0, 0, 0);
                     launch_species.setText(R.string.bottom_sheet_secondary_button_map);
                     launchNewCardViewFragment(siteInfo.getCode());
-                }
+                }*/
             }
         });
         //if added to favs, set the fab to remove
@@ -926,7 +931,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Shows
+     * Shows a dialog with a positive and negative button, and you can pass a clicklistener for the positive button
      * @param activity current activity
      * @param message
      * @param onPositiveClick
@@ -946,4 +951,20 @@ public class MainActivity extends AppCompatActivity implements
         dialog.show();
     }
 
+
+    //Shows a dialog with just an OK button and a message. TODO consider using snackbars instead
+    public static void showSimpleDialogMessage(Activity activity, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage(message)
+                .setTitle(R.string.app_name);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 }

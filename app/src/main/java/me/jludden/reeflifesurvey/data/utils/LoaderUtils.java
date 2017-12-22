@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.data.DataRepository;
+import me.jludden.reeflifesurvey.data.DataSource;
 import me.jludden.reeflifesurvey.data.model.SurveySiteList;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -96,7 +97,7 @@ public class LoaderUtils {
      * @param CARDS_TO_LOAD
      * @throws JSONException
      */
-    public static void loadSingleSiteSpeciesPreview(SurveySiteList.SurveySite site, DataRepository dataRepo, DataRepository.LoadFishCardCallBack callback, final int CARDS_TO_LOAD) throws JSONException {
+    public static void loadSingleSiteSpeciesPreview(SurveySiteList.SurveySite site, DataSource dataRepo, DataRepository.LoadFishCardCallBack callback, final int CARDS_TO_LOAD) throws JSONException {
         Log.d("jludden.reeflifesurvey"  , "loadSingleSite: "+site.getSiteName()+" attempting to load: "+CARDS_TO_LOAD+" fish cards");
 
         // List<CardDetails> fishCards = new ArrayList<>(); //todo...

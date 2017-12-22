@@ -10,8 +10,9 @@ import android.widget.LinearLayout
 import com.daimajia.slider.library.SliderLayout
 import com.daimajia.slider.library.SliderTypes.BaseSliderView
 import com.daimajia.slider.library.SliderTypes.TextSliderView
-import me.jludden.reeflifesurvey.data.DataRepository.*
+import me.jludden.reeflifesurvey.data.DataSource.*
 import kotlinx.android.synthetic.main.bottom_sheet.view.*
+import me.jludden.reeflifesurvey.Injection
 import me.jludden.reeflifesurvey.data.*
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.data.model.InfoCard
@@ -23,7 +24,7 @@ import me.jludden.reeflifesurvey.data.utils.LoaderUtils
  */
 
 class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack {
-    private lateinit var dataRepo: DataRepository
+    private lateinit var dataRepo: DataSource
     private lateinit var imageSliders: SliderLayout
     private lateinit var interactionListener: OnBottomSheetInteractionListener
 
@@ -49,7 +50,7 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
 
         if (context is OnBottomSheetInteractionListener) interactionListener = context else TODO()
 
-        dataRepo = DataRepository.getInstance(context.applicationContext)
+        dataRepo = Injection.provideDataRepository(context.applicationContext)
         imageSliders = findViewById(R.id.site_preview_carousel)
     }
 

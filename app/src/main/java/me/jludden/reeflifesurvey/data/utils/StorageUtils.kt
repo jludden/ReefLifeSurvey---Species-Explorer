@@ -11,13 +11,18 @@ import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.os.Environment
 import android.os.StatFs
+import android.support.design.widget.CoordinatorLayout
+import android.support.design.widget.Snackbar
+import android.support.design.widget.Snackbar.LENGTH_LONG
 import com.squareup.picasso.Picasso
 import android.util.Log
 import android.widget.RadioButton
 import android.widget.TextView
 import io.reactivex.Observable
+import me.jludden.reeflifesurvey.Injection
 import me.jludden.reeflifesurvey.MainActivity
 import me.jludden.reeflifesurvey.R
+import me.jludden.reeflifesurvey.R.id.top_level_layout
 import me.jludden.reeflifesurvey.data.DataRepository
 import java.io.*
 import me.jludden.reeflifesurvey.data.model.InfoCard.CardDetails
@@ -251,7 +256,7 @@ class StorageUtils{
             val storedSites = SharedPreferencesUtils.loadSitesStoredOffline(context)
             Log.d(TAG, "loadStoredFishCards loading ${storedSites.size} saved sites: ${storedSites.toString()}")
 
-            val dataRepo = DataRepository.getInstance(context)
+            val dataRepo = Injection.provideDataRepository(context)
 
             return dataRepo
                     .getSurveySitesAll(SurveySiteType.CODES)
@@ -268,7 +273,16 @@ class StorageUtils{
 
             val file = File(path)
             if(!file.isDirectory) Log.e(TAG, "clearOfflineSites - file is not a directory at $path" )
-            val imageFiles : Array<File> = file.listFiles(IMAGE_FILTER) //todo handle no files found
+            val imageFiles : Array<File>? = file.listFiles(IMAGE_FILTER)
+
+            if(imageFiles == null){
+                Log.d(TAG, "clearOfflineSites - NO image files found in $path" )
+//                Snackbar.make(activity.findViewById<CoordinatorLayout>(top_level_layout)
+//                    , R.string.no_downloaded_sites_to_delete_message, LENGTH_LONG)
+                MainActivity.showSimpleDialogMessage(activity, activity.resources.getString(R.string.no_downloaded_sites_to_delete_message)) //todo consider snackbar
+                return
+            }
+
             Log.d(TAG, "clearOfflineSites - ${imageFiles.size} image files found in $path" )
 
             //delete images

@@ -13,11 +13,6 @@
         <!--app:actionViewClass="android.support.v7.widget.SearchView"-->
         <!--app:showAsAction="ifRoom"/>-->
 
-    <item android:id="@+id/settings_opt_hide_menus"
-        android:icon="@drawable/ic_fab_fullscreen"
-        app:showAsAction="never"
-        android:title="Hide clutter"/>
-
     <item android:id="@+id/settings_opt_del_favorite_sites"
         android:icon="@drawable/ic_menu_camera"
         app:showAsAction="never"
@@ -36,5 +31,5 @@
     <item android:id="@+id/settings_opt_about"
         android:icon="@drawable/ic_menu_share"
         app:showAsAction="never"
-        android:title="About App" />
+        android:title="@string/about_app" />
 </menu>

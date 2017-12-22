@@ -14,6 +14,7 @@
     <string name="bottom_sheet_total_surveys">%1$d surveys in %2$d dive sites</string>
     <string name="bottom_sheet_secondary_button_browse">Browse</string>
     <string name="bottom_sheet_secondary_button_map">Map</string>
+    <string name="no_downloaded_sites_to_delete_message">No saved sites to clear</string>
 
     <!--About this app-->
     <string name="about_rls"> The Reef Life Survey Foundation (RLS) is a non-profit environmental organisation that makes the underwater world visible – to scientists, governments, artists and anyone with an interest in rocky and coral reefs around the world and how these reefs are changing./n/n
@@ -51,6 +52,7 @@ Working collaboratively with government and management agencies, professional sc
     <string name="launch_in_website">Open in browser</string>
     <string name="image_primary_content_description">image of the fish</string>
     <string name="species_favorite_button">add species to favorites</string>
+    <string name="about_app">About App</string>
 
 
 </resources>

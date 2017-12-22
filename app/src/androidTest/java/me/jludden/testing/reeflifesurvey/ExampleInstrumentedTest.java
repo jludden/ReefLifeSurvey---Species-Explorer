@@ -1,4 +1,4 @@
-package com.example.jason.reeflifesurvey;
+package me.jludden.testing.reeflifesurvey;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
