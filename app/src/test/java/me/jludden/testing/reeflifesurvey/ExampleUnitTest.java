@@ -1,4 +1,4 @@
-package com.example.jason.reeflifesurvey;
+package me.jludden.testing.reeflifesurvey;
 
 import org.junit.Test;
 
