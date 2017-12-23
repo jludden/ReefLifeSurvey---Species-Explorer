@@ -70,6 +70,8 @@ public class CardViewFragment extends Fragment implements
     private OnCardViewFragmentInteractionListener mListener;
     private View mProgressBar;
 
+    private onDataLoadedCallback mDataLoadedCallback; //todo list?
+
     //some not great stuff to enable loading all or loading incrementally
     //private boolean mMoreToLoad = true;
 
@@ -236,6 +238,12 @@ public class CardViewFragment extends Fragment implements
 
         if(mLoadedAll){ //everything is already loaded
             Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onLoadMore suppressed (everything already loaded)");
+
+            //onloadfinished wont be called again - pass back card list now
+            if(mDataLoadedCallback != null){
+                mDataLoadedCallback.onCardsLoaded( mViewAdapter.getCardList());
+            }
+
             return;
         }
 
@@ -244,6 +252,12 @@ public class CardViewFragment extends Fragment implements
             getLoaderManager().restartLoader(LOADER_ID, null, this); //will call onCreateLoader again, with the loadAll parameter passed in
         }
         else getLoaderManager().getLoader(LOADER_ID).onContentChanged();
+    }
+
+    //TODO onloadMore with a callback
+    public void loadAll(boolean forceReload, onDataLoadedCallback callback){
+        mDataLoadedCallback = callback;
+        onLoadMore(forceReload);
     }
 
     /**
@@ -325,6 +339,8 @@ public class CardViewFragment extends Fragment implements
 
         // remove progress bar
         animateView(mProgressBar, View.GONE, 0, 200);
+
+        if(mDataLoadedCallback != null) mDataLoadedCallback.onCardsLoaded(data);
     }
 
     /**
@@ -333,10 +349,16 @@ public class CardViewFragment extends Fragment implements
      */
     public void storeInLocal() {
 
-        if(!mLoadedAll) {
-            Log.e(TAG, "storeInLocal: not all loaded" );
-            return; //todo
-        }
+        CardViewSettings.LOAD_ALL = true;
+        loadAll(false, new onDataLoadedCallback() {
+            @Override
+            public void onCardsLoaded(List<CardDetails> cards) {
+                saveOfflineHelper(cards);
+            }
+        });
+    }
+
+    private void saveOfflineHelper(List<CardDetails> cards) {
 
         //todo refactor. this logic in both infocardloader and cardviewfragment
         List<String> siteCodes;
@@ -348,9 +370,8 @@ public class CardViewFragment extends Fragment implements
 
         //todo below here, everything should be in a different routine
         StorageUtils.Companion.promptToSaveOffline(
-                mViewAdapter.getCardList(), siteCodes, getActivity());
+               cards, siteCodes, getActivity());
 
-//        StorageUtils.Companion.promptToSaveOffline(siteCodes, getContext());
     }
 
 
@@ -501,6 +522,10 @@ public class CardViewFragment extends Fragment implements
         public static boolean LOAD_ALL = false;
         public static boolean FILTER_FAVORITES = false;
         public static String SEARCH_CONSTRAINT = "";
+    }
+
+    interface onDataLoadedCallback {
+        void onCardsLoaded(List<InfoCard.CardDetails> cards);
     }
 
 }

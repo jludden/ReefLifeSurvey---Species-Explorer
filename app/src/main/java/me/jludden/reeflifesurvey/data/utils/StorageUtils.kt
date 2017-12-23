@@ -275,7 +275,7 @@ class StorageUtils{
             if(!file.isDirectory) Log.e(TAG, "clearOfflineSites - file is not a directory at $path" )
             val imageFiles : Array<File>? = file.listFiles(IMAGE_FILTER)
 
-            if(imageFiles == null){
+            if(imageFiles == null || imageFiles.isEmpty()){
                 Log.d(TAG, "clearOfflineSites - NO image files found in $path" )
 //                Snackbar.make(activity.findViewById<CoordinatorLayout>(top_level_layout)
 //                    , R.string.no_downloaded_sites_to_delete_message, LENGTH_LONG)
@@ -292,6 +292,7 @@ class StorageUtils{
                 imageFiles.forEach {
                     it.delete()
                 }
+                MainActivity.showSimpleDialogMessage(activity, activity.resources.getString(R.string.delete_offline_on_success))
             }
 
             //delete SharedPreferences map of saved sites
@@ -326,14 +327,26 @@ class SaveToStorageTask(private val root: String, private val speciesToDownload:
     override fun doInBackground(vararg params: CardDetails): Boolean {
         val context : Context? = contextRef.get()
         Log.d(StorageUtils.TAG, "SaveToStorageTask doInBackground. \n has context: ${context!=null} \n data dir = $root")
+        var success = true
 
         if (context != null) {
 
             params.forEach {
                 if(it.imageURLs != null){
                     //todo download all images per
-                    val bitmap = loadBitmap(it.imageURLs[0], context)
-                    saveToInternalStorage(bitmap, root, it.getFileName(0))
+                    try {
+                        val bitmap = loadBitmap(it.imageURLs[0], context)
+                        if(bitmap!=null) {
+                            saveToInternalStorage(bitmap, root, it.getFileName(0))
+                        }
+                        else {
+                            Log.e(StorageUtils.TAG, "Failed to download image for ${it.cardName} [${it.getId()}]: ${it.primaryImageURL}")
+                            success = false
+                        }
+                    } catch (e: IOException){
+                        e.printStackTrace()
+                        success = false
+                    }
                     imageCount++
                 }
                 publishProgress(speciesCount++)
@@ -349,13 +362,13 @@ class SaveToStorageTask(private val root: String, private val speciesToDownload:
                 publishProgress(count)
             }*/
 
-            return true
+            return success
         }
         return false
     }
 
     /** Download the image using Picasso. MUST BE ON BACKGROUND THREAD**/
-   private fun loadBitmap(url: String, context: Context): Bitmap {
+   private fun loadBitmap(url: String, context: Context): Bitmap? {
         return Picasso
                 .with(context)
                 .load(url)
@@ -365,7 +378,7 @@ class SaveToStorageTask(private val root: String, private val speciesToDownload:
     /** Save image to path directory**/
     //todo filename - pass in fish id. increment so its like 123_1, 123_2 for each image for fish id 123
     private fun saveToInternalStorage(bitmapImage: Bitmap, path: String, fileName: String): Boolean {
-        val newImageFile = File(path, fileName+".png")
+        val newImageFile = File(path, fileName)
         Log.d(StorageUtils.TAG, "saveToInternalStorage AAA absoute path: "+newImageFile.absolutePath)
 
         try {

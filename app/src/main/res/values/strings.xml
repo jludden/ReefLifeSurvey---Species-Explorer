@@ -53,6 +53,7 @@ Working collaboratively with government and management agencies, professional sc
     <string name="image_primary_content_description">image of the fish</string>
     <string name="species_favorite_button">add species to favorites</string>
     <string name="about_app">About App</string>
+    <string name="delete_offline_on_success">Images deleted</string>
 
 
 </resources>
