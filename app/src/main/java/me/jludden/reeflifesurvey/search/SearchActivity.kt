@@ -1,10 +1,15 @@
 package me.jludden.reeflifesurvey.search
 
 import android.app.Activity
+import android.app.SharedElementCallback
 import android.content.Context
+import android.graphics.Point
 import android.os.Build
 import android.os.Bundle
+import android.support.annotation.IdRes
 import android.support.v7.app.AppCompatActivity
+import android.transition.Transition
+import android.transition.TransitionSet
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.SearchView
@@ -19,6 +24,7 @@ import java.util.concurrent.TimeUnit
 import kotlinx.android.synthetic.main.activity_search.*
 import me.jludden.reeflifesurvey.Injection
 import me.jludden.reeflifesurvey.data.DataRepository
+import me.jludden.reeflifesurvey.transitions.CircularReveal
 
 /**
  * Created by Jason on 11/9/2017.
@@ -99,6 +105,7 @@ class SearchActivity : AppCompatActivity() {
                 .subscribe({ query -> searchPresenter.onQueryTextChange(query)})
         )
 
+        setupTransitions()
     }
 
     fun showKeyboard() {
@@ -118,6 +125,50 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onEnterAnimationComplete() {
         search_view.requestFocus()
+    }
+
+    //credit Nick Butcher - Plaid app
+    private fun setupTransitions() {
+        // grab the position that the search icon transitions in *from*
+        // & use it to configure the return transition
+        setEnterSharedElementCallback(object : SharedElementCallback() {
+            override fun onSharedElementStart(
+                    sharedElementNames: List<String>,
+                    sharedElements: List<View>?,
+                    sharedElementSnapshots: List<View>) {
+                if (sharedElements != null && !sharedElements.isEmpty()) {
+                    val searchIcon = sharedElements[0]
+                    if (searchIcon.id != R.id.searchback) return
+                    val centerX = (searchIcon.left + searchIcon.right) / 2
+                    val hideResults = findTransition(
+                            window.returnTransition as TransitionSet,
+                            CircularReveal::class.java, R.id.search_results_container) as CircularReveal?
+                    if (hideResults != null) {
+                        hideResults.setCenter(Point(centerX, 0))
+                    }
+                }
+            }
+        })
+    }
+
+    //credit Nick Butcher - Plaid app
+    fun findTransition(
+            set: TransitionSet,
+            clazz: Class<out Transition>,
+            @IdRes targetId: Int): Transition? {
+        for (i in 0 until set.transitionCount) {
+            val transition = set.getTransitionAt(i)
+            if (transition.javaClass == clazz) {
+                if (transition.targetIds.contains(targetId)) {
+                    return transition
+                }
+            }
+            if (transition is TransitionSet) {
+                val child = findTransition(transition, clazz, targetId)
+                if (child != null) return child
+            }
+        }
+        return null
     }
 
 /*

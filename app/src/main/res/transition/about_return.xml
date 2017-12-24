@@ -35,6 +35,7 @@
         <targets>
             <target android:targetId="@id/indicator" />
             <target android:targetId="@id/about_rls_intro" />
+            <target android:targetId="@id/about_rls_methodology" />
             <target android:targetId="@+id/about_libs_content_frame" />
         </targets>
     </fade>

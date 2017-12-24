@@ -17,15 +17,18 @@
     <string name="no_downloaded_sites_to_delete_message">No saved sites to clear</string>
 
     <!--About this app-->
-    <string name="about_rls"> The Reef Life Survey Foundation (RLS) is a non-profit environmental organisation that makes the underwater world visible – to scientists, governments, artists and anyone with an interest in rocky and coral reefs around the world and how these reefs are changing./n/n
-Reef Life Survey relies on the skills and dedication of recreational SCUBA divers using the same detailed methodology to record the abundance of all conspicuous species observed on reefs. Since 2008, this RLS methodology has been used to survey over 3000 reefs across more than 50 countries spanning every continent in the world (including Antarctica!)./n/n
-Working collaboratively with government and management agencies, professional scientists and recreational divers, RLS aims to use this high-quality temporal and spatial information on the condition of reefs to improve biodiversity conservation and the sustainable management of marine resources.</string>
+    <string name="about_rls"> The Reef Life Survey Foundation (RLS) is a non-profit environmental organisation that makes the underwater world visible – to scientists, governments, artists and anyone with an interest in rocky and coral reefs around the world and how these reefs are changing.</string>
     <string name="website_launch_url">https://reeflifesurvey.com/</string>
-    <string name="about_app_pitch">Please consider donating: </string>
+    <string name="website_launch_support_url">https://reeflifesurvey.com/how-to/</string>
+
+    <string name="about_app_pitch">Support the Reef Life Survey Foundation </string>
     <string name="donation_launch_url"><![CDATA[https://www.paypal.com/donate/?token=NDJj6GNLXR-F-03Ob9TBTaS6eiHfY7pqIjYJURagwDJQPvNZ6R_ADGkhs1Bz_k1lMJOfzG&country.x=AU&locale.x=AU]]></string>
-    <string name="about_app_creation">This app was created by Jason Ludden and has been released as fully open-source on Github</string>
+    <string name="about_app_creation">This app was created by Jason Ludden and has been released as fully open-source on Github.</string>
     <!--TODO-->
     <string name="github_launch_url">https://github.com/jludden?tab=repositories</string>
+    <string name="launch_website">Learn more at reeflifesurvey.com</string>
+    <string name="rls_methodology_1">Reef Life Survey relies on the skills and dedication of recreational SCUBA divers using the same detailed methodology to record the abundance of all conspicuous species observed on reefs. Since 2008, this RLS methodology has been used to survey over 3000 reefs across more than 50 countries spanning every continent in the world (including Antarctica!).</string>
+    <string name="rls_methodology_2">Working collaboratively with government and management agencies, professional scientists and recreational divers, RLS aims to use this high-quality temporal and spatial information on the condition of reefs to improve biodiversity conservation and the sustainable management of marine resources.</string>
 
 
     <!--Strings for AboutLibraries lib-->
@@ -54,6 +57,7 @@ Working collaboratively with government and management agencies, professional sc
     <string name="species_favorite_button">add species to favorites</string>
     <string name="about_app">About App</string>
     <string name="delete_offline_on_success">Images deleted</string>
+    <string name="new_favorited_site">Added to site list</string>
 
 
 </resources>

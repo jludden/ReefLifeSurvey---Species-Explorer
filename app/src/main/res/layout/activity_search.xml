@@ -31,7 +31,7 @@
         android:id="@+id/scrim"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/scrim" />
+        android:background="@color/background_dark" />
 
     <FrameLayout
         android:id="@+id/search_toolbar"
@@ -46,7 +46,7 @@
             android:id="@+id/search_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/background_dark" />
+            android:background="@color/colorPrimary" />
 
         <SearchView
             android:id="@+id/search_view"
@@ -54,6 +54,7 @@
             android:layout_height="match_parent"
             android:layout_marginEnd="@dimen/padding_normal"
             android:iconifiedByDefault="false"
+            android:searchIcon="@color/colorPrimary"
             android:transitionGroup="true"
             android:layout_marginRight="@dimen/padding_normal" />
 
@@ -86,7 +87,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="?android:actionBarSize"
-        android:background="@color/background_dark"
+        android:background="@color/colorPrimary"
         android:elevation="@dimen/z_app_bar"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >

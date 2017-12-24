@@ -20,11 +20,10 @@
         android:layout_height="60dp"
         android:background="@color/white"
         android:gravity="start"
-        android:paddingEnd="65dp"
+        android:paddingEnd="70dp"
         android:paddingStart="10dp"
         android:minLines="1"
         android:maxLines="2"
-        android:text="top textview"
         android:textSize="36sp"
         android:textAlignment="textStart"
      />
@@ -49,7 +48,6 @@
             android:layout_weight="200"
             android:layout_height="match_parent"
             android:paddingStart="10dp"
-            android:text="100 dives in 12 locations"
             android:gravity="center_vertical"
 
             />
@@ -104,6 +102,13 @@
 
     </LinearLayout>-->
 
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:includeFontPadding="true"-->
+        <!--android:textSize="18sp"-->
+        <!--android:text="Sites surveyed: "/>-->
+
     <TextView
         android:id="@+id/bottom_sheet_main_text"
         android:layout_width="match_parent"
@@ -111,7 +116,6 @@
         android:gravity="center"
         android:includeFontPadding="true"
         android:padding="10dp"
-        android:text="hi this is texty"
         android:scrollbars="vertical" />
 
 </LinearLayout>

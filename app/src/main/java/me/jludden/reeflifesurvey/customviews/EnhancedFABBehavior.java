@@ -1,4 +1,4 @@
-package me.jludden.reeflifesurvey;
+package me.jludden.reeflifesurvey.customviews;
 
 import android.animation.Animator;
 import android.content.Context;
@@ -11,6 +11,8 @@ import android.view.animation.OvershootInterpolator;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+
+import me.jludden.reeflifesurvey.MainActivity;
 
 /**
  * Created by Jason on 8/20/2017.

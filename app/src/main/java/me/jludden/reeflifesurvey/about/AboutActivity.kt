@@ -1,6 +1,8 @@
-package me.jludden.reeflifesurvey
+package me.jludden.reeflifesurvey.about
 
 import android.app.FragmentManager
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.view.PagerAdapter
 import android.support.v7.app.AppCompatActivity
@@ -8,10 +10,13 @@ import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import me.jludden.reeflifesurvey.customviews.ElasticDragDismissFrameLayout
 import kotlinx.android.synthetic.main.activity_about.*
 
 import com.mikepenz.aboutlibraries.LibsBuilder
+import me.jludden.reeflifesurvey.R
+import me.jludden.reeflifesurvey.R.id.*
 
 
 /**
@@ -38,15 +43,28 @@ class AboutActivity : AppCompatActivity() {
                     }
                 })
 
-        pager.adapter = AboutPagerAdapter(fragmentManager)
+        pager.adapter = AboutPagerAdapter(fragmentManager, View.OnClickListener { v ->
+            when(v.id){
+                about_button_launch_website_support -> launchBrowser(getString(R.string.website_launch_support_url))
+                about_button_launch_website -> launchBrowser(getString(R.string.website_launch_url))
+                about_button_launch_github -> launchBrowser(getString(R.string.github_launch_url))
+            }
+        })
         indicator.setViewPager(pager)
     }
 
+    fun launchBrowser(url: String){
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            startActivity(intent)
+        }
+    }
 
-    class AboutPagerAdapter(private val fragmentManager: FragmentManager) : PagerAdapter() {
+
+    class AboutPagerAdapter(private val fragmentManager: FragmentManager, private val onClickListener: View.OnClickListener) : PagerAdapter() {
 
         override fun getCount(): Int {
-            return 2;
+            return 3;
         }
 
         override fun isViewFromObject(view: View?, obj: Any?): Boolean {
@@ -64,7 +82,15 @@ class AboutActivity : AppCompatActivity() {
             val layout : View
 
             when(position) {
-                0 -> layout = inflater.inflate(R.layout.about_reeflifesurvey, container, false)
+                0 -> {
+                    layout = inflater.inflate(R.layout.about_reeflifesurvey, container, false)
+                    layout.findViewById<Button>(about_button_launch_website_support).setOnClickListener(onClickListener)
+                    layout.findViewById<Button>(about_button_launch_github).setOnClickListener(onClickListener)
+                }
+                1 -> {
+                    layout = inflater.inflate(R.layout.about_reeflifesurvey_methodology, container, false)
+                    layout.findViewById<Button>(about_button_launch_website).setOnClickListener(onClickListener)
+                }
                 else -> {
                     layout = inflater.inflate(R.layout.about_libraries, container, false)
 
@@ -78,6 +104,10 @@ class AboutActivity : AppCompatActivity() {
 
             container.addView(layout);
             return layout
+        }
+
+        override fun destroyItem(container: ViewGroup, position: Int, view: Any) {
+            container.removeView(view as View)
         }
 
     }

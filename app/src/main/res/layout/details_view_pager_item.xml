@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/details_fishspecies_scrollview">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -13,8 +14,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:transitionName="@string/transition_launch_details"
             android:contentDescription="@string/image_primary_content_description" />
 
@@ -110,12 +111,12 @@
             android:text="@string/launch_in_website"
             android:drawableLeft="@drawable/ic_open_in_browser"/>-->
 
-        <TextView
-            android:id="@+id/details_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/details_common_name"
-            android:text="hello this is textview"/>
+        <!--<TextView-->
+            <!--android:id="@+id/details_text"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@id/details_common_name"-->
+            <!--android:text="hello this is textview"/>-->
 
     </RelativeLayout>
 </ScrollView>

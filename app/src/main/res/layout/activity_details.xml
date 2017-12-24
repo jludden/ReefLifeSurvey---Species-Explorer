@@ -6,6 +6,59 @@
 
     <include layout="@layout/details_view_pager_item" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:id="@+id/details_survey_site_parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            app:srcCompat="@drawable/rls_logo_vertical_rev"
+            />
+
+        <TextView
+            android:id="@+id/details_survey_site_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
+            />
+
+        <TextView
+            android:id="@+id/details_survey_site_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium" />
+
+        <TextView
+            android:id="@+id/details_survey_site_locations"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium" />
+    </LinearLayout>
+
+
+    <!-- Include the bottom sheet -->
+<!--
+    <me.jludden.reeflifesurvey.customviews.BottomSheet
+        android:id="@+id/bottom_sheet_details_activity"
+        android:layout_width="match_parent"
+        android:layout_height="450dp"
+        android:orientation="vertical"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="90dp"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"/>
+-->
 
     <!--
     <FrameLayout

@@ -19,7 +19,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
-import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
@@ -38,6 +37,7 @@ import android.widget.ToggleButton;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
+import me.jludden.reeflifesurvey.about.AboutActivity;
 import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils;
 import me.jludden.reeflifesurvey.data.utils.StorageUtils;
 import me.jludden.reeflifesurvey.detailed.DetailsActivity;
@@ -57,7 +57,6 @@ import static com.daimajia.androidanimations.library.Techniques.SlideInUp;
 import static com.daimajia.androidanimations.library.Techniques.SlideOutDown;
 
 public class MainActivity extends AppCompatActivity implements
-        NavigationView.OnNavigationItemSelectedListener,
         CompoundButton.OnCheckedChangeListener,
         CardViewFragment.OnCardViewFragmentInteractionListener,
         MapViewFragment.MapViewFragmentInteractionListener,
@@ -226,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         //Set up the bottom sheet
-        BottomSheet bottomSheet = (BottomSheet) findViewById(R.id.bottom_sheet);
+        BottomSheet bottomSheet = findViewById(R.id.bottom_sheet);
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -375,13 +374,13 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 });
                 return true;
-            case R.id.settings_opt_del_favorite_species:
+         /*   case R.id.settings_opt_del_favorite_species: //todo impl
                 showOkCancelDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) { // User clicked OK button;
                         SharedPreferencesUtils.clearFavSpecies(getApplicationContext());
                     }
                 });
-                return true;
+                return true;*/
             case R.id.settings_opt_del_offline_sites: //todo probably refactor to download settings activity
                 showOkCancelDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) { // User clicked OK button;
@@ -421,91 +420,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    //TODO DELETE UNUSED
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        Log.d("jludden.reeflifesurvey"  , "nav item selected: " + id);
-
-        Fragment newFragment;
-        String tag;
-        String subtitle;
-        mBottomSheetButton.setVisibility(View.GONE);
-        View bottomSheet = findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-
-//        switch(id) {
-//            case R.id
-//        }
-        if (id == R.id.nav_card_view) {   // Handle the camera action
-            //newFragment = new CardViewFragment();
-            newFragment = CardViewFragment.newInstance(CardViewFragment.CardType.Fish, "");
-            tag = CardViewFragment.TAG;
-
-//            String title = "Title here";
-//            subtitle = "hello world";
-//            getSupportActionBar().setTitle(title);
-//            getSupportActionBar().setSubtitle(subtitle);
-            AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
-            //mFAB.show();
-            launchUIFragment(newFragment, tag);
-
-        } else if (id == R.id.nav_map_view) {
-            newFragment = getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
-            if (newFragment == null) {
-                newFragment = MapViewFragment.newInstance();
-            }
-            tag = MapViewFragment.TAG;
-
-            //hide a bunch of shit
-            mFAB.hide();
-            hideFABmenu();
-            mBottomSheetButton.setVisibility(View.VISIBLE);
-            AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
-            toolbar.setExpanded(false, true);
-            //  SupportMapFragment mapFragment = (SupportMapFragment) newFragment;
-            // mapFragment.getMapAsync(this);
-            launchUIFragment(newFragment, tag);
-
-        } else if ( id == R.id.nav_about) {
-            //todo create dialog box or floating context menu
-            return true;
-        }
-/*
-        } else if (id == R.id.nav_send) {
-            newFragment = CardViewFragment.newInstance(CardViewFragment.CardType.Countries, "");
-            tag = "CountryFragment"; //TODO refactor these tags. They should be public static final vars on fragment classes
-            mFAB.hide();
-            launchUIFragment(newFragment, tag);
-
-        } else {
-            newFragment = new CountryListFragment();
-            tag = "CountryListFragment"; //TODO refactor these tags. They should be public static final vars on fragment classes
-            mFAB.hide();
-            launchUIFragment(newFragment, tag);
-*/
-
-//
-//        } else if (id == R.id.nav_slideshow) {
-//
-//        } else if (id == R.id.nav_manage) {
-//
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
-
-
- /*       DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);*/
-
-        return true;
-    }
-
     /**
      * public method to launch a new fragment
      * @param fragmentClass
@@ -521,7 +435,7 @@ public class MainActivity extends AppCompatActivity implements
                 newFragment = MapViewFragment.newInstance();
             }
 
-            //hide a bunch of shit
+            //todo cleanup
             mFAB.hide();
             hideFABmenu();
             mBottomSheetButton.setVisibility(View.VISIBLE);
@@ -756,7 +670,9 @@ public class MainActivity extends AppCompatActivity implements
 
                 launchNewCardViewFragment(siteInfo.getCode());
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                mBottomSheetButton.hide();
+//                mBottomSheetButton.hide();
+                mBottomSheetButton.setVisibility(View.GONE);
+
 
                 //todo refactor this
                 //todo this does not work properly if they are in details view

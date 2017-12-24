@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
+import android.support.design.widget.BottomSheetBehavior
 import android.support.transition.Visibility
 import android.support.v7.app.AppCompatActivity
 import android.transition.Transition
@@ -15,6 +16,8 @@ import android.view.View
 import android.widget.*
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_details.*
+import kotlinx.android.synthetic.main.details_view_pager_item.*
 import me.jludden.reeflifesurvey.Injection
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.customviews.BottomSheet
@@ -29,7 +32,7 @@ import me.jludden.reeflifesurvey.data.model.SurveySiteList
 /**
  * Created by Jason on 11/19/2017.
  */
-class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractionListener {
+class DetailsActivity : AppCompatActivity() {
     private lateinit var dataRepo: DataSource
     private var speciesCard: InfoCard.CardDetails? = null
     private lateinit var favoriteBtn: CheckBox
@@ -40,9 +43,52 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
 
         setContentView(R.layout.activity_details)
 
-        //todo set support postpone enter transition, but it can be very slow
+        //supporting postpone enter transition, but it can be very slow
         //currently only postponing transition for cardview -> details
         // supportPostponeEnterTransition() //postpone transition until the image is loaded
+
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true) // show back button
+        dataRepo = Injection.provideDataRepository(applicationContext)
+
+        if(intent.hasExtra(InfoCard.CardDetails.INTENT_EXTRA)){
+            val card = intent.getParcelableExtra<InfoCard.CardDetails>(InfoCard.CardDetails.INTENT_EXTRA)
+            loadFishSpecies(card.id)
+        }
+        else if(intent.hasExtra(SearchResult.INTENT_EXTRA)) {
+            val searchResult
+                    = intent.getParcelableExtra<SearchResult>(SearchResult.INTENT_EXTRA)
+
+            if(searchResult.type == SearchResultType.FishSpecies) {
+                loadFishSpecies(searchResult.id)
+            } else if (searchResult.type == SearchResultType.SurveySiteLocation){
+                loadSurveySite(searchResult.id)
+            }
+        }
+    }
+
+    private fun loadSurveySite(code: String){
+        details_fishspecies_scrollview.visibility = View.GONE
+        //favoriteBtn.visibility = View.GONE
+        details_survey_site_parent.visibility = View.VISIBLE
+
+        dataRepo.getSurveySites(SurveySiteType.CODES, object: LoadSurveySitesCallBack {
+            override fun onSurveySitesLoaded(sites: SurveySiteList) {
+                val siteList = sites.getSitesForCode(code)
+                val site = siteList[1]
+
+                supportActionBar?.title = site.ecoRegion
+                details_survey_site_title.text = site.displayName
+                details_survey_site_main.text = "${site.realm} [${site.position}]"
+                details_survey_site_locations.text = BottomSheet.Companion.getCodeList(siteList)
+            }
+            override fun onDataNotAvailable(reason: String) {
+                TODO("not implemented")
+            }
+        })
+    }
+
+    private fun loadFishSpecies(id: String) {
+        supportPostponeEnterTransition()
 
         //popping in the favorite button after the view loads for a little extra flair
         window.enterTransition.addListener(object : Transition.TransitionListener {
@@ -56,52 +102,20 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
             override fun onTransitionStart(transition: Transition) { }
         })
 
-        dataRepo = Injection.provideDataRepository(applicationContext)
-
-
-        if(intent.hasExtra(SearchResult.INTENT_EXTRA)) {
-            val searchResult
-                    = intent.getParcelableExtra<SearchResult>(SearchResult.INTENT_EXTRA)
-
-            if(searchResult.type == SearchResultType.FishSpecies) {
-                supportPostponeEnterTransition()
-                dataRepo.getFishCard(searchResult.id, object: LoadFishCardCallBack{
-                    override fun onFishCardLoaded(card: InfoCard.CardDetails) {
-                        setupFishDetails(card)
-                    }
-
-                    override fun onDataNotAvailable(reason: String) {
-                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                    }
-                })
-
-
-            } else if (searchResult.type == SearchResultType.SurveySiteLocation){
-
+        dataRepo.getFishCard(id, object: LoadFishCardCallBack{
+            override fun onFishCardLoaded(card: InfoCard.CardDetails) {
+                setupFishDetails(card)
             }
-        }
-        else if(intent.hasExtra(InfoCard.CardDetails.INTENT_EXTRA)){
-            val card = intent.getParcelableExtra<InfoCard.CardDetails>(InfoCard.CardDetails.INTENT_EXTRA)
-            //todo doesnt look like the card passed in had any data
-            supportPostponeEnterTransition()
-            dataRepo.getFishCard(card.id, object: LoadFishCardCallBack{
-                override fun onFishCardLoaded(card: InfoCard.CardDetails) {
-                    setupFishDetails(card)
-                }
 
-                override fun onDataNotAvailable(reason: String) {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                }
-            })
-        }
-
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true) // show back button
-
+            override fun onDataNotAvailable(reason: String) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+        })
     }
 
     fun setupFishDetails(card: InfoCard.CardDetails) {
         val mainImageView = findViewById<ImageView>(R.id.details_image_main)
-        val textView = findViewById<TextView>(R.id.details_text)
+//        val textView = findViewById<TextView>(R.id.details_text)
        // val linkBtn = findViewById<Button>(R.id.link_btn)
         val scientificNames = findViewById<TextView>(R.id.details_label_scientific)
         val commonNames = findViewById<TextView>(R.id.details_label_common)
@@ -124,7 +138,8 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
 //        android.widget.CheckBox
 
         val newText = StringBuilder(
-                "\n \n \n \n \n \n" +
+            "Card Name " + card.cardName + "\n" +
+                "Common Names" + card.commonNames + "\n" +
                 "Num sightings " + card.numSightings + "\n" +
                 "Found in " + card.FoundInSites.size() + " sites" + "\n")
 
@@ -179,7 +194,9 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
 
         newText.append("\n").append("SPECIES PAGE URL: ").append(card.reefLifeSurveyURL)
 
-        textView.setText(newText.toString())
+       // textView.setText(newText.toString())
+
+        Log.d(TAG,newText.toString())
 
         /*linkBtn.setOnClickListener {
             val url = card.reefLifeSurveyURL
@@ -192,25 +209,6 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
         }
 
     fun ImageView.loadURL(url: String) {
-      /*  Glide.with(context)
-                .load(url)
-                //.apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.DATA)) todo may slightly increase performance of transition animation
-                .listener(object: RequestListener<Drawable>{
-                    override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                        supportStartPostponedEnterTransition()
-                        return false
-                    }
-
-                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
-                        supportStartPostponedEnterTransition()
-                        return false
-                    }
-
-                })
-                .into(this)
-                .onLoadFailed(getDrawable(R.drawable.ic_menu_camera))*/
-
-
             Picasso.with(context)
             .load(url)
             .error(R.drawable.ic_menu_camera)
@@ -223,19 +221,7 @@ class DetailsActivity : AppCompatActivity(), BottomSheet.OnBottomSheetInteractio
                     supportStartPostponedEnterTransition()
                 }
             })
-
-
-        /*    Glide.with(context)
-                    .load(url)
-                    .transition(withCrossFade())
-                    .into(this)*/
-
-
     }
-    override fun onImageSliderClick(card: InfoCard.CardDetails, sharedElement: View) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.details_toolbar, menu)

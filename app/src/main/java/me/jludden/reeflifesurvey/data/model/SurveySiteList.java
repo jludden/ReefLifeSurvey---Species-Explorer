@@ -256,6 +256,7 @@ public class SurveySiteList {
             this.speciesFound = speciesFound;
         }
 
+        //TODO update matchesQuery to also match on survey site locations
         @Override
         public boolean matchesQuery(@NotNull String query) {
             String textToSearch =
@@ -286,7 +287,7 @@ public class SurveySiteList {
                 description = "realm: "+realm;
             }
 
-            return new SearchResult(name, description, SearchResultType.SurveySiteLocation, code+id);
+            return new SearchResult(name, description, SearchResultType.SurveySiteLocation, code);
         }
     }
 }

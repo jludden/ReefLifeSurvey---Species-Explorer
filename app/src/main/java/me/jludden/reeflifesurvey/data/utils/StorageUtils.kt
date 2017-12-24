@@ -110,11 +110,11 @@ class StorageUtils{
             builder
                     .setTitle(context.getString(R.string.storage_location_dialog_title)) //todo
                     .setView(R.layout.storage_location_dialog)
-            builder.setPositiveButton(R.string.ok) { _, _ ->
+            builder.setPositiveButton(R.string.ok) { _, _ -> //dialog, id
                 //user accepted
                 storeSites(cardList, siteCodes, context)
             }
-            builder.setNegativeButton(R.string.cancel) { dialog, id ->
+            builder.setNegativeButton(R.string.cancel) { _, _ ->
                 // User cancelled the dialog
             }
 

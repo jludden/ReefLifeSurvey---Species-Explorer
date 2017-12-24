@@ -18,10 +18,10 @@
         app:showAsAction="never"
         android:title="@string/del_favorite_sites"/>
 
-    <item android:id="@+id/settings_opt_del_favorite_species"
+<!--    <item android:id="@+id/settings_opt_del_favorite_species"
         android:icon="@drawable/ic_menu_camera"
         app:showAsAction="never"
-        android:title="@string/del_favorite_species"/>
+        android:title="@string/del_favorite_species"/>-->
 
     <item android:id="@+id/settings_opt_del_offline_sites"
         android:icon="@drawable/ic_store_offline"

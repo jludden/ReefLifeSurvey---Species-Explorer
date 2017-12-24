@@ -85,10 +85,10 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
         siteInfo ?: return
         surveySiteList ?: return
 
-        val details = StringBuilder()
         val code = siteInfo.code
-        var indivSites = surveySiteList?.getSitesForCode(code)
-        details.append("Code (ID) : " + code + " (" + siteInfo.getID() + ")")
+        val indivSites = surveySiteList?.getSitesForCode(code)
+        val details = StringBuilder()
+        details.append("Code (ID) : " + code + " (" + siteInfo.getID() + ") ")
         details.append("\n SiteName " + siteInfo.getSiteName())
         details.append("\n EcoRegion " + siteInfo.getEcoRegion())
         details.append("\n Realm " + siteInfo.getRealm())
@@ -96,15 +96,17 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
         details.append("\n Num Surveys " + siteInfo.getNumberOfSurveys())
         details.append("\n" + getCodeList(indivSites!!))
 
-        bottom_sheet_main_text.text = details
-        bottom_sheet_main_text.scrollTo(0, 0)
-
         bottom_sheet_number_surveys.text = resources.getString(
                 R.string.bottom_sheet_total_surveys,
                 getTotalSurveysForCode(indivSites),
                 indivSites.size)
 
+        //details text below image
+        bottom_sheet_main_text.scrollTo(0, 0)
+        bottom_sheet_main_text.text = getCodeList(indivSites)
+
         //"${surveySiteList?.getTotalSurveysForCode(code)} Surveys"
+        Log.d(TAG, details.toString())
     }
 
     //creates a TextSliderView (a fish preview image, with description and onclick listener) that can be added to a SliderLayout (an image carousel of fish previews)
@@ -157,34 +159,32 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
     companion object {
 
         val TAG = "BottomSheet"
+
+        //todo combine these loops
+        //possibly destructured syntax https://kotlinlang.org/docs/reference/multi-declarations.html
+        fun getCodeList(siteList: List<SurveySiteList.SurveySite>): String { //todo change len to charlen instead of numsites
+            val nameBuilder = StringBuilder().append(siteList.size).append(" Survey Sites: \n")
+
+            for (tSite in siteList) {
+                nameBuilder.append(tSite.getSiteName() + ", ")
+            }
+
+            nameBuilder.delete(nameBuilder.length - 2, nameBuilder.length) //remove trailing comma
+
+            return nameBuilder.toString()
+        }
+
+        fun getTotalSurveysForCode(siteList: List<SurveySiteList.SurveySite>): Int {
+            var numSurveys = 0
+            for (site in siteList) {
+                numSurveys += site.getNumberOfSurveys()
+            }
+            return numSurveys
+        }
     }
 
     interface OnBottomSheetInteractionListener {
         fun onImageSliderClick(card: InfoCard.CardDetails, sharedElement: View)
     }
-
-    //todo combine these loops
-    //possibly destructured syntax https://kotlinlang.org/docs/reference/multi-declarations.html
-    fun getCodeList(siteList: List<SurveySiteList.SurveySite>): String { //todo change len to charlen instead of numsites
-        val nameBuilder = StringBuilder().append(siteList.size).append(": ")
-
-        var iterCount = 0
-        for (tSite in siteList) {
-            nameBuilder.append(tSite.getSiteName() + ", ")
-        }
-
-        nameBuilder.delete(nameBuilder.length - 2, nameBuilder.length) //remove trailing comma
-
-        return nameBuilder.toString()
-    }
-
-    fun getTotalSurveysForCode(siteList: List<SurveySiteList.SurveySite>): Int {
-        var numSurveys = 0
-        for (site in siteList) {
-            numSurveys += site.getNumberOfSurveys()
-        }
-        return numSurveys
-    }
-
 
 }
