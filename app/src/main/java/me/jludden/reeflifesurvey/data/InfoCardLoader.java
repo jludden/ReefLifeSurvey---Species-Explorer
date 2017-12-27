@@ -18,9 +18,6 @@ import me.jludden.reeflifesurvey.fishcards.CardViewFragment;
 import me.jludden.reeflifesurvey.data.model.InfoCard.CardDetails;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.data.model.SurveySiteList.SurveySite;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -35,9 +32,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static me.jludden.reeflifesurvey.BuildConfig.DEBUG;
 import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.isOnline;
+import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.loadAllSitesStoredOffline;
 
 /**
  * Created by Jason on 5/1/2017.
@@ -112,6 +111,8 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
     private final int NUM_LOAD_PER_ITER = 20; //load 20 cards per iteration
     private SurveySiteList mSurveySitesList;
 
+    private boolean loadingOffline = false;
+
 
     //todo update. don't need card type, do need another parameter to load favorites or load all fish or something
     public InfoCardLoader(Context context, CardViewFragment.CardType cardType, @Nullable String siteCode) {
@@ -162,14 +163,17 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
     @Override
     public List<CardDetails> loadInBackground() {
 
-        Log.d(TAG  , "InfoCardLoader loadInBackground called "+isOnline()+"_"+(mData == null || mData.size() <= 0)+"_"+(mPassedInSurveySiteCode.equals("")));
+        boolean isOnline = isOnline();
+        Log.d(TAG  , "InfoCardLoader loadInBackground called "+isOnline+"_"+(mData == null || mData.size() <= 0)+"_"+(mPassedInSurveySiteCode.equals("")));
 
         //no internet, no passed in site - load downloaded
         //todo this is totally unnecessary, no part of this loading code needs to be online anyway
-        if(!isOnline() && (mData == null || mData.size() <= 0) && (mPassedInSurveySiteCode.equals(""))) {
-            Log.d(TAG, "InfoCardLoader: No Internet Detected and no passed in site - showing all downloaded");
+        if(!isOnline && (mData == null || mData.size() <= 0) && (mPassedInSurveySiteCode.equals(""))) {
+            Set<String> storedSites = loadAllSitesStoredOffline(getContext().getApplicationContext());
+            Log.d(TAG, "InfoCardLoader: No Internet Detected and no passed in site - showing all downloaded ("+storedSites.size()+" sites stored offline");
+            loadingOffline = true;
             loadOffline();
-            return mData; //todo couldn't there be a timing issue with the stream
+            return mData; //todo
         }
 
 
@@ -185,7 +189,6 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
 
         try {
 
-            //  getBasetripCountries();
             loadFishCardsIncremental(); //Load more fish cards into mData
 
 
@@ -193,16 +196,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
             //  mCardDict - dictionary of id, fishCard to check against
             //  return mCardDict.Values() or whatever
 
-        /*
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            if (mCardType == CardViewFragment.CardType.Countries) {
-                USE_GLIDE_FOR_IMAGES = false; //still using old bitmap loading
-                mData.add(getBasetripDetails("indonesia")),mData.add(getBasetripDetails("argentina")),mData.add(getBasetripDetails("russia"));
-            } else {
-                USE_GLIDE_FOR_IMAGES = true;
-                mData = getFishCards(mData); //Load fish cards
-            }
-        }*/
+
         } catch (IOException e) {
             Log.e("jludden.reeflifesurvey", "IOException: " + e.toString());
         } catch (JSONException e) {
@@ -212,35 +206,6 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
         return mData;
 
     }
-
-
-    //TODO!!!! #NOSHIP
-    String getBasetripCountries() throws IOException, JSONException {
-        //https://reeflifesurvey.com/species/####/
-        Request request = new Request.Builder()
-                .url("https://reeflifesurvey.com/species/4591/")
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Accept", "application/json")
-                .build();
-
-        OkHttpClient client = new OkHttpClient();
-        Response response = client.newCall(request).execute();
-        String result = response.body().string();
-        Log.d(TAG  ,"getBasetripCountries Download response: "+result.substring(14000));
-        Log.d(TAG  ,"getBasetripCountries Download response2: "+result.contains("54 cm"));
-        Log.d(TAG  ,"getBasetripCountries Download response2: "+result.contains("Max Size"));
-
-        int strStart = result.indexOf("Description");
-        int strEnd = result.indexOf("Edit by");
-        Log.d(TAG  ,"getBasetripCountries Download response2: "+strStart+"-"+strEnd+" substring: "+result.substring(strStart,strEnd));
-        Log.d(TAG  ,"getBasetripCountries Download response2: "+strStart+"-"+strEnd+" substring: "+result.substring(strStart,strEnd));
-
-//        int strStart = result.indexOf("Max Size");
-//        Log.d(TAG  ,"getBasetripCountries Download response2: "+strStart+" substring: "+result.substring(strStart,strStart+300));
-
-        return result;
-    }
-
 
     //todo switching to a new model for loading fish cards into the card list fragment & adapter
     //  this has the benefit of correcting the fish found in each location,
@@ -278,9 +243,8 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
         }*/
     }
 
-    //todo update to use loadsinglesite
     /**
-     * inrecementally loads fish cards into mData
+     * incrementally loads fish cards into mData
      * <p>
      * Using Yanir Seroussi's API, from:
      * https://yanirseroussi.com/2017/06/03/exploring-and-visualising-reef-life-survey-data/
@@ -288,7 +252,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
      * https://yanirs.github.io/tools/rls/api-species.json
      * species.json – a mapping from species ID to an array of five elements: scientific name, common name, species page URL, survey method (0: method 1, 1: method 2, or 2: both), and images (array of URLs).
      * https://yanirs.github.io/tools/rls/api-site-surveys.json
-     * . site-surveys.json – a mapping from site code to an array of seven elements: realm, ecoregion, site name, longitude, latitude, number of surveys, and species counts (mapping from each observed species ID to the number of surveys on which it was seen).
+     * site-surveys.json – a mapping from site code to an array of seven elements: realm, ecoregion, site name, longitude, latitude, number of surveys, and species counts (mapping from each observed species ID to the number of surveys on which it was seen).
      */
     private void loadFishCardsIncremental() throws IOException, JSONException {
         // Call to set up the site surveys TODO return type + should this be in constructor? Or can we cache?
@@ -338,42 +302,44 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
      * Filters the site json object to just the sites relevant to this load
      * and aggregates them in a new JSON object
      * also, parses out all the irrelevant site info so we are left with just the species found
+     *
+     * Loading order for the browse species screen:
+     * 1. load passed in site
+     * 2. load favorite sites
+     * 3. load favorite species
+     * 4. load none (show no sites selected. load popular fish?)
+     * 5. load popular? fish
+     *
      * @return
      */
     private JSONObject setupFishLocations(){
 
-        /**
-         * TODO refactor
-         * 12/3 new plan
-         * 1. load passed in site
-         * 2. load favorite sites
-         * 3. load none (show no sites selected. load popular fish?)
-         * 4. load popular? fish
-         *
-         * old
-         * 1. Load passed in site (no params)
-         * 2. Load favorite sites (
-         * 3. Load all fish
-         */
-        Injection.provideDataRepository(getContext().getApplicationContext())
-                .getSurveySites(SurveySiteType.ALL_IDS, this);
-        int i = 0;
-        while(mSurveySitesList == null){ //todo handle failure to load
-            try {
-                Log.d(TAG  , "InfoCardLoader loading waiting: "+i++);
-                wait(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        //terrible todo
+        if(mSurveySitesList == null) {
+            Injection.provideDataRepository(getContext().getApplicationContext())
+                    .getSurveySites(SurveySiteType.ALL_IDS, this);
+            int i = 0;
+            while (mSurveySitesList == null && i < 50) { //todo handle failure to load
+                try {
+                    Log.d(TAG, "InfoCardLoader loading waiting: " + i++);
+                    wait(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (i >= 50) {
+                Log.e(TAG, "InfoCardLoader failed to load survey sites");
             }
         }
 
         List<SurveySite> siteList;
         if(mPassedInSurveySiteCode.equals("")){
             siteList = mSurveySitesList.getFavoritedSitesAll();
-            Log.d(TAG  , "InfoCardLoader loading favorite survey sites");
+            if(siteList.size() > 0)  Log.d(TAG  , "InfoCardLoader setupFishLocations loading "+siteList.size()+" favorite survey sites");
+            else Log.d(TAG, "sInfoCardLoader setupFishLocations no favorite sites or passed in site ");
         } else {
             siteList = mSurveySitesList.getSitesForCode(mPassedInSurveySiteCode);
-            Log.d(TAG  , "InfoCardLoader loading passed in survey site");
+            Log.d(TAG  , "InfoCardLoader setupFishLocations loading passed in survey site");
         }
 
 
@@ -381,7 +347,15 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
         try {
             //todo at this point i would love to no longer use any JSON at all
             JSONObject result = new JSONObject(); //resulting jsonobject aggregated out of separate site jsons
-           // JSONObject surveySites = loadFishSurveySites(getContext()); //full sitejson from the file
+
+            //todo load favorite fish instead (if no favorite sites or passed in site)
+        /*    FAVORITE_SPECIES_LOADED = true;
+            SharedPreferencesUtils.LoadAllFavoriteSpecies
+            speciesFound = {"2952":1,"1420":1,"1423":2,"2963":2,"1691":1,"1692":1}
+            result.accumulate(0, speciesFound);
+            result.put(0, speciesFound);*/
+
+
 
 
             StringBuilder selectedSites = new StringBuilder(siteList.size() * 7);
@@ -389,12 +363,10 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
                // Log.d(TAG  , "InfoCardLoader loading site: "+selSite.getCode()+selSite.getID());
 
                 selectedSites.append(selSite.getCode()).append(selSite.getID()).append(", ");
-
                 String siteID = selSite.getCode()+selSite.getID();
 //            }
 //
-//            String[] codes = {"FLORES1", "FLORES2", "FLORES2", "FLORES4", "FLORES5"} ; //TODO get these site names from the maps activity
-//
+//            String[] codes = {"FLORES1", "FLORES2", "FLORES2", "FLORES4", "FLORES5"} ;
 //
 //            int count = 0;
 //            int MAX_NUM_EL = 4000; //max appears to be 3025 in the survey sites json file
@@ -437,23 +409,8 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
             }
 
             Log.d(TAG  , "InfoCardLoader setupFishLocations SELECTED SITES: " + selectedSites.toString());
-
             return result;
 
-            //parse the fish species
-            /*
-            String fishSpecies;
-            Iterator<String> keys = speciesFound.keys();
-            while(keys.hasNext()){
-                fishSpecies = keys.next();
-                Log.d(TAG  , "getFishInCards setupFishLocations key: "+fishSpecies);
-                int fishCount = (int) speciesFound.get(fishSpecies);
-                Log.d(TAG  , "getFishInCards setupFishLocations val: "+fishCount);
-            }
-           */
-
-//        } catch (IOException e) {
-//            Log.d(TAG  , "setupFishLocations ioexception: " + e.toString());
         } catch (JSONException e){
             Log.d(TAG  , "setupFishLocations JSONException: " + e.toString());
 
@@ -507,6 +464,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
                     //Add the number of times the fish was seen per site
                     cardDetails.numSightings += numSightings;
                     cardDetails.setFoundInSites(siteID, numSightings);
+                    if(loadingOffline) cardDetails.setOffline(true);
                 }
             }
 

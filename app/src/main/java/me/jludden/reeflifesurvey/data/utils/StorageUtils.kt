@@ -11,9 +11,6 @@ import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.os.Environment
 import android.os.StatFs
-import android.support.design.widget.CoordinatorLayout
-import android.support.design.widget.Snackbar
-import android.support.design.widget.Snackbar.LENGTH_LONG
 import com.squareup.picasso.Picasso
 import android.util.Log
 import android.widget.RadioButton
@@ -22,15 +19,13 @@ import io.reactivex.Observable
 import me.jludden.reeflifesurvey.Injection
 import me.jludden.reeflifesurvey.MainActivity
 import me.jludden.reeflifesurvey.R
-import me.jludden.reeflifesurvey.R.id.top_level_layout
-import me.jludden.reeflifesurvey.data.DataRepository
 import java.io.*
 import me.jludden.reeflifesurvey.data.model.InfoCard.CardDetails
 import me.jludden.reeflifesurvey.data.SurveySiteType
 import me.jludden.reeflifesurvey.data.model.InfoCard
+import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.loadSitesStoredOffline
 import me.jludden.reeflifesurvey.data.utils.StorageUtils.Companion.NOTIFICATION_CHANNEL_ID
 import me.jludden.reeflifesurvey.data.utils.StorageUtils.Companion.NOTIFICATION_ID
-import me.jludden.reeflifesurvey.data.utils.StorageUtils.Companion.writeToExternal
 import java.lang.ref.WeakReference
 
 
@@ -207,8 +202,8 @@ class StorageUtils{
         */
 
         // filter to identify images based on their extensions
-        val EXTENSIONS = arrayOf("png", "jpg", "bmp")
-        val IMAGE_FILTER = FilenameFilter { _, name -> EXTENSIONS.any { name.endsWith("." + it) } }
+        private val EXTENSIONS = arrayOf("png", "jpg", "bmp")
+        private val IMAGE_FILTER = FilenameFilter { _, name -> EXTENSIONS.any { name.endsWith("." + it) } }
 
         /*
           a File object can represents both
@@ -251,9 +246,10 @@ class StorageUtils{
             return images
         }
 
+        //todo probably not useful
         fun loadStoredFishCards(context: Context) : Observable<CardDetails> {
 
-            val storedSites = SharedPreferencesUtils.loadSitesStoredOffline(context)
+            val storedSites = SharedPreferencesUtils.loadAllSitesStoredOffline(context)
             Log.d(TAG, "loadStoredFishCards loading ${storedSites.size} saved sites: ${storedSites.toString()}")
 
             val dataRepo = Injection.provideDataRepository(context)
@@ -268,25 +264,27 @@ class StorageUtils{
          * Deletes all images stored offline
          */
         fun clearOfflineSites(activity: Activity) {
-            val isExternal: Boolean = writeToExternal //todo
-            val path = SharedPreferencesUtils.loadStoredOfflinePath(isExternal, activity.applicationContext)
+            val extPath = SharedPreferencesUtils.loadStoredOfflinePath(true, activity.applicationContext)
+            val localPath = SharedPreferencesUtils.loadStoredOfflinePath(false, activity.applicationContext)
+            val storedSites = SharedPreferencesUtils.loadAllSitesStoredOffline(activity.applicationContext)
+            val path = "External path: $extPath \n Local path: $localPath"
 
-            val file = File(path)
-            if(!file.isDirectory) Log.e(TAG, "clearOfflineSites - file is not a directory at $path" )
-            val imageFiles : Array<File>? = file.listFiles(IMAGE_FILTER)
+            val imageFiles : Array<File>? = File(extPath).listFiles(IMAGE_FILTER)
+                    ?.plus(File(localPath).listFiles(IMAGE_FILTER))
 
             if(imageFiles == null || imageFiles.isEmpty()){
-                Log.d(TAG, "clearOfflineSites - NO image files found in $path" )
+                Log.d(TAG, "clearOfflineSites - NO image files found in $path (for ${storedSites.size} saved sites)" )
 //                Snackbar.make(activity.findViewById<CoordinatorLayout>(top_level_layout)
 //                    , R.string.no_downloaded_sites_to_delete_message, LENGTH_LONG)
                 MainActivity.showSimpleDialogMessage(activity, activity.resources.getString(R.string.no_downloaded_sites_to_delete_message)) //todo consider snackbar
                 return
             }
 
-            Log.d(TAG, "clearOfflineSites - ${imageFiles.size} image files found in $path" )
+            Log.d(TAG, "clearOfflineSites - ${imageFiles.size} image files found in $path  (for ${storedSites.size} saved sites)" )
 
             //delete images
-            val message = activity.resources.getString(R.string.clear_offline_sites_final_prompt, imageFiles.size, path)
+            val message = activity.resources.getString(R.string.clear_offline_sites_final_prompt, imageFiles.size)
+                //todo messages could use clear_offline_sites_final_prompt_with_path but I do not trust it - would be nice to convey the path or number of saved sites
             MainActivity.showOkCancelDialog(activity, message) { _, _ ->
                 Log.d(TAG, "DELETING OFFLINE SITES IN $path! (${imageFiles.size} sites)" )
                 imageFiles.forEach {
@@ -296,7 +294,9 @@ class StorageUtils{
             }
 
             //delete SharedPreferences map of saved sites
-            SharedPreferencesUtils.setSitesStoredOffline(ArrayList<String>(), path, isExternal, activity.applicationContext)
+            SharedPreferencesUtils.setSitesStoredOffline(ArrayList<String>(), localPath, false, activity.applicationContext)
+            SharedPreferencesUtils.setSitesStoredOffline(ArrayList<String>(), extPath, true, activity.applicationContext)
+
         }
 
     }
@@ -443,15 +443,20 @@ class StoredImageLoader(context: Context){
     val placeholderImage: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_map_action)
 
     var path: String
-    var externalStorage: Boolean = writeToExternal //todo make dialog and prompt
+    var externalStorage: Boolean = determineLocation(context) //todo ideally handle both storage locations
 
     init {
 
         path = SharedPreferencesUtils.loadStoredOfflinePath(externalStorage, context)
         if(path == "") Log.e(StorageUtils.TAG, "StoredImageLoader no saved file path found")
-        Log.d(StorageUtils.TAG, "StoredImageLoader initiated path: $path  external storage: $externalStorage")
+        Log.d(StorageUtils.TAG, "StoredImageLoader initiated path: $path  external storage: $externalStorage  determine location externalStorage: {${determineLocation(context)}")
+    }
 
-
+    //todo not really handling this well
+    fun determineLocation(context: Context) : Boolean {
+        val localCodes = loadSitesStoredOffline(context, false)
+        val extCodes = loadSitesStoredOffline(context, true)
+        return extCodes.size >= localCodes.size
     }
 
     fun loadPrimaryCardImage(card: CardDetails): Bitmap? {

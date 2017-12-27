@@ -28,6 +28,8 @@ import me.jludden.reeflifesurvey.data.model.InfoCard
 import me.jludden.reeflifesurvey.data.model.SearchResult
 import me.jludden.reeflifesurvey.data.model.SearchResultType
 import me.jludden.reeflifesurvey.data.model.SurveySiteList
+import me.jludden.reeflifesurvey.data.utils.StorageUtils
+import me.jludden.reeflifesurvey.data.utils.StoredImageLoader
 
 /**
  * Created by Jason on 11/19/2017.
@@ -37,6 +39,7 @@ class DetailsActivity : AppCompatActivity() {
     private var speciesCard: InfoCard.CardDetails? = null
     private lateinit var favoriteBtn: CheckBox
 
+    private lateinit var storedImageLoader: StoredImageLoader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +52,7 @@ class DetailsActivity : AppCompatActivity() {
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true) // show back button
         dataRepo = Injection.provideDataRepository(applicationContext)
+        storedImageLoader = StoredImageLoader(applicationContext)
 
         if(intent.hasExtra(InfoCard.CardDetails.INTENT_EXTRA)){
             val card = intent.getParcelableExtra<InfoCard.CardDetails>(InfoCard.CardDetails.INTENT_EXTRA)
@@ -69,6 +73,8 @@ class DetailsActivity : AppCompatActivity() {
     private fun loadSurveySite(code: String){
         details_fishspecies_scrollview.visibility = View.GONE
         //favoriteBtn.visibility = View.GONE
+//        details_survey_site_parent.visibility = View.VISIBLE
+
         details_survey_site_parent.visibility = View.VISIBLE
 
         dataRepo.getSurveySites(SurveySiteType.CODES, object: LoadSurveySitesCallBack {
@@ -153,13 +159,12 @@ class DetailsActivity : AppCompatActivity() {
             newText.append("\n" + site.siteName + "\t" + numSightings)
         }
 
-        if (card.imageURLs != null && card.imageURLs.size >= 1)
-        {
+        val loadedSuccessfully = card.tryLoadPrimaryImageOffline(storedImageLoader, mainImageView)
+        if(!loadedSuccessfully && (card.imageURLs != null && card.imageURLs.size >= 1)) {
             mainImageView.loadURL(card.imageURLs.get(0))
         } else {
             supportStartPostponedEnterTransition()
         }
-
 
         val additionalImages = findViewById<LinearLayout>(R.id.details_additional_images)
         if (card.imageURLs == null)

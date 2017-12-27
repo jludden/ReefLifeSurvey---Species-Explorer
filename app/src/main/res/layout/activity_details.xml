@@ -6,16 +6,23 @@
 
     <include layout="@layout/details_view_pager_item" />
 
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:visibility="gone"
+    android:id="@+id/details_survey_site_parent">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
-        android:id="@+id/details_survey_site_parent">
+        android:orientation="vertical">
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             app:srcCompat="@drawable/rls_logo_vertical_rev"
@@ -27,6 +34,8 @@
             android:layout_height="wrap_content"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
             android:textAppearance="@android:style/TextAppearance.Material.Title"
             />
 
@@ -35,6 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="20dp"
+            android:paddingBottom="10dp"
             android:paddingEnd="20dp"
             android:textAppearance="@android:style/TextAppearance.Material.Medium" />
 
@@ -46,7 +56,7 @@
             android:paddingEnd="20dp"
             android:textAppearance="@android:style/TextAppearance.Material.Medium" />
     </LinearLayout>
-
+</ScrollView>
 
     <!-- Include the bottom sheet -->
 <!--

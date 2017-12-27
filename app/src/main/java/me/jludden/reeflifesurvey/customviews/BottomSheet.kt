@@ -120,6 +120,7 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
                     interactionListener.onImageSliderClick(card, textSliderView.view)
                 }
 
+        //todo handle downloaded
         if(card.primaryImageURL == "") textSliderView.image(R.drawable.ic_menu_camera)
         else textSliderView.image(card.primaryImageURL)
 
@@ -162,7 +163,7 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
 
         //todo combine these loops
         //possibly destructured syntax https://kotlinlang.org/docs/reference/multi-declarations.html
-        fun getCodeList(siteList: List<SurveySiteList.SurveySite>): String { //todo change len to charlen instead of numsites
+        fun getCodeList(siteList: List<SurveySiteList.SurveySite>): String {
             val nameBuilder = StringBuilder().append(siteList.size).append(" Survey Sites: \n")
 
             for (tSite in siteList) {

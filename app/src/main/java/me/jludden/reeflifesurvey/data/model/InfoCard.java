@@ -1,10 +1,12 @@
 package me.jludden.reeflifesurvey.data.model;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.ImageView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -12,13 +14,12 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import me.jludden.reeflifesurvey.data.utils.StoredImageLoader;
+
 import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.getPref;
 
 /**
- * Helper class for providing sample cardName for user interfaces created by
- * Android template wizards.
- * <p>
- * TODO: Replace all uses of this class before publishing your app.
+ * Todo I made this class with a helper wizard and only ever use the inner class
  */
 public class InfoCard {
 
@@ -226,6 +227,17 @@ public class InfoCard {
         @Override
         public SearchResult createResult(@NotNull String query) {
             return new SearchResult(cardName, commonNames, getPrimaryImageURL(), SearchResultType.FishSpecies, getId());
+        }
+
+        public boolean tryLoadPrimaryImageOffline(StoredImageLoader storedImageLoader, ImageView imageView) {
+            if(getOffline()) {
+                Bitmap img = storedImageLoader.loadPrimaryCardImage(this);
+                if(img != null) {
+                    imageView.setImageBitmap(img);
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

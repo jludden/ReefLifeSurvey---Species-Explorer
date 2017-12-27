@@ -28,7 +28,7 @@
             style="?android:attr/borderlessButtonStyle"
             android:id="@+id/button_launch_select_sites"
             android:theme="@style/IntroButtons"
-            android:text="Select Reefs"
+            android:text="@string/button_home_select_reefs"
             android:layout_weight=".5"/>
 
         <View
@@ -42,7 +42,7 @@
             android:layout_width="0dp"
             style="?android:attr/borderlessButtonStyle"
             android:id="@+id/button_launch_browse_species"
-            android:text="Browse Species"
+            android:text="@string/button_home_browse_species"
             android:theme="@style/IntroButtons"
             android:layout_weight=".5"/>
 

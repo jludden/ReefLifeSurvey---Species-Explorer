@@ -278,8 +278,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
-        toolbar.setExpanded(false,true);
+        hideClutter();
         super.onBackPressed();
     }
 
@@ -382,7 +381,7 @@ public class MainActivity extends AppCompatActivity implements
                 });
                 return true;*/
             case R.id.settings_opt_del_offline_sites: //todo probably refactor to download settings activity
-                showOkCancelDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
+                showOkCancelDialog(this, getString(R.string.del_downloaded_sites_message), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) { // User clicked OK button;
                         StorageUtils.Companion.clearOfflineSites(MainActivity.this);
                     }

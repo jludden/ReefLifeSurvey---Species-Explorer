@@ -273,6 +273,8 @@ public class LoaderUtils {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
+//                .addHeader("Content-Type", "application/json")
+//                .addHeader("Accept", "application/json")
         Response response = client.newCall(request).execute();
         return response.body().string();
     }

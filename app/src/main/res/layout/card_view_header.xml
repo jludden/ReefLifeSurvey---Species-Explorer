@@ -5,9 +5,6 @@
     android:background="@color/white"
     android:orientation="horizontal"
     android:visibility="visible">
-<!--todo currently doing this whole thing just for a little extra padding?-->
-
-
 
     <TextView
         android:id="@+id/header_text"
@@ -17,69 +14,4 @@
         android:layout_gravity="center"
         android:padding="16dp"/>
 
-    </LinearLayout>
-
-    <!--<ImageView-->
-    <!--android:id="@+id/menu_icon"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:paddingTop="@dimen/nav_header_vertical_spacing"-->
-    <!--app:srcCompat="@android:drawable/sym_def_app_icon" />-->
-
-    <!--<ToggleButton-->
-    <!--android:id="@+id/toggleButton2"-->
-    <!--android:layout_width="50dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:text="ToggleButton" />-->
-
-    <!--<ToggleButton-->
-    <!--android:id="@+id/toggleButton3"-->
-    <!--android:layout_width="50dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:text="ToggleButton" />-->
-
-    <!--<ToggleButton-->
-    <!--android:id="@+id/toggleButton"-->
-    <!--android:layout_width="50dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:text="ToggleButton" />-->
-    <!--</LinearLayout>-->
-
-    <!--<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:layout_width="250dp"-->
-    <!--android:layout_height="40dp"-->
-    <!--android:visibility="visible">-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:background="@color/colorPrimaryDark"-->
-    <!--android:orientation="horizontal"-->
-    <!--android:visibility="visible">-->
-
-    <!--<ImageView-->
-    <!--android:id="@+id/menu_icon"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:paddingTop="@dimen/nav_header_vertical_spacing"-->
-    <!--app:srcCompat="@android:drawable/sym_def_app_icon" />-->
-
-    <!--<ToggleButton-->
-    <!--android:id="@+id/toggleButton2"-->
-    <!--android:layout_width="50dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:text="ToggleButton" />-->
-
-    <!--<ToggleButton-->
-    <!--android:id="@+id/toggleButton3"-->
-    <!--android:layout_width="50dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:text="ToggleButton" />-->
-
-    <!--<ToggleButton-->
-    <!--android:id="@+id/toggleButton"-->
-    <!--android:layout_width="50dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:text="ToggleButton" />-->
-    <!--</LinearLayout>-->
-    <!--</HorizontalScrollView>-->
+</LinearLayout>

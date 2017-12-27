@@ -143,7 +143,7 @@ public class SharedPreferencesUtils {
     // save the set of sites that are stored offline
     //  also save a single storage path
     //  all fish images are saved in a single path - fish will often appear in multiple sites, so it is needlessly complex to sort them by site
-    //  similarly, we will only support deleting ALL saved sites? todo possible enhancement
+    //  similarly, we will only support deleting ALL saved sites (todo possible enh)
     //
     public static void setSitesStoredOffline(List<String> siteCodeList, String path, Boolean isExternal, Context context) {
 
@@ -163,14 +163,27 @@ public class SharedPreferencesUtils {
     }
 
     //return the lit of sites that are stored offline
-    public static Set<String> loadSitesStoredOffline(Context context) {
+    public static Set<String> loadAllSitesStoredOffline(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(
                 "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
 
-        Set<String> siteCodes = new HashSet<>();
-        siteCodes = prefs.getStringSet(FAV_SITES_KEY,siteCodes); //unordered set of SurveySite combinedCodes
+        Set<String> localCodes = new HashSet<>();
+        Set<String> extCodes = new HashSet<>();
+        localCodes = prefs.getStringSet(STORED_OFFLINE_SITES_KEY, localCodes); //unordered set of SurveySite combinedCodes
+        extCodes = prefs.getStringSet(STORED_OFFLINE_SITES_EXT_KEY, extCodes); //unordered set of SurveySite combinedCodes
+        localCodes.addAll(extCodes);
+        return localCodes;
+    }
 
-        return siteCodes;
+    //return the lit of sites that are stored offline
+    public static Set<String> loadSitesStoredOffline(Context context, Boolean isExternal) {
+        String sitesKey = isExternal ? STORED_OFFLINE_SITES_EXT_KEY : STORED_OFFLINE_SITES_KEY;
+        SharedPreferences prefs = context.getSharedPreferences(
+                "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
+
+        Set<String> codes = new HashSet<>();
+        codes = prefs.getStringSet(sitesKey, codes); //unordered set of SurveySite combinedCodes
+        return codes;
     }
 
     public static String loadStoredOfflinePath(Boolean isExternal, Context context){

@@ -127,37 +127,10 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             final InfoCard.CardDetails cardDetails = mCardList.get(realPosition);
              Log.d("jludden.reeflifesurvey"  , "CardViewAdapter onBind FishCardVH. CardListSize: "+ mCardList.size()+ " HiddenListSize: "+mHiddenList.size()+" adapter pos: "+ position + " datasource pos: "+position);
 
-
-            //todo maybe i can refactor this into a CardDetails method
-            boolean loadedSuccessfully = false;
-            if(cardDetails.getOffline()) {
-
-                Bitmap img = mStoredImageLoader.loadPrimaryCardImage(cardDetails);
-
-                if(img != null) {
-
-                    vhItem.mImageView.setImageBitmap(
-                            mStoredImageLoader.loadPrimaryCardImage(cardDetails));
-
-                    loadedSuccessfully = true;
-                }
-
-
-              //  glide.load(mStoredImageLoader.loadPrimaryCardImage(cardDetails))
-                //        .into(vhItem.mImageView);
-//                glide.load(mStoredImageLoader.loadImageFromStorage(cardDetails.id)) //todo will not work in future
-//                        .into(vhItem.mImageView);
-            }
+            boolean loadedSuccessfully = cardDetails.tryLoadPrimaryImageOffline(mStoredImageLoader, vhItem.mImageView);
 
             //even if offline, picasso may have it cached
             if(!loadedSuccessfully) {
-         /*       glide
-                        .load(cardDetails.getPrimaryImageURL())
-                        .apply(mGlideRequestOptions)
-                            //.diskCacheStrategy(DiskCacheStrategy.DATA)) may slightly increase performance when loading details activity transition
-                        .transition(withCrossFade())
-                        .into(vhItem.mImageView);*/
-
                 if(cardDetails.getPrimaryImageURL().equals("")){
                     picasso.load(R.drawable.ic_menu_camera).into(vhItem.mImageView);
                 } else {

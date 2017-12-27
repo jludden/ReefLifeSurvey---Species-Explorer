@@ -33,14 +33,16 @@
 
     <!--Strings for AboutLibraries lib-->
     <string name="aboutLibraries_description_showIcon">true</string>
-    <string name="aboutLibraries_description_showVersion">false</string>
+    <string name="aboutLibraries_description_showVersion">true</string>
     <string name="aboutLibraries_description_text"><![CDATA[<font color="#f2f2f2">This application would not be possible without the following Android libraries. In addition, special thanks to Nick Butcher and the Plaid application, as well as Google Android Architecture Blueprints</font>]]></string>
     <string name="ok">OK</string>
     <string name="cancel">CANCEL</string>
     <string name="del_favorite_sites_message">Delete all favorited sites?</string>
     <string name="del_favorite_species_message">Delete all favorited species?</string>
+    <string name="del_downloaded_sites_message">Delete all downloaded sites?</string>
     <string name="del_offline_sites">Delete downloaded sites</string>
-    <string name="clear_offline_sites_final_prompt">Are you sure you want to delete %1$d images found in %2$s?</string>
+    <string name="clear_offline_sites_final_prompt_with_path">Are you sure you want to delete %1$d images found in %2$s?</string>
+    <string name="clear_offline_sites_final_prompt">Are you sure you want to delete %1$d images?</string>
     <string name="notification_download_starting">Downloading… (%1$d species)</string>
     <string name="notification_download_complete">Download complete (%1$d images of %2$d species)</string>
     <string name="storage_location_dialog_title">Choose storage location</string>
@@ -58,6 +60,8 @@
     <string name="about_app">About App</string>
     <string name="delete_offline_on_success">Images deleted</string>
     <string name="new_favorited_site">Added to site list</string>
+    <string name="button_home_select_reefs">Reefs</string>
+    <string name="button_home_browse_species">Species</string>
 
 
 </resources>
