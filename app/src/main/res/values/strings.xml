@@ -62,6 +62,11 @@
     <string name="new_favorited_site">Added to site list</string>
     <string name="button_home_select_reefs">Reefs</string>
     <string name="button_home_browse_species">Species</string>
+    <string name="no_internet_detected">No internet detected</string>
+    <string name="unable_connect_google_maps">Unable to connect to Google Maps</string>
+    <string name="site_already_added">%1$s is already in the site list</string>
+    <string name="site_removed">Removed</string>
+    <string name="select_a_site">Select a location to add it to the list</string>
 
 
 </resources>

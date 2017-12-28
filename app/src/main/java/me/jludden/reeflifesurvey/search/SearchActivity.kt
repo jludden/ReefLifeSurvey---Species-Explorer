@@ -55,8 +55,7 @@ class SearchActivity : AppCompatActivity() {
                 searchFragment
         )
 
-
-        //todo im still handlling on stuff here when it should be in view/presenter
+        //set up return button and searchbox
         searchback.setOnClickListener {
             searchback.background = null
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -66,29 +65,11 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-
-        /*var searchViewListener: SearchView.OnQueryTextListener = object : SearchView.OnQueryTextListener {
-
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                searchPresenter.onQueryTextSubmit(query)
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                searchPresenter.onQueryTextChange(newText)
-                return true
-            }
-        }
-
-        search_view.setOnQueryTextListener(searchViewListener)*/
-
-
         compositeSubscription.add(
             Observable
                 .create(ObservableOnSubscribe<String> { subscriber ->
                    search_view.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                        override fun onQueryTextSubmit(query: String): Boolean {
-                           //searchPresenter.onQueryTextSubmit(query)
                            hideKeyboard(search_view)
                            return true
                        }

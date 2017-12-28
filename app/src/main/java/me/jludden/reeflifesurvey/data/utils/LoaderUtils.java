@@ -1,12 +1,16 @@
 package me.jludden.reeflifesurvey.data.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.annotation.RawRes;
 import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
+import com.squareup.haha.perflib.Main;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +35,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
+import me.jludden.reeflifesurvey.MainActivity;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.data.DataRepository;
 import me.jludden.reeflifesurvey.data.DataSource;
@@ -45,24 +50,26 @@ import okhttp3.Response;
 
 public class LoaderUtils {
 
-
-
-    //region Loading Single Site
-
-    //11/4 FIXED shouldn't this really be loading all sites for a code?
-    //10/24 todo currently only called from mapview->bottomsheet
-    //          would like it to be called during the normal incremental load for each site, then have results aggregated
-
-
-
+    //can run on UI thread because it will spawn an asynctask
+    //checks connection to google.com
+    public static void checkInternetConnection(final Activity activity, final String hostname, final int messageID) {
+        final Runnable r = new Runnable() {
+            public void run() {
+                if(!isOnline(hostname)){
+                    showToastFromBackgroundThread(activity, messageID);
+                }
+            }
+        };
+        AsyncTask.execute(r);
+    }
 
     // cant run on UI thread
     // TCP/HTTP/DNS (depending on the port, 53=DNS, 80=HTTP, etc.)
-    public static boolean isOnline() {
+    public static boolean isOnline(String hostname) {
         try {
             int timeoutMs = 1500;
             Socket sock = new Socket();
-            SocketAddress sockaddr = new InetSocketAddress("www.reeflifesurvey.com", 80);
+            SocketAddress sockaddr = new InetSocketAddress(hostname, 80);
 
             sock.connect(sockaddr, timeoutMs);
             sock.close();
@@ -71,8 +78,20 @@ public class LoaderUtils {
         } catch (IOException e) { return false; }
     }
 
+    //simple way - if you have an activity reference - to update UI from a background thread
+    public static void showToastFromBackgroundThread(final Activity activity, final int message) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //MainActivity.showSimpleToastMessage(activity, message);
+                MainActivity.showSimpleSnackbarMessage(activity, activity.getString(message));
+            }
+        });
+    }
 
-    /*public static Observable<CardDetails> loadCardsforSite(SurveySite site, DataRepository dataRepo) {
+
+
+    /*public static Observable<FishSpecies> loadCardsforSite(SurveySite site, DataRepository dataRepo) {
         JSONObject fullSpeciesJSON = site.getSpeciesFound();
         Iterator<String> speciesList = fullSpeciesJSON.keys();
 
@@ -100,7 +119,7 @@ public class LoaderUtils {
     public static void loadSingleSiteSpeciesPreview(SurveySiteList.SurveySite site, DataSource dataRepo, DataRepository.LoadFishCardCallBack callback, final int CARDS_TO_LOAD) throws JSONException {
         Log.d("jludden.reeflifesurvey"  , "loadSingleSite: "+site.getSiteName()+" attempting to load: "+CARDS_TO_LOAD+" fish cards");
 
-        // List<CardDetails> fishCards = new ArrayList<>(); //todo...
+        // List<FishSpecies> fishCards = new ArrayList<>(); //todo...
         int cards_loaded = 0;
         String speciesKey;
 
@@ -114,7 +133,7 @@ public class LoaderUtils {
             speciesKey = speciesList.next();
             dataRepo.getFishCard(speciesKey, callback);
 
-       //     InfoCard.CardDetails fishCard = new InfoCard.CardDetails(speciesKey);
+       //     InfoCard.FishSpecies fishCard = new InfoCard.FishSpecies(speciesKey);
         //    int numSightings = fullSpeciesJSON.getInt(speciesKey); //number of sightings of this fish in this survey site (may not be accurate due to datasource)
 
 /*            if(fishCards.contains(fishCard)) { //todo verify using overriden equals() func
@@ -131,17 +150,6 @@ public class LoaderUtils {
         }
 //        return fishCards;
     }
-
-//endregion
-
-
-
-
-
-
-
-
-
 
     //region Loading Utility Functions
 
@@ -168,8 +176,7 @@ public class LoaderUtils {
         try {
             String surveys = LoaderUtils.loadStringFromDisk(R.raw.api_site_surveys, context); //TODO this can cause out of memory crash
             JSONObject json = new JSONObject(surveys);
-            return json; //TODO
-
+            return json;
         } catch (IOException e) {
             Log.d("jludden.reeflifesurvey"  , "SurveySiteListLoader setupFishLocations ioexception: " + e.toString());
         } catch (JSONException e){
@@ -258,8 +265,6 @@ public class LoaderUtils {
 
         return siteList;
     }
-
-
 
     /**
      * Downloads a string from a URL with no parameters needed

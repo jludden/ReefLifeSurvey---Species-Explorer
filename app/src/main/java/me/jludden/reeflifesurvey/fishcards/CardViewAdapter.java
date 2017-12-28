@@ -1,6 +1,5 @@
 package me.jludden.reeflifesurvey.fishcards;
 
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
-import me.jludden.reeflifesurvey.data.model.InfoCard;
+import me.jludden.reeflifesurvey.data.model.FishSpecies;
 import me.jludden.reeflifesurvey.BuildConfig;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils;
@@ -25,19 +24,15 @@ import static me.jludden.reeflifesurvey.fishcards.CardViewFragment.TAG;
 import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.setUpFavoritesButton;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link InfoCard.CardDetails} and makes a call to the
- * specified {TODO add OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
+ * {@link RecyclerView.Adapter} that can display a {@link FishSpecies} and makes a call to the
+ * {@link CardViewFragment.OnCardViewFragmentInteractionListener}
  */
 public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
 
-    private CardViewHeader mHeader;
-    private List<InfoCard.CardDetails> mCardList = new ArrayList<>(); //visible cards, the Adapters backing data source
-    private List<InfoCard.CardDetails> mAllCardList = new ArrayList<>(); //All cards, including any hidden / filtered ones
-    private List<String> mHiddenList = new ArrayList<>(); //list of hidden cards (just their string IDs) TODO delete in favor of ALL + SHOWN model
-    //private RequestManager glide;
+    private List<FishSpecies> mCardList = new ArrayList<>(); //visible cards, the Adapters backing data source
+    private List<FishSpecies> mAllCardList = new ArrayList<>(); //All cards, including any hidden / filtered ones
+    private List<String> mHiddenList = new ArrayList<>(); //list of hidden cards (just their string IDs)
     private Picasso picasso;
-    //private RequestOptions mGlideRequestOptions;
 
     private RecyclerView mRecyclerView;
     private CardViewFragment mCardViewFragment;
@@ -48,10 +43,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public static final int TYPE_ITEM = 1;
 
     public CardViewAdapter(CardViewFragment parent, RecyclerView listView, CardViewFragment.OnCardViewFragmentInteractionListener listener) {
-       // this.glide = Glide.with(parent); //cache the Glide RequestManager object
         this.picasso = Picasso.with(parent.getContext().getApplicationContext());
-        this.mHeader = new CardViewHeader("hi this is a header"); //todo
-        //mListener = listener;
         this.mRecyclerView = listView;
         this.mCardViewFragment = parent;
         this.mListener = listener;
@@ -113,7 +105,6 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             String headerText = (getItemCount() <= 1) ? "No items loaded" : "";
             vhHeader.mContentView.setText(headerText);
         }
-        //todo clean this mess up
         else if(holder instanceof FishCardViewHolder) {
             final FishCardViewHolder vhItem = (FishCardViewHolder) holder;
 
@@ -124,7 +115,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 return;
             }
 
-            final InfoCard.CardDetails cardDetails = mCardList.get(realPosition);
+            final FishSpecies cardDetails = mCardList.get(realPosition);
              Log.d("jludden.reeflifesurvey"  , "CardViewAdapter onBind FishCardVH. CardListSize: "+ mCardList.size()+ " HiddenListSize: "+mHiddenList.size()+" adapter pos: "+ position + " datasource pos: "+position);
 
             boolean loadedSuccessfully = cardDetails.tryLoadPrimaryImageOffline(mStoredImageLoader, vhItem.mImageView);
@@ -196,7 +187,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         Log.d(TAG,"apply filter Adapter. getItemCount: "+getItemCount()+" cardlistsize: "+mCardList.size());
 
         int realPosition;
-        InfoCard.CardDetails cardDetails;
+        FishSpecies cardDetails;
         //loop through each displayed item in the adapter
         //NOTE THIS WILL ONLY WORK TO HIDE, not to
         int i = 1;
@@ -303,7 +294,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      *  TODO choose:
      *  Fast filtering - return a basic list of cards in performFiltering(). Set this new list using updateItems(). pros - filters on background thread. cons - no animation
      *  Slow filtering - loop through adapter positions in publishResults(). call hideCard() if it should be excluded. pros - animate the removal of cards. cons - more work on UI thread
-
+     *
      * @return a filter used to constrain data
      */
     @Override
@@ -333,9 +324,10 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     List<String> removeList = new ArrayList<>();
 
                     //todo refactor this whole method
-                    for(InfoCard.CardDetails card : mCardList){
+                    for(FishSpecies card : mCardList){
                         if(!card.cardName.toLowerCase().contains(constraint)&&
-                                !card.commonNames.toLowerCase().contains(constraint)) removeList.add(card.getId());
+                                !card.commonNames.toLowerCase().contains(constraint))
+                            removeList.add(card.getId());
                     }
 
                     results.values = removeList;
@@ -361,7 +353,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     mHiddenList = new ArrayList<>();
                     notifyDataSetChanged();
 //                    if (results.count > 0) {
-//                        updateItems((List<InfoCard.CardDetails>) results.values);
+//                        updateItems((List<InfoCard.FishSpecies>) results.values);
 //                    }
                 }
                 else if(!((constraint == "" || constraint.length() <= 0))){
@@ -381,7 +373,6 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     /**
      * FishCardViewHolder holds all the views needed in the fish based card
      */
-    // TODO define viewholder for these cards RENAME VIEWHOLDER TO something like CardViewHolder
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
@@ -394,12 +385,11 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         public  TextView mContentLabel;
         //public final TextView mIdView;
-        // public CardDetails mItem;
+        // public FishSpecies mItem;
 
         public FishCardViewHolder(View view) {
             super(view);
             mView = view;
-            // mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.info_text);
             mImageView = (ImageView) view.findViewById(R.id.card_image);
             mOverlayView = (TextView) view.findViewById(R.id.overlay_text);
@@ -422,7 +412,6 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public HeaderViewHolder(View view) {
             super(view);
             mView = view;
-            // mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.header_text);
         }
     }
@@ -430,7 +419,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     /**
      * return the current data list:
      */
-    public  List<InfoCard.CardDetails> getCardList() {
+    public List<FishSpecies> getCardList() {
         return mCardList;
     }
 
@@ -438,7 +427,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * Sets the data in the adapter
      * @param data
      */
-    public void updateItems(List<InfoCard.CardDetails> data){
+    public void updateItems(List<FishSpecies> data){
         Log.d(TAG, "cardview adapter update items");
 
         mCardList = data;
@@ -446,14 +435,5 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.mAllCardList = new ArrayList<>();
         this.mAllCardList.addAll(data);
         notifyDataSetChanged();
-    }
-
-    //todo a class to define the header object. possibly move to an outer class if it grows
-    //todo not really using this header for anything besides some white space. consider deleting
-    private class CardViewHeader {
-        private String headerText;
-        CardViewHeader(String headerText){
-            this.headerText = headerText;
-        }
     }
 }

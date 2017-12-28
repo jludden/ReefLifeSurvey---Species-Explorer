@@ -20,9 +20,8 @@ import me.jludden.reeflifesurvey.Injection
 import me.jludden.reeflifesurvey.MainActivity
 import me.jludden.reeflifesurvey.R
 import java.io.*
-import me.jludden.reeflifesurvey.data.model.InfoCard.CardDetails
+import me.jludden.reeflifesurvey.data.model.FishSpecies
 import me.jludden.reeflifesurvey.data.SurveySiteType
-import me.jludden.reeflifesurvey.data.model.InfoCard
 import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.loadSitesStoredOffline
 import me.jludden.reeflifesurvey.data.utils.StorageUtils.Companion.NOTIFICATION_CHANNEL_ID
 import me.jludden.reeflifesurvey.data.utils.StorageUtils.Companion.NOTIFICATION_ID
@@ -99,7 +98,7 @@ class StorageUtils{
          *
          * todo show gb/mb/kb instead of just mb
          */
-        fun promptToSaveOffline(cardList: List<CardDetails>, siteCodes: List<String>, context: Activity) {
+        fun promptToSaveOffline(cardList: List<FishSpecies>, siteCodes: List<String>, context: Activity) {
 
             val builder = AlertDialog.Builder(context)
             builder
@@ -175,7 +174,7 @@ class StorageUtils{
         /**
          * Launches a background task to save the sites
          */
-        private fun storeSites(cardList: List<CardDetails>, siteCodes: List<String>, context: Context) {
+        private fun storeSites(cardList: List<FishSpecies>, siteCodes: List<String>, context: Context) {
             val cw = ContextWrapper(context)
             val folderName = "images"
             val path : String
@@ -247,7 +246,7 @@ class StorageUtils{
         }
 
         //todo probably not useful
-        fun loadStoredFishCards(context: Context) : Observable<CardDetails> {
+        fun loadStoredFishCards(context: Context) : Observable<FishSpecies> {
 
             val storedSites = SharedPreferencesUtils.loadAllSitesStoredOffline(context)
             Log.d(TAG, "loadStoredFishCards loading ${storedSites.size} saved sites: ${storedSites.toString()}")
@@ -276,7 +275,9 @@ class StorageUtils{
                 Log.d(TAG, "clearOfflineSites - NO image files found in $path (for ${storedSites.size} saved sites)" )
 //                Snackbar.make(activity.findViewById<CoordinatorLayout>(top_level_layout)
 //                    , R.string.no_downloaded_sites_to_delete_message, LENGTH_LONG)
-                MainActivity.showSimpleDialogMessage(activity, activity.resources.getString(R.string.no_downloaded_sites_to_delete_message)) //todo consider snackbar
+                //MainActivity.showSimpleDialogMessage(activity, activity.resources.getString(R.string.no_downloaded_sites_to_delete_message)) //todo consider snackbar
+                MainActivity.showSimpleSnackbarMessage(activity, activity.resources.getString(R.string.no_downloaded_sites_to_delete_message)) //todo consider snackbar
+
                 return
             }
 
@@ -290,7 +291,8 @@ class StorageUtils{
                 imageFiles.forEach {
                     it.delete()
                 }
-                MainActivity.showSimpleDialogMessage(activity, activity.resources.getString(R.string.delete_offline_on_success))
+//                MainActivity.showSimpleDialogMessage(activity, activity.resources.getString(R.string.delete_offline_on_success))
+                MainActivity.showSimpleSnackbarMessage(activity, activity.resources.getString(R.string.delete_offline_on_success))
             }
 
             //delete SharedPreferences map of saved sites
@@ -316,7 +318,7 @@ class StorageUtils{
  * Background task for saving fish images to storage
  */
 class SaveToStorageTask(private val root: String, private val speciesToDownload: Int, context: Context)
-    : AsyncTask<CardDetails, Int, Boolean>() {
+    : AsyncTask<FishSpecies, Int, Boolean>() {
 
     private val contextRef: WeakReference<Context> = WeakReference(context)
     private val notificationBuilder = android.support.v4.app.NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
@@ -324,7 +326,7 @@ class SaveToStorageTask(private val root: String, private val speciesToDownload:
     private var imageCount = 0
     private var speciesCount = 0
 
-    override fun doInBackground(vararg params: CardDetails): Boolean {
+    override fun doInBackground(vararg params: FishSpecies): Boolean {
         val context : Context? = contextRef.get()
         Log.d(StorageUtils.TAG, "SaveToStorageTask doInBackground. \n has context: ${context!=null} \n data dir = $root")
         var success = true
@@ -459,11 +461,11 @@ class StoredImageLoader(context: Context){
         return extCodes.size >= localCodes.size
     }
 
-    fun loadPrimaryCardImage(card: CardDetails): Bitmap? {
+    fun loadPrimaryCardImage(card: FishSpecies): Bitmap? {
         return loadImageFromStorage(card.getFileName(0))
     }
 
-    fun loadPrimaryCardImageWithPlaceholder(card: CardDetails): Bitmap {
+    fun loadPrimaryCardImageWithPlaceholder(card: FishSpecies): Bitmap {
         val image = loadImageFromStorage(card.getFileName(0))
         return image ?: placeholderImage
     }
@@ -483,10 +485,23 @@ class StoredImageLoader(context: Context){
         return null
     }
 
+    /**
+     * @return File returned may be null
+     */
+    fun loadImageFileFromStorage(card: FishSpecies): File? {
+        val fileName = card.getFileName(0)
+        try {
+            return File(path, fileName)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
 }
 
 // 1234_1, 12345_2
-fun InfoCard.CardDetails.getFileName(imageNumber: Int): String {
+fun FishSpecies.getFileName(imageNumber: Int): String {
     if(imageNumber > 0 ) TODO("not impl")
     return "${this.id}.png"
 }

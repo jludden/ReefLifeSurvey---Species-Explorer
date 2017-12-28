@@ -14,9 +14,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import me.jludden.reeflifesurvey.data.model.FishSpecies;
 import me.jludden.reeflifesurvey.fishcards.CardViewFragment;
 import me.jludden.reeflifesurvey.data.InfoCardLoader;
-import me.jludden.reeflifesurvey.data.model.InfoCard;
 import me.jludden.reeflifesurvey.R;
 
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.List;
  */
 
 public class FullScreenImageActivity extends FragmentActivity
-        implements LoaderManager.LoaderCallbacks<List<InfoCard.CardDetails>> {
+        implements LoaderManager.LoaderCallbacks<List<FishSpecies>> {
 
     final static String DEBUG_TAG = "me.jludden.reeflifesurvey" ;
 
@@ -39,14 +39,11 @@ public class FullScreenImageActivity extends FragmentActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.image_view_activity); //TODO layout for view_activity
+        setContentView(R.layout.image_view_activity);
 
         Log.d("jludden.reeflifesurvey"  , "FullScreenImageActivity onCreate");
 
         mViewAdapter = new FullScreenImageAdapter(this);
-
-        mViewAdapter.setRootLayout((RelativeLayout) findViewById(R.id.root_layout)); //todo probly doesnt do anything
-
         mViewPager = (ViewPager) findViewById(R.id.fullscreen_activity_pager);
         mViewPager.setAdapter(mViewAdapter);
         //mViewPager.setRotationY(180); //todo testing
@@ -105,7 +102,7 @@ public class FullScreenImageActivity extends FragmentActivity
         // mViewPager.setCurrentItem(0); //set the viewpager to the passed in index
 
         //start loader
-        getSupportLoaderManager().initLoader(0, null, this); //todo need to be calling initloader for incremental as well
+        getSupportLoaderManager().initLoader(0, null, this); //need to be calling initloader for incremental as well
 
         // TODO we can add our own page change listener implementation here,
         // or we could just extend ViewPager class instead
@@ -145,13 +142,13 @@ public class FullScreenImageActivity extends FragmentActivity
     }
 
     @Override
-    public Loader<List<InfoCard.CardDetails>> onCreateLoader(int id, Bundle args) {
+    public Loader<List<FishSpecies>> onCreateLoader(int id, Bundle args) {
         Log.d("jludden.reeflifesurvey"  , "FullScreenImageActivity OnCreateLoader");
         return new InfoCardLoader(this, CardViewFragment.CardType.Fish, "");
     }
 
     @Override
-    public void onLoadFinished(Loader<List<InfoCard.CardDetails>> loader, List<InfoCard.CardDetails> data) {
+    public void onLoadFinished(Loader<List<FishSpecies>> loader, List<FishSpecies> data) {
         Log.d("jludden.reeflifesurvey"  , "FullScreenImageActivity onLoadFinished loaderid: " + loader.getId() + " data length: " + data.size());
 
         mViewAdapter.updateItems(data); //update items in the adapter
@@ -159,7 +156,7 @@ public class FullScreenImageActivity extends FragmentActivity
     }
 
     @Override
-    public void onLoaderReset(Loader<List<InfoCard.CardDetails>> loader) {
+    public void onLoaderReset(Loader<List<FishSpecies>> loader) {
 
     }
 

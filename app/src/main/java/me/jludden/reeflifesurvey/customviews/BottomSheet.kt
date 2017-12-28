@@ -15,9 +15,11 @@ import kotlinx.android.synthetic.main.bottom_sheet.view.*
 import me.jludden.reeflifesurvey.Injection
 import me.jludden.reeflifesurvey.data.*
 import me.jludden.reeflifesurvey.R
-import me.jludden.reeflifesurvey.data.model.InfoCard
+import me.jludden.reeflifesurvey.data.model.FishSpecies
 import me.jludden.reeflifesurvey.data.model.SurveySiteList
 import me.jludden.reeflifesurvey.data.utils.LoaderUtils
+import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils
+import me.jludden.reeflifesurvey.data.utils.StoredImageLoader
 
 /**
  * Created by Jason on 11/16/2017.
@@ -27,6 +29,8 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
     private lateinit var dataRepo: DataSource
     private lateinit var imageSliders: SliderLayout
     private lateinit var interactionListener: OnBottomSheetInteractionListener
+    private lateinit var offlineSiteCodes: Set<String>
+    private lateinit var storedImageLoader: StoredImageLoader
 
     private var surveySiteList : SurveySiteList? = null
     private var currentSite : SurveySiteList.SurveySite? = null
@@ -52,6 +56,8 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
 
         dataRepo = Injection.provideDataRepository(context.applicationContext)
         imageSliders = findViewById(R.id.site_preview_carousel)
+        offlineSiteCodes = SharedPreferencesUtils.loadAllSitesStoredOffline(context.applicationContext)
+        storedImageLoader = StoredImageLoader(context.applicationContext)
     }
 
     override fun onFinishInflate() {
@@ -110,7 +116,7 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
     }
 
     //creates a TextSliderView (a fish preview image, with description and onclick listener) that can be added to a SliderLayout (an image carousel of fish previews)
-    private fun addSliderImage(card: InfoCard.CardDetails) {
+    private fun addSliderImage(card: FishSpecies) {
         val name = card.cardName
         val textSliderView = TextSliderView(context)
         textSliderView
@@ -121,8 +127,13 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
                 }
 
         //todo handle downloaded
-        if(card.primaryImageURL == "") textSliderView.image(R.drawable.ic_menu_camera)
-        else textSliderView.image(card.primaryImageURL)
+        val siteLoadedOffline = offlineSiteCodes.contains(currentSite?.code)
+        Log.d(TAG, "bottom sheet load new site - site dl offline?: $siteLoadedOffline")
+        when(true){
+            siteLoadedOffline -> textSliderView.image(storedImageLoader.loadImageFileFromStorage(card))
+            card.primaryImageURL == "" -> textSliderView.image(R.drawable.ic_menu_camera)
+            else -> textSliderView.image(card.primaryImageURL)
+        }
 
         imageSliders.addSlider(textSliderView);
     }
@@ -133,6 +144,10 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
     fun clearView() {
         imageSliders.removeAllSliders()
         imageSliders.stopAutoCycle()
+    }
+
+    fun restartView() {
+        currentSite?.let{loadNewSite(it)}
     }
 
     //todo fun restartView()
@@ -147,7 +162,7 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
         setupSiteDetails()
     }
 
-    override fun onFishCardLoaded(card: InfoCard.CardDetails) {
+    override fun onFishCardLoaded(card: FishSpecies) {
         addSliderImage(card)
     }
 
@@ -185,7 +200,7 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
     }
 
     interface OnBottomSheetInteractionListener {
-        fun onImageSliderClick(card: InfoCard.CardDetails, sharedElement: View)
+        fun onImageSliderClick(card: FishSpecies, sharedElement: View)
     }
 
 }

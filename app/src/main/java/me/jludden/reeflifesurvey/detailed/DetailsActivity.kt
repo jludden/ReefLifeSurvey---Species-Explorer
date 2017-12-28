@@ -1,12 +1,8 @@
 package me.jludden.reeflifesurvey.detailed
 
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.widget.AppBarLayout
-import android.support.design.widget.BottomSheetBehavior
-import android.support.transition.Visibility
 import android.support.v7.app.AppCompatActivity
 import android.transition.Transition
 import android.util.Log
@@ -24,11 +20,7 @@ import me.jludden.reeflifesurvey.customviews.BottomSheet
 import me.jludden.reeflifesurvey.data.*
 import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.setUpFavoritesButton
 import me.jludden.reeflifesurvey.data.DataSource.*
-import me.jludden.reeflifesurvey.data.model.InfoCard
-import me.jludden.reeflifesurvey.data.model.SearchResult
-import me.jludden.reeflifesurvey.data.model.SearchResultType
-import me.jludden.reeflifesurvey.data.model.SurveySiteList
-import me.jludden.reeflifesurvey.data.utils.StorageUtils
+import me.jludden.reeflifesurvey.data.model.*
 import me.jludden.reeflifesurvey.data.utils.StoredImageLoader
 
 /**
@@ -36,7 +28,7 @@ import me.jludden.reeflifesurvey.data.utils.StoredImageLoader
  */
 class DetailsActivity : AppCompatActivity() {
     private lateinit var dataRepo: DataSource
-    private var speciesCard: InfoCard.CardDetails? = null
+    private var speciesCard: FishSpecies? = null
     private lateinit var favoriteBtn: CheckBox
 
     private lateinit var storedImageLoader: StoredImageLoader
@@ -54,8 +46,8 @@ class DetailsActivity : AppCompatActivity() {
         dataRepo = Injection.provideDataRepository(applicationContext)
         storedImageLoader = StoredImageLoader(applicationContext)
 
-        if(intent.hasExtra(InfoCard.CardDetails.INTENT_EXTRA)){
-            val card = intent.getParcelableExtra<InfoCard.CardDetails>(InfoCard.CardDetails.INTENT_EXTRA)
+        if(intent.hasExtra(FishSpecies.INTENT_EXTRA)){
+            val card = intent.getParcelableExtra<FishSpecies>(FishSpecies.INTENT_EXTRA)
             loadFishSpecies(card.id)
         }
         else if(intent.hasExtra(SearchResult.INTENT_EXTRA)) {
@@ -109,7 +101,7 @@ class DetailsActivity : AppCompatActivity() {
         })
 
         dataRepo.getFishCard(id, object: LoadFishCardCallBack{
-            override fun onFishCardLoaded(card: InfoCard.CardDetails) {
+            override fun onFishCardLoaded(card: FishSpecies) {
                 setupFishDetails(card)
             }
 
@@ -119,7 +111,7 @@ class DetailsActivity : AppCompatActivity() {
         })
     }
 
-    fun setupFishDetails(card: InfoCard.CardDetails) {
+    fun setupFishDetails(card: FishSpecies) {
         val mainImageView = findViewById<ImageView>(R.id.details_image_main)
 //        val textView = findViewById<TextView>(R.id.details_text)
        // val linkBtn = findViewById<Button>(R.id.link_btn)

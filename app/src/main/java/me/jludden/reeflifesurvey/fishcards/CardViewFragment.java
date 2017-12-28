@@ -34,11 +34,12 @@ import me.jludden.reeflifesurvey.data.utils.StorageUtils;
 import me.jludden.reeflifesurvey.data.model.SurveySiteList;
 import me.jludden.reeflifesurvey.data.SurveySiteType;
 import me.jludden.reeflifesurvey.R;
-import me.jludden.reeflifesurvey.data.model.InfoCard;
-import me.jludden.reeflifesurvey.data.model.InfoCard.CardDetails;
+import me.jludden.reeflifesurvey.data.model.FishSpecies;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.checkInternetConnection;
 
 /**
  * A fragment with a Google +1 button.
@@ -49,20 +50,15 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class CardViewFragment extends Fragment implements
-        LoaderManager.LoaderCallbacks<List<CardDetails>>,
+        LoaderManager.LoaderCallbacks<List<FishSpecies>>,
         DataRepository.LoadSurveySitesCallBack,
         CompoundButton.OnCheckedChangeListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String TYPE_TO_LOAD = "param1";
-    private static final String OPT_SURVEY_SITE = "param2";
+    private static final String TYPE_TO_LOAD = "card_type_to_load";
+    private static final String OPT_SURVEY_SITE = "optional_survey_site";
     public static final String TAG = "FishCardView";
-    public static final String TITLE = "Browse Fish";
     private static final int LOADER_ID = 0;
 
-    // TODO: Rename and change types of parameters
     private CardType mCardType;
-    private String mParam2;
     private FloatingActionButton mFloatingActionButton;
     public RecyclerView mRecyclerView;
     private CardViewAdapter mViewAdapter;
@@ -72,18 +68,12 @@ public class CardViewFragment extends Fragment implements
 
     private onDataLoadedCallback mDataLoadedCallback; //todo list?
 
-    //some not great stuff to enable loading all or loading incrementally
-    //private boolean mMoreToLoad = true;
-
-    //stuff to track scrolling
     private boolean mIsLoading = true;
-    private int mCurrentPage = 0;
     private int mPreviousTotalItemCount = 0;
-//    private boolean mFilterFavorites = false;
     private boolean mLoadedAll = false;
     private String mPassedInSurveySiteCode = "";//optional passed in parameter. otherwise load favorite sites
     private SurveySiteList mSurveySiteList;
-
+    private int SCROLLING_VISIBLE_ITEM_THRESHOLD = 3;
 
     public enum CardType{
         Fish,
@@ -101,8 +91,7 @@ public class CardViewFragment extends Fragment implements
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnCardViewFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFishDetailsRequested(InfoCard.CardDetails cardDetails, View sharedElement);
+        void onFishDetailsRequested(FishSpecies cardDetails, View sharedElement);
     }
 
     public CardViewFragment() {
@@ -150,6 +139,8 @@ public class CardViewFragment extends Fragment implements
             mPassedInSurveySiteCode = getArguments().getString(OPT_SURVEY_SITE);
         }
 
+        checkInternetConnection(getActivity(), "www.reeflifesurvey.com", R.string.no_internet_detected);
+
         Log.d("jludden.reeflifesurvey"  ,"CardViewFragment Created. Card type: "+mCardType);
 
     }
@@ -173,11 +164,11 @@ public class CardViewFragment extends Fragment implements
         Log.d("jludden.reeflifesurvey"  ,"CardViewFragment view instanceof recyclerview!");
 
         Context context = view.getContext();
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.jason_cards);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_card_list);
         mLayoutManager = new LinearLayoutManager(context);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mViewAdapter = new CardViewAdapter(this, mRecyclerView, mListener); //todo reconcile infocard.items with the onloadfinished(arraylist<InfoCard.CardDetails>)
+        mViewAdapter = new CardViewAdapter(this, mRecyclerView, mListener);
         mRecyclerView.setAdapter(mViewAdapter);
 
         mProgressBar = view.findViewById(R.id.progress_overlay);
@@ -197,8 +188,7 @@ public class CardViewFragment extends Fragment implements
                 int visibleItemCount = recyclerView.getChildCount();
                 int totalItemCount = mLayoutManager.getItemCount();
                 int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
-                int previousTotal = 20; //todo
-                int visibleThreshold = 3; //todo
+
                 //Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onScrolled! "+visibleItemCount+" tot"+totalItemCount+" first: "+firstVisibleItem+" isloading:"+mIsLoading);
 
 
@@ -209,7 +199,7 @@ public class CardViewFragment extends Fragment implements
                     }
                 }
                 if (!mIsLoading && (totalItemCount - visibleItemCount)
-                        <= (firstVisibleItem + visibleThreshold)) {
+                        <= (firstVisibleItem + SCROLLING_VISIBLE_ITEM_THRESHOLD)) {
                     onLoadMore(false);
                     mIsLoading = true;
                 }
@@ -254,7 +244,7 @@ public class CardViewFragment extends Fragment implements
         else getLoaderManager().getLoader(LOADER_ID).onContentChanged();
     }
 
-    //TODO onloadMore with a callback
+    //onloadMore with a callback
     public void loadAll(boolean forceReload, onDataLoadedCallback callback){
         mDataLoadedCallback = callback;
         onLoadMore(forceReload);
@@ -305,7 +295,7 @@ public class CardViewFragment extends Fragment implements
      * @return Return a new Loader instance that is ready to start loading.
      */
     @Override
-    public Loader<List<CardDetails>> onCreateLoader(int id, Bundle args) {
+    public Loader<List<FishSpecies>> onCreateLoader(int id, Bundle args) {
         Log.d("jludden.reeflifesurvey"  ,"CardViewFragment OnCreateLoader");
         return new InfoCardLoader(getActivity(), mCardType, mPassedInSurveySiteCode);
     }
@@ -321,10 +311,10 @@ public class CardViewFragment extends Fragment implements
      * @param data   The data generated by the Loader.
      */
     @Override
-    public void onLoadFinished(Loader<List<CardDetails>> loader, List<CardDetails> data) {
+    public void onLoadFinished(Loader<List<FishSpecies>> loader, List<FishSpecies> data) {
 
         //update cards from the sharedpreferences data
-     /*   for(CardDetails card : data){
+     /*   for(FishSpecies card : data){
             if(getPref(card.getId(),InfoCard.PREF_FAVORITED)) card.favorited = true;
         }*/
         Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onLoadFinished - still need to apply filter and update adapter ");
@@ -345,20 +335,19 @@ public class CardViewFragment extends Fragment implements
 
     /**
      * Store the current configuration of sites and all their relevant fish images to disk
-     * would like to one day refactor this so we weren't relying on the already loaded card list
      */
     public void storeInLocal() {
 
         CardViewSettings.LOAD_ALL = true;
         loadAll(false, new onDataLoadedCallback() {
             @Override
-            public void onCardsLoaded(List<CardDetails> cards) {
+            public void onCardsLoaded(List<FishSpecies> cards) {
                 saveOfflineHelper(cards);
             }
         });
     }
 
-    private void saveOfflineHelper(List<CardDetails> cards) {
+    private void saveOfflineHelper(List<FishSpecies> cards) {
 
         //todo refactor. this logic in both infocardloader and cardviewfragment
         List<String> siteCodes;
@@ -368,10 +357,8 @@ public class CardViewFragment extends Fragment implements
             siteCodes.add(mPassedInSurveySiteCode);
         }
 
-        //todo below here, everything should be in a different routine
         StorageUtils.Companion.promptToSaveOffline(
                cards, siteCodes, getActivity());
-
     }
 
 
@@ -397,7 +384,7 @@ public class CardViewFragment extends Fragment implements
      * @param loader The Loader that is being reset.
      */
     @Override
-    public void onLoaderReset(Loader<List<CardDetails>> loader) {
+    public void onLoaderReset(Loader<List<FishSpecies>> loader) {
 
     }
 
@@ -405,8 +392,7 @@ public class CardViewFragment extends Fragment implements
     public void onSurveySitesLoaded(@NotNull SurveySiteList sites) {
         mSurveySiteList = sites;
 
-        //todo this is just adding favorites to toolbar
-        //  update to add th actual sites being searched
+        // todo update to add th actual sites being searched. like this doesnt work when we are looking at a single site
         addSiteLocationsToToolbar(sites.getFavoritedSiteCodes());
 
         addStaticMapToToolbar(sites);
@@ -524,8 +510,9 @@ public class CardViewFragment extends Fragment implements
         public static String SEARCH_CONSTRAINT = "";
     }
 
+    //can currently call a single callback after the data is finished loading
     interface onDataLoadedCallback {
-        void onCardsLoaded(List<InfoCard.CardDetails> cards);
+        void onCardsLoaded(List<FishSpecies> cards);
     }
 
 }

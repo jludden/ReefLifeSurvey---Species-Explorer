@@ -20,7 +20,14 @@ import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.*;
 /**
  * Created by Jason on 8/20/2017.
  *
- * todo - make it have a constructor? or separate out favorite sites from all sites from saved sites
+ * TODO some refactoring needed:
+ * I really don't like having lists of survey sites, list of strings for codes, list of favorites and downloaded sites all in one megaclass
+ * If we really are always loading the list of survey sites into memory when the app starts, maybe some of that initialization code could go here
+ * We are also sort of building an intermediate layer here between a list of sites -> site CODE -> individual sites
+ *  basically (as of late 2017) individual sites are not being properly handled, and everything is done at the code level
+ *  so individual sites EST1, EST2, EST3, etc. will all be aggregated into EST
+ *  we are kind of butchering SurveySite by storing these different concepts in the same class
+ * I'd also like to separate out the favorited sites concept from the selected sites concept, so you can keep sites as favorites but have them "unselected"
  */
 
 public class SurveySiteList {
@@ -42,7 +49,6 @@ public class SurveySiteList {
     public final List<SurveySite> SITE_CODE_LIST = new ArrayList<>();
 
     //Add a new survey site to all applicable collections
-    //todo make private or something why is this a thing
     public void add(SurveySite site){
         SITE_LIST.add(site);
 
@@ -145,7 +151,7 @@ public class SurveySiteList {
         }
         else{
             SELECTED_SURVEY_SITES.addAll(list);
-            updateFavSites(getFavoritedSiteCodes(),context);
+            updateFavSites(getFavoritedSiteCodes(), context);
         }
     }
 
@@ -156,7 +162,7 @@ public class SurveySiteList {
         }
         else {
             SELECTED_SURVEY_SITES.removeAll(list);
-            updateFavSites(getFavoritedSiteCodes(),context);
+            updateFavSites(getFavoritedSiteCodes(), context);
         }
     }
 

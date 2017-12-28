@@ -39,23 +39,22 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.checkInternetConnection;
 
 /**
  * Created by Jason on 5/15/2017.
  *
- * TODO
  *  10/23: refactor. map+surveysitelist model into new folder
- *      3 different colors for map icons: new, added, selected. DONT HARDCODE?
+ *      3 different colors for map icons: new, added, selected.
  *          new - red marker? or maybe a custom icon
  *          favorites - star
  *          currently selected - adding a red marker to the currently selected location could be cool, or whatever
  *
  *  11/1:
  *      Update UI. when just viewing, can have a minimized or no bottom sheet showing
- *      when you click on a survey location, immediately show the data within the bottom sheet - no more marker menus
+ *      when you click on a survey location, immediately show the data within the bottom sheet - no more info windows on markers
  *      bottom sheet buttons:
- *          have a favorites/unfavorites button within the bottom sheet (I think within the sheet)
- *          have the FAB be a direct link to the browse fish for this survey site location!!!!
+ *          have a favorites/unfavorites button within the bottom sheet
  *          Maybe another button that links to a relevant reeflifesurvey.com website?
  *          Maybe a share button?
  *
@@ -77,7 +76,7 @@ public class MapViewFragment extends Fragment
 
 //    private static final float FAVORITED_SITE_COLOR = BitmapDescriptorFactory.HUE_AZURE;
 //    private static final float NORMAL_SITE_COLOR = BitmapDescriptorFactory.HUE_ROSE;
-    private static final float FAVORITED_SITE_COLOR = BitmapDescriptorFactory.HUE_RED;
+    private static final float FAVORITED_SITE_COLOR = BitmapDescriptorFactory.HUE_RED; //todo could these be res?
     private static final float NORMAL_SITE_COLOR = BitmapDescriptorFactory.HUE_AZURE;
     private static final float SELECTED_SITE_COLOR = BitmapDescriptorFactory.HUE_YELLOW;
     View rootView;
@@ -85,7 +84,7 @@ public class MapViewFragment extends Fragment
     private MapView mMapView;
    // private MapCallback mMapCallback;
     private Marker mSelectedMarker;
-    private ArrayList<Marker> mSelectedSiteList = new ArrayList<>(); //todo use static selected site list //todo save these preferences //11/16 TODO DELETE
+    private ArrayList<Marker> mSelectedSiteList = new ArrayList<>();  //11/16 currently only use to remove the last added site
     private FloatingActionButton mFAB;
 
     public static final String TAG = "MapViewFragment";
@@ -138,37 +137,8 @@ public class MapViewFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG  ,"map view fragment created");
-
-        MainActivity main = (MainActivity) getActivity();
-        //mFAB = main.getFAB(); //TODO
-//        mFAB = mMapViewFragmentInteractionListener.getFloatingActionButton();
-       // mFAB = main.getFloatingActionButton();
-
-        //make sure these are being cleaned up in onDestroy TODO
-//        mFABmenu = main.getFABmenu();
-//
-//        mFABmenu[0].setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d("jludden.reeflifesurvey"  ,"mMiniFab1 clicked");
-//                hideFABmenu();
-//            }
-//        });
-//
-//        mFABmenu[1].setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d("jludden.reeflifesurvey"  ,"mMiniFab2 clicked");
-//                hideFABmenu();
-//            }
-//        });
-
-//        setContentView(R.layout.maps_view_fragment);
-//        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
+        Log.d(TAG, "map view fragment created");
+        checkInternetConnection(getActivity(), "www.google.com", R.string.unable_connect_google_maps);
     }
 
     @Override
@@ -181,24 +151,6 @@ public class MapViewFragment extends Fragment
         if(rootView == null){
             rootView = inflater.inflate(R.layout.maps_view_fragment, null, false); //pass in viewgroup?
         }
-
-//        rootView.seton
-
-//        mMapView = (MapView) rootView.findViewById(R.id.fragment_map);
-//        mMapView.getMapAsync(this);
-//        mMapView.onCreate(getArguments());
-
-//        if(mMapCallback==null) {
-//            mMapCallback.onMapReady(((SupportMapFragment)
-//                    getFragmentManager().findFragmentById(R.id.fragment_map)).getMapAsync(this));
-//        }
-
-//        SupportMapFragment mapFragment  = ((SupportMapFragment) getFragmentManager().findFragmentById(
-//                R.id.fragment_map));
-//        mapFragment.getMapAsync(this);
-
-//        mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(
-//                R.id.fragment_map)).getMapAsync(this);
 
         return rootView;
     }
@@ -242,7 +194,6 @@ public class MapViewFragment extends Fragment
         mMap.setOnMarkerClickListener(this);
         //mMap.setOnInfoWindowClickListener(this);
 
-
         //todo set map settings
         //mMap.getUiSettings().setZoomControlsEnabled(true);
 
@@ -270,7 +221,7 @@ public class MapViewFragment extends Fragment
         resetMarkerColor(mSelectedMarker);
         mSelectedMarker = null;
         mFAB.setImageResource(R.drawable.ic_add_white);
-        //todo delete ic_add_location_black_24dp, ic_add_loc_2,
+
         View bottomSheet = getActivity().findViewById(R.id.bottom_sheet);
         BottomSheetBehavior<View> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -324,10 +275,8 @@ public class MapViewFragment extends Fragment
     /*@Override
     public void onInfoWindowClick(Marker marker) {
         Log.d("jludden.reeflifesurvey"  , "MapViewFragment onInfoWindowClick marker: "+ marker.toString());
-        //Snackbar.make(mMapView, "clicked", Snackbar.LENGTH_SHORT).show();
         marker.hideInfoWindow();
         mMapViewFragmentInteractionListener.expandBottomSheet((SurveySite) marker.getTag());
-        //((MainActivity) getActivity()).expandBottomSheet((SurveySite) mSelectedMarker.getTag());
     }*/
 
     /**t
@@ -338,11 +287,7 @@ public class MapViewFragment extends Fragment
      *
      * Called when the floating action button is pressed
      * If a marker is currently select, add it to the currently active site list
-     * Else, show additional buttons for more options
-     *  todo - one option to show the currently active sites
-     *  todo - another option to switch currenly active site lists
-     *  todo probably dont need both mSelectedSiteList and SurveySiteList.SELECTED_SURVEY_SITES
-     *      TODO - have info window to expand sites at location, choose individually based on name
+     * Else, show msg
      */
     public void onFABclick() {
         Log.d(TAG ,"map view fragment fab clicked. markersel? "+(mSelectedMarker!=null));
@@ -353,13 +298,12 @@ public class MapViewFragment extends Fragment
             String code = oldMarkerSite != null ? oldMarkerSite.getCode(): "-1";
 
             if(mSurveySiteList.getFavoritedSiteCodes().contains(code)) {
-                Snackbar.make(mMapView, mSelectedMarker.getTitle()+" is already in the site list" , Snackbar.LENGTH_LONG).show();
-                //todo should this remove? how else to remove an icon
+                Snackbar.make(mMapView, getString(R.string.site_already_added, mSelectedMarker.getTitle()), Snackbar.LENGTH_LONG).show();
+                //todo animate and unfavorite
             } else {
-                mSelectedSiteList.add(mSelectedMarker); //todo save this to preferences 11/16 TODO DELETE
+                mSelectedSiteList.add(mSelectedMarker); //todo only using this for removing last added site (from snackbar->undo)
                 String siteCode = ((SurveySite) mSelectedMarker.getTag()).getCode();
                 mSurveySiteList.addFavoriteSite(siteCode, getContext());
-                //mSurveySiteList.SELECTED_SURVEY_SITES.add((SurveySite) mSelectedMarker.getTag()); //todo why both REMOVE
                 mSelectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(FAVORITED_SITE_COLOR));
 
 //                mSelectedMarker = null;
@@ -376,15 +320,13 @@ public class MapViewFragment extends Fragment
                             @Override
                             public void onClick(View v) {
                                 MapViewFragment.this.removeLastMarker(); // fancy classname.this (qualified this) syntax
-                                Snackbar.make(mMapView, "Removed", Snackbar.LENGTH_SHORT).show();
+                                if(mMapView != null) Snackbar.make(mMapView, R.string.site_removed, Snackbar.LENGTH_SHORT).show();
                             }
                         }).show();
-
            }
         }
-        else{ //display a list of menu options from the floating action button
-            //displayFABmenu();
-            if(mMapView != null) Snackbar.make(mMapView, "Select a location to add it to the list" , Snackbar.LENGTH_LONG).show();
+        else{
+            if(mMapView != null) Snackbar.make(mMapView, R.string.select_a_site, Snackbar.LENGTH_LONG).show();
         }
 
         Log.d(TAG ,"map view fragment fab clicked. markerlist: "+ mSelectedSiteList.toString());
@@ -409,8 +351,6 @@ public class MapViewFragment extends Fragment
         lastMark.setIcon((BitmapDescriptorFactory.defaultMarker(NORMAL_SITE_COLOR)));
         String siteCode = ((SurveySite) lastMark.getTag()).getCode();
         mSurveySiteList.removeFavoriteSite(siteCode, getContext());
-
-        //todo remove from preferences list
     }
 
     @Override

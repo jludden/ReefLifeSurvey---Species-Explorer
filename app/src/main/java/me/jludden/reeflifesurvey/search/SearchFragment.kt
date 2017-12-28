@@ -67,18 +67,15 @@ class SearchFragment : Fragment(), SearchContract.View {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    //
     override fun addSearchResult(result: SearchResult) {
         //val curText = search_results_text.text
         val newResult = result.name + "_" + result.description
-        //val newText = "$curText \n $newResult"
         //search_results_text.text = newText
         Log.d(TAG, "searchfragment addSearchResult "+newResult)
 
         viewAdapter.updateItems(element = result)
     }
 
-    //todo
     override fun clearSearchResults() {
         viewAdapter.updateItems(list = ArrayList())
     }
@@ -90,7 +87,6 @@ class SearchFragment : Fragment(), SearchContract.View {
      */
     override fun launchResultDetails(searchResult: SearchResult) {}
 
-    //todo should v be the imageview and not the whole item?
     //consider, instead of passing v, having the adapter return the imageview for the last clicked item
     fun launchResultDetails(searchResult: SearchResult, v: View) {
       Log.d(TAG, "searchfragment launchResultDetails CALLED")
@@ -102,22 +98,6 @@ class SearchFragment : Fragment(), SearchContract.View {
             ActivityOptions.makeSceneTransitionAnimation(activity,
                     Pair.create(v, getString(R.string.transition_launch_details)))
         startActivityForResult(intent, REQUEST_CODE, options.toBundle())
-
-
-
-       /* if(searchResult.type == SearchResultType.SurveySiteLocation){
-            //val bottomSheet = findViewById(R.id.bottom_sheet) as BottomSheet
-            val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet)
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
-        else {
-            (activity as SearchActivity).supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.search_results_container,
-                            DetailsViewFragment.newInstance(searchResult), DetailsViewFragment.TAG)
-                    .addToBackStack(null)
-                    .commit()
-        }*/
     }
 
     /**

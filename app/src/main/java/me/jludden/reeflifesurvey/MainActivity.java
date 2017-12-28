@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -32,12 +33,14 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
 import me.jludden.reeflifesurvey.about.AboutActivity;
+import me.jludden.reeflifesurvey.data.model.FishSpecies;
 import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils;
 import me.jludden.reeflifesurvey.data.utils.StorageUtils;
 import me.jludden.reeflifesurvey.detailed.DetailsActivity;
@@ -45,7 +48,6 @@ import me.jludden.reeflifesurvey.fishcards.CardViewFragment;
 import me.jludden.reeflifesurvey.fishcards.CardViewFragment.CardViewSettings;
 
 import me.jludden.reeflifesurvey.fullscreenquiz.FullScreenImageActivity;
-import me.jludden.reeflifesurvey.data.model.InfoCard;
 import me.jludden.reeflifesurvey.customviews.BottomSheet;
 import me.jludden.reeflifesurvey.search.SearchActivity;
 import me.jludden.reeflifesurvey.data.model.SurveySiteList;
@@ -88,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-//This will set Expanded text to transparent so it wount overlap the content of the toolbar
+        //This will set Expanded text to transparent so it wont overlap the content of the toolbar
         collapsingToolbar.setExpandedTitleColor(Color.parseColor("#00FF0000"));//ContextCompat.getColor(this, R.color.transparent));
 
        // getSupportActionBar().setDisplayHomeAsUpEnabled(true); //todo testing
@@ -297,43 +299,10 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+    // Inflate the menu; this adds items to the action bar if it is present.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-//        final MenuItem settings_item = menu.findItem(R.id.action_settings);
-//        settings_item.getac
-
-
-        // TODO: 11/9/2017 instead launch a new activity
-        //final MenuItem search_item = menu.findItem(R.id.action_search);
-        //final SearchView searchView = (SearchView) MenuItemCompat.getActionView(search_item);
-        /*  searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                searchView.clearFocus();
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                CardViewSettings.SEARCH_CONSTRAINT = newText.toLowerCase();
-                CardViewFragment viewFragment = (CardViewFragment) getSupportFragmentManager().findFragmentByTag(CardViewFragment.TAG);
-                if (viewFragment != null && viewFragment.isVisible()) {
-                    viewFragment.onFilterApplied();
-                }
-                return true;
-            }
-        });
-        //        searchView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                Log.d("jludden.reeflifesurvey"  , "Searchview OnFocusChange. hasfocus: " +hasFocus);
-
-                if(!hasFocus) hideKeyboard(v);
-            }
-        });*/
         return true;
     }
 
@@ -370,6 +339,7 @@ public class MainActivity extends AppCompatActivity implements
                 showOkCancelDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) { // User clicked OK button;
                         SharedPreferencesUtils.clearFavSites(getApplicationContext());
+                        showSimpleSnackbarMessage(MainActivity.this, "Favorite sites cleared (restart app for it to take effect)"); //todo
                     }
                 });
                 return true;
@@ -395,8 +365,6 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d(TAG,"HOME OPTION SELECTED ");
                 hideClutter();
                 onBackPressed();
-                // Navigate to parent activity
-                // NavUtils.navigateUpFromSameTask(this);
                 return true;
         }
 
@@ -493,7 +461,7 @@ public class MainActivity extends AppCompatActivity implements
     public void launchFullScreenQuizModeActivity(){
         //get data from CardViewFragment TODO whole list of card data?
         Intent i = getIntent();
-        InfoCard.CardDetails cardInfo = (InfoCard.CardDetails) i.getParcelableExtra("cardInfo");
+        FishSpecies cardInfo = (FishSpecies) i.getParcelableExtra("cardInfo");
         //
         //                if(cardInfo != null)   Log.d("jludden.reeflifesurvey"  ,"mFAB onclick. cardinfo name"+cardInfo.cardName);
         //
@@ -730,13 +698,13 @@ public class MainActivity extends AppCompatActivity implements
      * @param sharedElement view to animate transition
      */
     @Override
-    public void onFishDetailsRequested(InfoCard.CardDetails cardDetails, @Nullable View sharedElement) {
+    public void onFishDetailsRequested(FishSpecies cardDetails, @Nullable View sharedElement) {
         Log.d(TAG, "MainActivity onFishDetailsRequested: "+cardDetails.toString());
 
         //launch details
         Intent intent = new Intent(MainActivity.this,
                 DetailsActivity.class);
-        intent.putExtra(InfoCard.CardDetails.INTENT_EXTRA, cardDetails);
+        intent.putExtra(FishSpecies.INTENT_EXTRA, cardDetails);
         if(sharedElement != null) {
             ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
                     new Pair<View, String>(sharedElement, getString(R.string.transition_launch_details)));
@@ -752,6 +720,12 @@ public class MainActivity extends AppCompatActivity implements
     protected void onStop() {
         ((BottomSheet) findViewById(R.id.bottom_sheet)).clearView();
         super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        ((BottomSheet) findViewById(R.id.bottom_sheet)).restartView();
+        super.onResume();
     }
 
 
@@ -840,7 +814,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onImageSliderClick(@NotNull InfoCard.CardDetails card, @NotNull View sharedElement) {
+    public void onImageSliderClick(@NotNull FishSpecies card, @NotNull View sharedElement) {
         //todo the imageview from the image slider does not transition well into new activity, so implement an animation later if you want
         onFishDetailsRequested(card, null);
     }
@@ -881,5 +855,16 @@ public class MainActivity extends AppCompatActivity implements
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    //showing a snackbar requires a reference to a view or the activity
+    public static void showSimpleSnackbarMessage(Activity activity, String message) {
+        View rootView = activity.findViewById(R.id.top_level_layout);
+        Snackbar.make(rootView, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    //showing a toast message only requires the context
+    public static void showSimpleToastMessage(Context context, int message) {
+        Toast.makeText(context.getApplicationContext(), message , Toast.LENGTH_SHORT).show();
     }
 }

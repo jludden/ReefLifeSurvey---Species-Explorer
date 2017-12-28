@@ -2,7 +2,7 @@ package me.jludden.reeflifesurvey.data
 
 import android.support.annotation.VisibleForTesting
 import io.reactivex.Observable
-import me.jludden.reeflifesurvey.data.model.InfoCard
+import me.jludden.reeflifesurvey.data.model.FishSpecies
 import me.jludden.reeflifesurvey.data.model.SurveySiteList
 
 /**
@@ -11,18 +11,18 @@ import me.jludden.reeflifesurvey.data.model.SurveySiteList
 
 class FakeDataRepository private constructor() : DataSource {
 
-    private val FISH_SPECIES = LinkedHashMap<String, InfoCard.CardDetails>()
+    private val FISH_SPECIES = LinkedHashMap<String, FishSpecies>()
     private val SURVEY_SITES = LinkedHashMap<String, SurveySiteList.SurveySite>()
 
     override fun getSurveySitesAll(type: SurveySiteType): Observable<SurveySiteList.SurveySite> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getFishSpeciesAll(): Observable<InfoCard.CardDetails> {
+    override fun getFishSpeciesAll(): Observable<FishSpecies> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getFishSpeciesForSite(site: SurveySiteList.SurveySite): Observable<InfoCard.CardDetails> {
+    override fun getFishSpeciesForSite(site: SurveySiteList.SurveySite): Observable<FishSpecies> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -30,15 +30,11 @@ class FakeDataRepository private constructor() : DataSource {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getFishSpeciesJSON(callback: DataSource.LoadFishSpeciesJSONCallBack) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun getFishCard(id: String, callback: DataSource.LoadFishCardCallBack) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    @VisibleForTesting fun addFishSpecies(vararg species: InfoCard.CardDetails) {
+    @VisibleForTesting fun addFishSpecies(vararg species: FishSpecies) {
         for (fish in species) {
             FISH_SPECIES.put(fish.id, fish)
         }

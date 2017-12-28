@@ -8,14 +8,17 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 
+import com.squareup.haha.perflib.Main;
+
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 import me.jludden.reeflifesurvey.Injection;
+import me.jludden.reeflifesurvey.MainActivity;
 import me.jludden.reeflifesurvey.data.model.SurveySiteList;
 import me.jludden.reeflifesurvey.data.utils.LoaderUtils;
 import me.jludden.reeflifesurvey.data.utils.StorageUtils;
 import me.jludden.reeflifesurvey.fishcards.CardViewFragment;
-import me.jludden.reeflifesurvey.data.model.InfoCard.CardDetails;
+import me.jludden.reeflifesurvey.data.model.FishSpecies;
 import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.data.model.SurveySiteList.SurveySite;
 
@@ -41,87 +44,82 @@ import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.loadAl
 /**
  * Created by Jason on 5/1/2017.
  *
- * Loads and parses data from the ReefLifeSurvey API into a List of InfoCard.CardDetails
+ * Loads and parses data from the ReefLifeSurvey API into a List of InfoCard.FishSpecies
  *
-     Request siteRequest = new Request.Builder()
-     .url("https://yanirs.github.io/tools/rls/api-site-surveys.json")
-     .build();
-     Response siteResponse = client.newCall(siteRequest).execute();
-     String siteResult = siteResponse.body().string();
-     Log.d(TAG  ,"getFishInCards siteResult: "+ siteResult.substring(0,50000));
-
-     *** JSON FORMAT ***
-     {code: [
-     realm,
-     ecoregion,
-     name,
-     longitude,
-     latitude,
-     number_of_surveys,
-     {
-     fishSpecies: surveyedCount
-     }], ... }
-
-     such as:
-     {"NSW1":[
-     "Temperate Australasia",
-     "Cape Howe",
-     "Green Cape SE",
-     150.05,
-     -37.26,
-     4,
-     {
-     "1027":3,
-     "3005":3,
-     "3087":1,
-     "791":4
-     }], ... }
+ * Request siteRequest = new Request.Builder()
+ * .url("https://yanirs.github.io/tools/rls/api-site-surveys.json")
+ * .build();
+ * Response siteResponse = client.newCall(siteRequest).execute();
+ * String siteResult = siteResponse.body().string();
+ * Log.d(TAG  ,"getFishInCards siteResult: "+ siteResult.substring(0,50000));
+ *
+ * *** Survey site format ***
+ * {code: [
+ * realm,
+ * ecoregion,
+ * name,
+ * longitude,
+ * latitude,
+ * number_of_surveys,
+ * {
+ * fishSpecies: surveyedCount
+ * }], ... }
+ *
+ * such as:
+ * {"NSW1":[
+ * "Temperate Australasia",
+ * "Cape Howe",
+ * "Green Cape SE",
+ * 150.05,
+ * -37.26,
+ * 4,
+ * {
+ * "1027":3,
+ * "3005":3,
+ * "3087":1,
+ * "791":4
+ * }], ... }
  *
  *
  *
- * API format to fish species:
- {
-    0: [
-        "Scientific Name",
-        "Common name, common name, common name",
-        "https://reeflifesurvey.com/species/###", --species key
-        #,                                        --
-        [
-            "https image1",
-            "https image2"
-        ]
-    ],
-    1: [
-        ...
-    ]
- }
+ * *** Fish species format ***
+ * {
+ *  0: [
+ *      "Scientific Name",
+ *      "Common name, common name, common name",
+ *      "https://reeflifesurvey.com/species/###", --species key
+ *      #,                                        --
+ *      [
+ *          "https image1",
+ *          "https image2"
+ *      ]
+ *  ],
+ *  1: [
+ *      ...
+ *  ]
+ * }
  *
  */
 
-public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implements DataRepository.LoadSurveySitesCallBack, DataRepository.LoadFishCardCallBack {
+public class InfoCardLoader extends AsyncTaskLoader<List<FishSpecies>> implements DataRepository.LoadSurveySitesCallBack, DataRepository.LoadFishCardCallBack {
 
     private static final String TAG = "InfoCardLoader";
-    private List<CardDetails> mData; //final, sorted list of fish cards TODO why not just InfoCard, which is already a card list
+    private List<FishSpecies> mData; //final, sorted list of fish cards
     private String mPassedInSurveySiteCode = "";//optional passed in parameter. otherwise load favorite sites
-
     private CardViewFragment.CardType mCardType;
     private final static boolean DOWNLOAD_FISH_SPECIES_FROM_GITHUB = false;
-    private Map<String, CardDetails> mCardDict; //map of fish ID to fish card details. these values are then sorted to the final, mData, order
-    private Iterator<CardDetails> mCardListIterator; //iterator of fish IDs in sorted order
+    private Map<String, FishSpecies> mCardDict; //map of fish ID to fish card details. these values are then sorted to the final, mData, order
+    private Iterator<FishSpecies> mCardListIterator; //iterator of fish IDs in sorted order
     private final int NUM_LOAD_PER_ITER = 20; //load 20 cards per iteration
     private SurveySiteList mSurveySitesList;
 
     private boolean loadingOffline = false;
 
-
-    //todo update. don't need card type, do need another parameter to load favorites or load all fish or something
     public InfoCardLoader(Context context, CardViewFragment.CardType cardType, @Nullable String siteCode) {
         super(context);
         mPassedInSurveySiteCode = siteCode;
         mCardType = cardType;
-        if(DEBUG) Log.d(TAG  , "InfoCardLoader Created. Card Type to load: " + cardType);
-
-//        if(!isOnline()) {} show snackbar
+        Log.d(TAG  , "InfoCardLoader Created. Card Type to load: " + cardType);
     }
 
     /**
@@ -161,19 +159,19 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
      * @see #onCanceled
      */
     @Override
-    public List<CardDetails> loadInBackground() {
+    public List<FishSpecies> loadInBackground() {
 
-        boolean isOnline = isOnline();
+        boolean isOnline = isOnline("www.reeflifesurvey.com");
         Log.d(TAG  , "InfoCardLoader loadInBackground called "+isOnline+"_"+(mData == null || mData.size() <= 0)+"_"+(mPassedInSurveySiteCode.equals("")));
 
         //no internet, no passed in site - load downloaded
         //todo this is totally unnecessary, no part of this loading code needs to be online anyway
-        if(!isOnline && (mData == null || mData.size() <= 0) && (mPassedInSurveySiteCode.equals(""))) {
+        if(!isOnline && (mData == null || mData.size() <= 0)) {
             Set<String> storedSites = loadAllSitesStoredOffline(getContext().getApplicationContext());
             Log.d(TAG, "InfoCardLoader: No Internet Detected and no passed in site - showing all downloaded ("+storedSites.size()+" sites stored offline");
             loadingOffline = true;
-            loadOffline();
-            return mData; //todo
+//            loadOffline();
+//            return mData; //todo
         }
 
 
@@ -182,7 +180,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
         } else {
             // TODO jank - loader manager won't call load finished if the data reference is the same?
             // TODO UPDATE 8/12 seems fine UPDATE 10/12 it will mostly work with the adapter, but loadfinished is definitely not called
-            ArrayList<CardDetails> tempList = new ArrayList<>();
+            ArrayList<FishSpecies> tempList = new ArrayList<>();
             tempList.addAll(mData);
             mData = tempList;
         }
@@ -213,7 +211,6 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
     //incrementally loads fish cards into mData, based on selected survey sites
     private void loadFishCardsIncrementalTWO() throws IOException, JSONException {
 
-        //todo this list of selected sites should be moved from a static reference to a member on the data frag
         //  List<SurveySite> SELECTED_SURVEY_SITES
         //TODO loadSingleSite isn't properly filtering out cards already picked up (by other sites or previous iterations)
         //  either it must check mData.contains (poor performance) or a Dictionary(id, fishCard)
@@ -236,7 +233,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
             else {
                 numPerSite = (NUM_LOAD_PER_ITER - numLoaded) / numSitesLeftToLoad--;
             }
-            List<CardDetails> siteList = loadSingleSite(site, mDataRetrievalCallback, numPerSite);
+            List<FishSpecies> siteList = loadSingleSite(site, mDataRetrievalCallback, numPerSite);
             numLoaded += siteList.size();
 
             mData.addAll(siteList);
@@ -255,8 +252,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
      * site-surveys.json – a mapping from site code to an array of seven elements: realm, ecoregion, site name, longitude, latitude, number of surveys, and species counts (mapping from each observed species ID to the number of surveys on which it was seen).
      */
     private void loadFishCardsIncremental() throws IOException, JSONException {
-        // Call to set up the site surveys TODO return type + should this be in constructor? Or can we cache?
-        //TODO can we just return mCardDict with species added, but no cards added yet
+        // Call to set up the site surveys
         if(mCardDict ==  null) {
 
             JSONObject speciesJSON = setupFishLocations();
@@ -265,10 +261,11 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
             mCardDict = mergeFishSpecies(speciesJSON);
 
             //sort the species by most common TODO performance could be improved, certainly
-            //CardDetails[] fishArray =  (CardDetails[]) mCardDict.values().toArray(CardDetails.type());
-            CardDetails[] fishArray =  new CardDetails[mCardDict.size()];
+            //todo the number of sitings is not accurate, so this probably doesn't do anything
+            //FishSpecies[] fishArray =  (FishSpecies[]) mCardDict.values().toArray(FishSpecies.type());
+            FishSpecies[] fishArray =  new FishSpecies[mCardDict.size()];
             mCardDict.values().toArray(fishArray);
-            List<CardDetails> fishList = new ArrayList<>(Arrays.asList(fishArray));
+            List<FishSpecies> fishList = new ArrayList<>(Arrays.asList(fishArray));
             Collections.sort(fishList);
             mCardListIterator = fishList.iterator();
             //or, if we don't want it sorted, just do: //Iterator<String> mCardListIterator = mCardDict.keySet().iterator(); //species iterator from dictionary
@@ -289,7 +286,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
             Injection.provideDataRepository(getContext().getApplicationContext()).getFishCard(speciesKey, this);
             
             
-         //   CardDetails cardDetails = mCardDict.get(speciesKey) ; // infocard shell already created - time to add details
+         //   FishSpecies cardDetails = mCardDict.get(speciesKey) ; // infocard shell already created - time to add details
             //Log.d(TAG  , "getFishInCards ID: "+cardDetails.getId()+" VS SPECIESKEY: " + speciesKey); //YES THEY ARE THE SAME
 
           // parseSpeciesDetailsHelper(cardDetails, mDataRetrievalCallback);
@@ -356,53 +353,12 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
             result.put(0, speciesFound);*/
 
 
-
-
             StringBuilder selectedSites = new StringBuilder(siteList.size() * 7);
             for( SurveySite selSite: siteList){
                // Log.d(TAG  , "InfoCardLoader loading site: "+selSite.getCode()+selSite.getID());
-
                 selectedSites.append(selSite.getCode()).append(selSite.getID()).append(", ");
                 String siteID = selSite.getCode()+selSite.getID();
-//            }
-//
-//            String[] codes = {"FLORES1", "FLORES2", "FLORES2", "FLORES4", "FLORES5"} ;
-//
-//            int count = 0;
-//            int MAX_NUM_EL = 4000; //max appears to be 3025 in the survey sites json file
-//            String prevCode = "";
-//
-//            //TODO loop through JSON
-//            //Iterator<String> keys = surveySites.keys();
-//           // while(keys.hasNext() && count < MAX_NUM_EL) {
-//            for( String code : codes){
-                // if(count > 1) break; //todo
-                //  code = keys.next();
-
-              //  JSONArray site1 = surveySites.getJSONArray(siteID); // new JSONArray("NSW1");
-
-
-            /*
-            {code: [
-                realm,
-                ecoregion,
-                name,
-                longitude,
-                latitude,
-                ?,
-                {
-                    numSurveys: speciesCounts
-                }], ... }
-             */
-             /*   String realm = site1.getString(0);
-                String ecoRegion = site1.getString(1);
-                String name = site1.getString(2);
-                double longitude = site1.getDouble(3);
-                double latitude = site1.getDouble(4);
-                String idkwhat = site1.getString(5);
-                JSONObject speciesFound = site1.getJSONObject(6);*/
                 JSONObject speciesFound = selSite.getSpeciesFound();
-                //Log.d(TAG  , "getFishInCards setupFishLocations site1 stuff: " + realm + ecoRegion + longitude + latitude + speciesFound.toString());
 
                 result.accumulate(siteID, speciesFound);
                 result.put(siteID, speciesFound);
@@ -420,9 +376,8 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
 
     //merge fish species from json to the dictionary keys. then we will add the cards to the dictionary in getfishcards
     //todo shouldn't we be switching to using the SurveySiteList object, instead of raw json
-    //todo delete this. we should separate processing of sites and species
-    private HashMap<String, CardDetails> mergeFishSpecies(JSONObject siteJSON) {
-        HashMap<String, CardDetails> speciesDictionary = new HashMap<>(); //dictionary mapping a fish id to its carddetails
+    private HashMap<String, FishSpecies> mergeFishSpecies(JSONObject siteJSON) {
+        HashMap<String, FishSpecies> speciesDictionary = new HashMap<>(); //dictionary mapping a fish id to its carddetails
         //PriorityQueue<Integer> fishSightingsIndex = new PriorityQueue<>();
         //multiset or bag?
         //HashMap<Integer, Integer> fishSightingsIndex = new HashMap<>(); //dictionary mapping the number of sightings for each fish to its fish ID
@@ -430,34 +385,33 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
 
         try {
             //return siteJSON.getJSONObject("NSW1");
-            //todo these count loops arent working, they need incrementers
             int siteCount = 0;
             int MAX_NUM_SITE_EL = 200; //?
             Iterator<String> sitesList = siteJSON.keys();
             JSONObject site;
-            while(sitesList.hasNext() && siteCount < MAX_NUM_SITE_EL) {
+            while(sitesList.hasNext() && siteCount++ < MAX_NUM_SITE_EL) {
 
                 String siteID = sitesList.next();
                 site = siteJSON.getJSONObject(siteID); // loop through sites
 
-                String species; //TODO
+                String species;
                 int numSightings;
                 int count = 0;
                 int MAX_NUM_SPECIES_PER_SITE_EL = 200; //?
                 Iterator<String> speciesList = site.keys();
 
                 //add each species to the dictionary
-                while (speciesList.hasNext() && count < MAX_NUM_SPECIES_PER_SITE_EL) {
+                while (speciesList.hasNext() && count++ < MAX_NUM_SPECIES_PER_SITE_EL) {
                     species = speciesList.next();
                     numSightings = site.getInt(species);
-                    CardDetails cardDetails;
+                    FishSpecies cardDetails;
 
                     if(speciesDictionary.containsKey(species)){ //check if already added from previously surveyed site
                       //  Log.d(TAG  , "getFishInCards mergeFishSpecies overwriting fish : " + species);
                         cardDetails = speciesDictionary.get(species);
                     }
                     else {
-                        cardDetails = new CardDetails(species);
+                        cardDetails = new FishSpecies(species);
                         speciesDictionary.put(species, cardDetails);
                     }
 
@@ -484,13 +438,12 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
      * @return the same fishCard, with details added (name, image url, etc.)
      * Created 10/24
      */
-    public static CardDetails parseSpeciesDetailsHelper(CardDetails fishCard, JSONArray basicData) throws JSONException {
+    public static FishSpecies parseSpeciesDetailsHelper(FishSpecies fishCard, JSONArray basicData) throws JSONException {
         fishCard.cardName = basicData.getString(0);
         fishCard.commonNames = basicData.getString(1);
         fishCard.reefLifeSurveyURL = basicData.getString(2);
 
         //Parse out image URL
-        //todo can do this better. dont set imageurl, just use the first one of the list, etc.
         String imageURL = basicData.getString(4);
         if (imageURL.length() <= 10)  Log.d(TAG  , "parseSpeciesDetailsHelper no image found1 for card (image url too short): " + fishCard.getId());
         else {
@@ -531,12 +484,12 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
         Log.d(TAG, "InfoCardLoader loadOffline");
         mData = new ArrayList<>();
 
-        Observable<CardDetails> offlineCards
+        Observable<FishSpecies> offlineCards
                 = StorageUtils.Companion.loadStoredFishCards(getContext().getApplicationContext());
 
-        offlineCards.subscribe(new Consumer<CardDetails>() {
+        offlineCards.subscribe(new Consumer<FishSpecies>() {
             @Override
-            public void accept(CardDetails cardDetails) throws Exception {
+            public void accept(FishSpecies cardDetails) throws Exception {
                 Log.d(TAG, "load offline accept: "+cardDetails.cardName+" ["+cardDetails.getId()+"]");
 
                 cardDetails.setOffline(true);
@@ -553,7 +506,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<CardDetails>> implement
     }
 
     @Override
-    public void onFishCardLoaded(@NotNull CardDetails card) {
+    public void onFishCardLoaded(@NotNull FishSpecies card) {
         mData.add(card);
     }
 

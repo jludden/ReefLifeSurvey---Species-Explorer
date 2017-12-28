@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import me.jludden.reeflifesurvey.R;
-import me.jludden.reeflifesurvey.data.model.InfoCard;
+import me.jludden.reeflifesurvey.data.model.FishSpecies;
 
 /**
  * Created by Jason on 10/29/2017.
@@ -37,12 +37,12 @@ public class SharedPreferencesUtils {
 
 
 
-    public static void setUpFavoritesButton(final InfoCard.CardDetails cardDetails, final CheckBox favoriteBtn, final Activity activity) {
+    public static void setUpFavoritesButton(final FishSpecies cardDetails, final CheckBox favoriteBtn, final Activity activity) {
         setUpFavoritesButton(cardDetails, favoriteBtn, activity, false);
     }
 
     //set up the favorites button initial state and onclick listener
-    public static void setUpFavoritesButton(final InfoCard.CardDetails cardDetails, final CheckBox favoriteBtn, final Activity activity, final Boolean useWhiteOutline){
+    public static void setUpFavoritesButton(final FishSpecies cardDetails, final CheckBox favoriteBtn, final Activity activity, final Boolean useWhiteOutline){
         if(cardDetails.getFavorited(activity)) {
             favoriteBtn.setButtonDrawable(FAVORITES_SELECTED); //todo check the SharedPreferences cache
         } else {
@@ -61,7 +61,7 @@ public class SharedPreferencesUtils {
 
     //set up the on click listener for a favorites button
     //todo unhappy about direct refernces to carddetails.favorited
-    public static void onFavoritesButtonClick(final InfoCard.CardDetails cardDetails, final CheckBox favoriteBtn, final Activity activity, final Boolean useWhiteOutline) {
+    public static void onFavoritesButtonClick(final FishSpecies cardDetails, final CheckBox favoriteBtn, final Activity activity, final Boolean useWhiteOutline) {
         Log.d(TAG, "Favorites Button onClick. now favorited: " + !cardDetails.favorited);
 
         if (cardDetails.favorited) {
@@ -71,7 +71,7 @@ public class SharedPreferencesUtils {
             cardDetails.favorited = true;
             favoriteBtn.setButtonDrawable(FAVORITES_SELECTED);
         }
-        savePref(cardDetails.id, InfoCard.PREF_FAVORITED, cardDetails.favorited, activity);
+        savePref(cardDetails.id, FishSpecies.PREF_FAVORITED, cardDetails.favorited, activity);
     }
 
 
@@ -82,7 +82,7 @@ public class SharedPreferencesUtils {
         SharedPreferences prefs = activity.getSharedPreferences(
                 "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
 
-        String key = InfoCard.generateSharedPrefKey(id,valKey);//"me.jludden.reeflifesurvey.CardPref_" + id + "_" + valKey;
+        String key = FishSpecies.generateSharedPrefKey(id,valKey);//"me.jludden.reeflifesurvey.CardPref_" + id + "_" + valKey;
         prefs.edit().putBoolean(key, val).apply();
     }
 
@@ -91,7 +91,7 @@ public class SharedPreferencesUtils {
         SharedPreferences prefs = activity.getSharedPreferences(
                 "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
 
-        String key = InfoCard.generateSharedPrefKey(id,valKey); //"me.jludden.reeflifesurvey.CardPref_" + id + "_" + valKey;
+        String key = FishSpecies.generateSharedPrefKey(id,valKey); //"me.jludden.reeflifesurvey.CardPref_" + id + "_" + valKey;
         boolean temp=prefs.getBoolean(key, false);
         if(temp) Log.d("jludden.reeflifesurvey"  , "OnLoadFinished getPref-TRUE id: " + id + " key: " + valKey + " result: "+temp );
         return temp;//prefs.getBoolean(key, false);
@@ -126,13 +126,16 @@ public class SharedPreferencesUtils {
      * @param context
      */
     public static void updateFavSites(List<String> siteCodeList, Context context) {
-       Log.d("jludden.reeflifesurvey"  , "updateFavSites. Saving " + siteCodeList.size() + " sites");
-       SharedPreferences prefs = context.getSharedPreferences(
+        if(context == null) {
+            Log.e(TAG, "update favorite sites Shared Preferences - null context");
+            return;
+        }
+        Log.d(TAG  , "updateFavSites. Saving " + siteCodeList.size() + " sites");
+        SharedPreferences prefs = context.getSharedPreferences(
                 "me.jludden.reeflifesurvey", Context.MODE_PRIVATE);
 
-       Set<String> set = new HashSet<>(siteCodeList);
-       prefs.edit().putStringSet(FAV_SITES_KEY, set).apply();
-
+        Set<String> set = new HashSet<>(siteCodeList);
+        prefs.edit().putStringSet(FAV_SITES_KEY, set).apply();
     }
     
     public static void clearFavSites(Context context) {
@@ -175,7 +178,7 @@ public class SharedPreferencesUtils {
         return localCodes;
     }
 
-    //return the lit of sites that are stored offline
+    //return the list of sites that are stored offline
     public static Set<String> loadSitesStoredOffline(Context context, Boolean isExternal) {
         String sitesKey = isExternal ? STORED_OFFLINE_SITES_EXT_KEY : STORED_OFFLINE_SITES_KEY;
         SharedPreferences prefs = context.getSharedPreferences(

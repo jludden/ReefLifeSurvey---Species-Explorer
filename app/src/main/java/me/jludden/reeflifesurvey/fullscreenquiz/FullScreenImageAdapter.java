@@ -6,6 +6,7 @@ package me.jludden.reeflifesurvey.fullscreenquiz;
  * http://www.androidhive.info/2013/09/android-fullscreen-image-slider-with-swipe-and-pinch-zoom-gestures/
  */
 
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.PagerAdapter;
 
 
@@ -26,7 +27,7 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import me.jludden.reeflifesurvey.data.model.InfoCard;
+import me.jludden.reeflifesurvey.data.model.FishSpecies;
 import me.jludden.reeflifesurvey.R;
 
 
@@ -34,8 +35,7 @@ public class FullScreenImageAdapter extends PagerAdapter {
 
     private Activity mActivity;
     private LayoutInflater mLayoutInflater;
-    private List<InfoCard.CardDetails> mCardList;
-    private RelativeLayout mRoot;
+    private List<FishSpecies> mCardList;
     private ImageView mImgDisplay;
     private int mCurrentPos;
 
@@ -72,29 +72,18 @@ public class FullScreenImageAdapter extends PagerAdapter {
         //Set the Card Image
         if(!mCardList.isEmpty()){
            // Log.d("jludden.reeflifesurvey"  , "FullScreenImageAdapter instantiateItem mCardList not empty");
-            InfoCard.CardDetails cardDetails = mCardList.get(position);
+            FishSpecies cardDetails = mCardList.get(position);
 
             //set up image
-            //todo trying the just glide
-            //todo cache glide.with
-            //Glide.with(mActivity)
             Picasso.with(mActivity)
                     .load(cardDetails.getPrimaryImageURL())
                     .into(mImgDisplay);
-
-
-          //   Try to draw from drawable first, then fall back to bitmap
-//            Drawable image = cardDetails.getDrawable(); //cardDetails.image; //todo getDrawable works but is causing asserts to fail
-//            Bitmap flag = cardDetails.imageBitmap;
-//
-//            if(image != null)  mImgDisplay.setImageDrawable(image);
-//            else if (flag != null) mImgDisplay.setImageBitmap(flag);
         }
 
         return viewLayout;
     }
 
-    public void updateItems(List<InfoCard.CardDetails> data){
+    public void updateItems(List<FishSpecies> data){
         Log.d("jludden.reeflifesurvey"  , "FullScreenImageAdapter update items: " +data.size());
 
         mCardList = data;
@@ -104,7 +93,7 @@ public class FullScreenImageAdapter extends PagerAdapter {
 
 //        if(!mCardList.isEmpty()){
 //            Log.d("jludden.reeflifesurvey"  , "FullScreenImageAdapter updateItems drawing not empty");
-//            InfoCard.CardDetails cardDetails = mCardList.get(0);
+//            InfoCard.FishSpecies cardDetails = mCardList.get(0);
 //
 //            //set up image
 //            if(mImgDisplay == null) return;
@@ -121,7 +110,7 @@ public class FullScreenImageAdapter extends PagerAdapter {
         ((ViewPager) container).removeView((ImageView) object);
         //
         // todo glide clear
-        // InfoCard.CardDetails cardDetails = mCardList.get(position);
+        // InfoCard.FishSpecies cardDetails = mCardList.get(position);
 
     }
 
@@ -142,12 +131,9 @@ public class FullScreenImageAdapter extends PagerAdapter {
             String description = mCardList.get(mCurrentPos-1).commonNames; //idk why -1 but it works
             Toast.makeText(mActivity, description , Toast.LENGTH_SHORT).show();
 
+//            View rootView = mActivity.getWindow().getDecorView().getRootView();
+//            Snackbar.make(rootView, description, Snackbar.LENGTH_SHORT).show();
 
         }
-    }
-
-    //todo useless doesnt work
-    public void setRootLayout(RelativeLayout v){
-        mRoot = (RelativeLayout) v;
     }
 }

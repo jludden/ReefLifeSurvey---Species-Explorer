@@ -5,13 +5,12 @@ import android.util.Log
 import io.reactivex.Observable
 import me.jludden.reeflifesurvey.data.InfoCardLoader.parseSpeciesDetailsHelper
 import me.jludden.reeflifesurvey.R
-import me.jludden.reeflifesurvey.data.model.InfoCard.CardDetails
+import me.jludden.reeflifesurvey.data.model.FishSpecies
 import org.json.JSONObject
 import kotlin.collections.HashMap
 import me.jludden.reeflifesurvey.data.SurveySiteType.*
 import me.jludden.reeflifesurvey.data.model.SurveySiteList
 import me.jludden.reeflifesurvey.data.utils.LoaderUtils
-import me.jludden.reeflifesurvey.data.DataSource.DataLoadCallback
 import java.io.InputStream
 import java.util.ArrayList
 
@@ -29,13 +28,13 @@ class DataRepository private constructor(context: Context) : DataSource {
     private val siteList : SurveySiteList
     // private val speciesString : String
     //private var speciesJSON : JSONObject
-    //private val fishSpecies : Observable<InfoCard.CardDetails>
+    //private val fishSpecies : Observable<InfoCard.FishSpecies>
     //  private val fishStringStream : Observable<String>
     private var allSpeciesLoaded: Boolean = false
     private val speciesStream: InputStream
 
     //todo possibly sorted list better
-    private var speciesCards: HashMap<String, CardDetails>
+    private var speciesCards: HashMap<String, FishSpecies>
 
 
     init {
@@ -72,14 +71,14 @@ class DataRepository private constructor(context: Context) : DataSource {
     //and it can be defered with observable.defer until it is actually subscribed to:
     //Observable.defer(() -> Observable.just(slowBlockingMethod()))
     //
-    override fun getFishSpeciesAll(): Observable<CardDetails> {
+    override fun getFishSpeciesAll(): Observable<FishSpecies> {
         /*if(!allSpeciesLoaded){
             speciesCards = loadFromDiskBlocking()
         }*/
         return Observable.fromIterable(speciesCards.values)
     }
 
-    override fun getFishSpeciesForSite(site: SurveySiteList.SurveySite): Observable<CardDetails>
+    override fun getFishSpeciesForSite(site: SurveySiteList.SurveySite): Observable<FishSpecies>
     {
         val speciesList = site.getSpeciesFound().keys()
         val speciesIDs = ArrayList<String>()
@@ -93,18 +92,18 @@ class DataRepository private constructor(context: Context) : DataSource {
         return Observable.fromIterable(speciesIDs).map { speciesCards[it] }
     }
 
-    //NOT asynchronously load the data but oh well at least its already on disk right todo delete and do it better
-    private fun loadFromDiskBlocking(): HashMap<String, CardDetails> {
+    //block the main thread and load the data but oh well at least its already on disk right todo delete and do it better
+    private fun loadFromDiskBlocking(): HashMap<String, FishSpecies> {
         val speciesJSON = JSONObject(LoaderUtils.loadStringFromDiskHelper(speciesStream))
         val iter = speciesJSON.keys()
 
-        val species = HashMap<String, CardDetails>()
+        val species = HashMap<String, FishSpecies>()
 
         while (iter.hasNext()){
             val curKey = iter.next()
             val speciesData = speciesJSON.getJSONArray(curKey)
 
-            val cardDetails = CardDetails(curKey)
+            val cardDetails = FishSpecies(curKey)
             species.put(curKey, parseSpeciesDetailsHelper(cardDetails, speciesData))
         }
         Log.d("DataRepository", "loaded fish species: "+species.size)
@@ -112,71 +111,6 @@ class DataRepository private constructor(context: Context) : DataSource {
         allSpeciesLoaded = true
         return species
     }
-
-    /*
-    fun getFishSpeciesAll(context: Context): Observable<CardDetails> {
-
-        fishStringStream
-                .map { str -> JSONObject(str)}
-                .flatMap { json -> Observable.range(1,3) }
-                .flatMap {
-                    json -> ObservableOnSubscribe {
-
-                    subscriber.onNext("1")
-
-                }
-                }
-
-        Observable.create<> { ObservableOnSubscribe<> {
-           result : String =
-            subscriber.onNext(result)
-        } }
-
-        ObservableFrom
-
-
-//        fun JSONObject.iterable(): MutableIterator<String> {
-//            return this.keys()
-//        }
-//
-//        val keys : MutableIterator<String> = speciesJSON.keys()
-//                .fromIterable(speciesJSON)
-        //.fromIterable<String>(speciesJSON.keys())
-
-        //Flowable.
-
-      /*
-        Observable.create<JSONArray> {
-            ObservableOnSubscribe<String> { subscriber ->
-
-            }
-        }
-        .create(ObservableOnSubscribe<String> { subscriber ->
-            search_view.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String): Boolean {
-                    //  searchFor(query)
-                }
-
-                override fun onQueryTextChange(query: String): Boolean {
-                    if (TextUtils.isEmpty(query)) {
-                        //        clearResults()
-                    }
-                    subscriber.onNext(query)
-                    return true
-                }
-            })
-*/
-        /*return Observable
-                .fromCallable<MutableIterator<String>>({speciesJSON.keys()})
-                .flatMap { iter ->
-
-                }
-                .map<JSONArray>{ key -> speciesJSON.getJSONArray(key) }
-                .map<CardDetails>{ speciesData -> parseSpeciesDetailsHelper(CardDetails("1"), speciesData)}*/
-    }
-        */
-
-
 
     override fun getSurveySites(type: SurveySiteType, callback: DataSource.LoadSurveySitesCallBack) {
  /*       if(type == ALL_IDS) TODO()
@@ -187,13 +121,8 @@ class DataRepository private constructor(context: Context) : DataSource {
         callback.onSurveySitesLoaded(siteList)
     }
 
-    override fun getFishSpeciesJSON(callback: DataSource.LoadFishSpeciesJSONCallBack) {
-        TODO("not impl")
-        //callback.onFishSpeciesJSONLoaded()
-    }
-
     override fun getFishCard(id: String, callback: DataSource.LoadFishCardCallBack){
-        val card: CardDetails? = speciesCards[id]
+        val card: FishSpecies? = speciesCards[id]
         if(card != null) callback.onFishCardLoaded(card)
         else callback.onDataNotAvailable(id)
     }
@@ -203,28 +132,21 @@ interface DataSource {
 
     fun getSurveySitesAll(type: SurveySiteType = SurveySiteType.CODES) : Observable<SurveySiteList.SurveySite>
 
-    fun getFishSpeciesAll() : Observable<CardDetails>
+    fun getFishSpeciesAll() : Observable<FishSpecies>
 
-    fun getFishSpeciesForSite(site: SurveySiteList.SurveySite) : Observable<CardDetails>
+    fun getFishSpeciesForSite(site: SurveySiteList.SurveySite) : Observable<FishSpecies>
 
     fun getSurveySites(type: SurveySiteType, callback: LoadSurveySitesCallBack)
-
-    fun getFishSpeciesJSON(callback: LoadFishSpeciesJSONCallBack)
 
     fun getFishCard(id: String, callback: LoadFishCardCallBack)
 
     //interface for providing callbacks for accessing data
-    //todo add onDataNotAvailable callbacks to each interface as well
     interface LoadSurveySitesCallBack : DataLoadCallback {
         fun onSurveySitesLoaded(sites : SurveySiteList)
     }
 
-    interface LoadFishSpeciesJSONCallBack : DataLoadCallback {
-        fun onFishSpeciesJSONLoaded(speciesJSON: JSONObject)
-    }
-
     interface LoadFishCardCallBack : DataLoadCallback {
-        fun onFishCardLoaded(card: CardDetails)
+        fun onFishCardLoaded(card: FishSpecies)
     }
 
     interface DataLoadCallback {
