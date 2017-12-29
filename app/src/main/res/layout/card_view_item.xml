@@ -54,6 +54,7 @@
             android:layout_below="@+id/card_image"
             android:minLines="1"
             android:maxLines="3"
+            android:ellipsize="end"
             android:paddingEnd="30dp"
             android:paddingStart="30dp"
             android:padding="16dp"/>

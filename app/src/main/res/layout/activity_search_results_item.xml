@@ -25,8 +25,8 @@
 
         <ImageView
             android:id="@+id/results_card_image"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
             android:layout_alignParentStart="true"
             android:scaleType="fitXY" />
         <!--            android:transitionName="@string/transition_launch_details"-->
@@ -37,8 +37,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:textSize="16sp"
             android:layout_toEndOf="@+id/results_card_image"
-            android:padding="16dp"/>
+            android:paddingTop="8dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="8dp"/>
 
         <TextView
             android:id="@+id/results_card_description"
@@ -47,6 +50,10 @@
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/results_card_name"
             android:layout_toEndOf="@+id/results_card_image"
+            android:paddingStart="12dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp"
             android:padding="16dp"/>
 
     </RelativeLayout>

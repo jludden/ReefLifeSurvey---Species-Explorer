@@ -11,10 +11,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import me.jludden.reeflifesurvey.customviews.ElasticDragDismissFrameLayout
 import kotlinx.android.synthetic.main.activity_about.*
 
 import com.mikepenz.aboutlibraries.LibsBuilder
+import com.squareup.picasso.Picasso
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.R.id.*
 
@@ -90,6 +92,8 @@ class AboutActivity : AppCompatActivity() {
                 1 -> {
                     layout = inflater.inflate(R.layout.about_reeflifesurvey_methodology, container, false)
                     layout.findViewById<Button>(about_button_launch_website).setOnClickListener(onClickListener)
+                    layout.findViewById<ImageView>(about_method_image_1).load("https://reeflifesurvey.com/wp-content/uploads/2017/08/DSC_4282_KrisOkeefe-1.jpg", container)
+                    layout.findViewById<ImageView>(about_method_image_2).load("https://reeflifesurvey.com/wp-content/uploads/2015/08/Ningaloo-Diver1.jpg", container)
                 }
                 else -> {
                     layout = inflater.inflate(R.layout.about_libraries, container, false)
@@ -116,4 +120,8 @@ class AboutActivity : AppCompatActivity() {
         const val TAG: String = "AboutActivity"
         const val librariesFragmentTAG: String = "AboutLibrariesFragment"
     }
+}
+
+private fun ImageView.load(path: String, container: ViewGroup) {
+    Picasso.with(container.context).load(path).into(this)
 }

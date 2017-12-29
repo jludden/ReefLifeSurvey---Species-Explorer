@@ -128,7 +128,7 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
 
         //todo handle downloaded
         val siteLoadedOffline = offlineSiteCodes.contains(currentSite?.code)
-        Log.d(TAG, "bottom sheet load new site - site dl offline?: $siteLoadedOffline")
+        Log.d(TAG, "bottom sheet load new site - favorited?: ${currentSite?.favorited} dl offline?: $siteLoadedOffline")
         when(true){
             siteLoadedOffline -> textSliderView.image(storedImageLoader.loadImageFileFromStorage(card))
             card.primaryImageURL == "" -> textSliderView.image(R.drawable.ic_menu_camera)

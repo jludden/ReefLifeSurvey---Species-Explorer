@@ -3,6 +3,7 @@ package me.jludden.reeflifesurvey.search
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -31,6 +32,7 @@ import me.jludden.reeflifesurvey.detailed.DetailsActivity.Companion.REQUEST_CODE
 class SearchFragment : Fragment(), SearchContract.View {
     companion object {
         const val TAG: String = "SearchResultsFragment"
+        const val MAX_ITEM_DISPLAY_COUNT : Long = 15
         fun newInstance() = SearchFragment()
     }
 
@@ -44,6 +46,11 @@ class SearchFragment : Fragment(), SearchContract.View {
         override fun onItemClicked(item: SearchResult, v: View) {
             //presenter.onItemClicked(item)
             launchResultDetails(item, v) //todo handle here.. or pass presenter a view.. or setup a method (in adapter?) to return last clicked view
+        }
+
+        override fun onMaxItemsDisplayed() {
+            //todo display a message to notify the user that there are more results that aren't displayed
+//            Snackbar.make(recyclerView, R.string.search_view_max_items_displayed, Snackbar.LENGTH_SHORT)
         }
     }
 
@@ -115,6 +122,11 @@ class SearchFragment : Fragment(), SearchContract.View {
             if(list!=null) resultsList = list
             if(element!=null) resultsList.add(element)
             notifyDataSetChanged()
+
+            if(itemCount >= MAX_ITEM_DISPLAY_COUNT) {
+                itemListener.onMaxItemsDisplayed()
+                Log.d(TAG, "searchfragment max results displayed")
+            }
         }
 
         fun ViewGroup.inflate(layoutRes: Int): View {
@@ -194,5 +206,6 @@ class SearchFragment : Fragment(), SearchContract.View {
 
     interface SearchResultItemListener {
         fun onItemClicked(item: SearchResult, v: View)
+        fun onMaxItemsDisplayed()
     }
 }

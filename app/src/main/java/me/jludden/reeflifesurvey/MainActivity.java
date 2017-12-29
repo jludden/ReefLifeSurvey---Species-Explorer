@@ -93,9 +93,7 @@ public class MainActivity extends AppCompatActivity implements
         //This will set Expanded text to transparent so it wont overlap the content of the toolbar
         collapsingToolbar.setExpandedTitleColor(Color.parseColor("#00FF0000"));//ContextCompat.getColor(this, R.color.transparent));
 
-       // getSupportActionBar().setDisplayHomeAsUpEnabled(true); //todo testing
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-
+        //Show the back button if we are not on the home fragment
         getSupportFragmentManager().addOnBackStackChangedListener(
             new FragmentManager.OnBackStackChangedListener() {
                 @Override
@@ -202,7 +200,6 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 Snackbar.make(v, "FAB2 Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                //expandBottomSheet(null);
                 hideFABmenu();
             }
         });
@@ -269,7 +266,6 @@ public class MainActivity extends AppCompatActivity implements
         //start the home fragment
         hideClutter();
         launchUIFragment(new HomeFragment(), HomeFragment.TAG, true, false);
-
     }
 
     @Override
@@ -321,15 +317,11 @@ public class MainActivity extends AppCompatActivity implements
         Bundle options;
 
         switch (id) {
-            // TODO: 11/9/2017 catch the search clicked item here
             case R.id.action_search: //Inspiration and implementation from the Plaid App
                 View searchMenuView = findViewById(R.id.action_search);
                 options = ActivityOptions.makeSceneTransitionAnimation(this, searchMenuView,
                             getString(R.string.transition_search_back)).toBundle();
-
-//                startActivity(new Intent(this, SearchActivity.class), options);
                 Log.d(TAG,"STARTING SEARCH ACTIVITY");
-
                 startActivityForResult(new Intent(this, SearchActivity.class), SearchActivity.REQUEST_CODE, options);
                 return true;
 /*            case R.id.settings_opt_hide_menus:
@@ -339,7 +331,11 @@ public class MainActivity extends AppCompatActivity implements
                 showOkCancelDialog(this, getString(R.string.del_favorite_sites_message), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) { // User clicked OK button;
                         SharedPreferencesUtils.clearFavSites(getApplicationContext());
-                        showSimpleSnackbarMessage(MainActivity.this, "Favorite sites cleared (restart app for it to take effect)"); //todo
+                        showSimpleSnackbarMessage(MainActivity.this, "Favorite sites cleared"); //todo
+                        MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
+                        if (mapFrag != null && mapFrag.isVisible()) {
+                            mapFrag.resetMarkers();
+                        }
                     }
                 });
                 return true;
@@ -457,9 +453,9 @@ public class MainActivity extends AppCompatActivity implements
         }
     }*/
 
-    //todo - launch activity - right now just the full screen quiz mode
+    //todo - launch activity - right now just the full screen quiz mode - currently not passing in anything useful
     public void launchFullScreenQuizModeActivity(){
-        //get data from CardViewFragment TODO whole list of card data?
+        //get data from CardViewFragment
         Intent i = getIntent();
         FishSpecies cardInfo = (FishSpecies) i.getParcelableExtra("cardInfo");
         //
@@ -618,8 +614,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Show the initial survey site location in just the top part of the bottom sheet
-     * TODO merge with expand bottom sheet? they should at the very least set the same info
+     * Display the survey site information in the bottom sheet
      * @param siteInfo
      */
     public void peekBottomSheet(final SurveySiteList.SurveySite siteInfo) {
@@ -637,40 +632,13 @@ public class MainActivity extends AppCompatActivity implements
 
                 launchNewCardViewFragment(siteInfo.getCode());
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-//                mBottomSheetButton.hide();
                 mBottomSheetButton.setVisibility(View.GONE);
-
-
-                //todo refactor this
-                //todo this does not work properly if they are in details view
-                //if the detailsviewfragment is showing, and they click the top of bottom sheet,
-                //navigate them back to the mapview
-                /*MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
-                if (mapFrag != null && !mapFrag.isVisible()) {
-                    Log.d(TAG, "Bottom Sheet TEST1 PASSED");
-                    mBottomSheetButton.setVisibility(View.VISIBLE);
-                    launch_species.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_view_in_list, 0, 0, 0);
-                    launch_species.setText(R.string.bottom_sheet_secondary_button_browse);
-//                    launchUIFragment(mapFrag, MapViewFragment.TAG);
-
-                    hideClutter();
-                    onBackPressed();
-                } else if (mapFrag != null) { //launch browse fish details for this site
-                   //AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
-                    //toolbar.setExpanded(true,true);
-                    //addSiteLocationsToToolbar();
-                    //mFAB.show();
-                    launch_species.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_open_in_map, 0, 0, 0);
-                    launch_species.setText(R.string.bottom_sheet_secondary_button_map);
-                    launchNewCardViewFragment(siteInfo.getCode());
-                }*/
             }
         });
-        //if added to favs, set the fab to remove
+
+        //todo if added to favs, set the fab to remove
 
         ((BottomSheet) bottomSheet).loadNewSite(siteInfo);
-
-
         //show some info like num sites etc
 
         final TextView topText = (TextView) findViewById(R.id.bottom_sheet_top);
@@ -680,14 +648,8 @@ public class MainActivity extends AppCompatActivity implements
             public void onClick(View v) {
                 //todo state_expanded or whole fullscreen view?
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
             }
         });
-
-    }
-
-    public FloatingActionButton[] getFABmenu(){
-        return mFABmenu;
     }
 
     /**
@@ -714,8 +676,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    //todo move to bottomsheet class
-    //todo restart image sliders when power on (onResume, see IntroPageTwoFragment)
     @Override
     protected void onStop() {
         ((BottomSheet) findViewById(R.id.bottom_sheet)).clearView();
@@ -777,7 +737,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    // jump to full screen mode yeeaah
+    //hide all fabs, expandable toolbars, bottomsheets etc
     public void hideClutter(){
         mFAB.hide();
         hideFABmenu();
@@ -841,7 +801,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    //Shows a dialog with just an OK button and a message. TODO consider using snackbars instead
+    //Shows a dialog with just an OK button and a message. consider using snackbars instead
     public static void showSimpleDialogMessage(Activity activity, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(message)

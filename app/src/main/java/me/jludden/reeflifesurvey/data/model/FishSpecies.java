@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -14,9 +15,12 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils;
+import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.Favoritable;
 import me.jludden.reeflifesurvey.data.utils.StoredImageLoader;
 
 import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.getPref;
+import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.savePref;
 
 /**
  * FishSpecies class for containing all the data pieces a fish card needs to be displayed in my app
@@ -25,13 +29,13 @@ import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.getPre
  * With that in mind, try not to save any images or drawables here.
  * Those can be loaded and garbage collected by the view adapter
  */
-public class FishSpecies implements Parcelable, Comparable, SearchResultable {
+public class FishSpecies implements Parcelable, Comparable, SearchResultable, Favoritable {
     public final String id;
     public String cardName;
     public String commonNames;
     public int numSightings; //TODO
     public Dictionary<SurveySiteList.SurveySite, Integer> FoundInSites = new Hashtable<>();
-    public boolean favorited = false;
+    private boolean favorited = false;
     public List<String> imageURLs;
     private boolean offline = false;
     public String reefLifeSurveyURL;
@@ -50,9 +54,37 @@ public class FishSpecies implements Parcelable, Comparable, SearchResultable {
     }
 
     //todo performance impact? we are not caching this value but preferences should be in memory
-    public boolean getFavorited(Activity activity) {
-        if(getPref(id, PREF_FAVORITED, activity)) this.favorited = true;
+
+    /**
+     * @return the cached value of the favorites field
+     */
+    @Override
+    public boolean getFavorited() {
+        return getFavorited(null);
+    }
+
+    /**
+     * Updates and returns the favorited value from SharedPreferences
+     * @param activity if null return the local cached value (default false)
+     * @return the updated value of the favorites field
+     */
+    @Override
+    public boolean getFavorited(@Nullable Activity activity) {
+        if(activity != null){
+            if (getPref(id, PREF_FAVORITED, activity)) this.favorited = true;
+        }
         return this.favorited;
+    }
+
+    /**
+     * Sets the updated favorites value
+     * @param favorited
+     * @param activity
+     */
+    @Override
+    public void setFavorited(boolean favorited, Activity activity) {
+        this.favorited = favorited;
+        savePref(id, PREF_FAVORITED, getFavorited(), activity);
     }
 
     public void setFoundInSites(String siteID, int sightingsCount) {

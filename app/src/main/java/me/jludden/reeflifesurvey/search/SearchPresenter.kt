@@ -3,8 +3,10 @@ package me.jludden.reeflifesurvey.search
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import me.jludden.reeflifesurvey.data.*
+import me.jludden.reeflifesurvey.data.model.FishSpecies
 import me.jludden.reeflifesurvey.data.model.SearchResult
 import me.jludden.reeflifesurvey.data.model.SearchResultable
+import me.jludden.reeflifesurvey.data.model.SurveySiteList
 
 /**
  * Created by Jason on 11/12/2017.
@@ -32,12 +34,14 @@ class SearchPresenter(
 
     private fun doSearch(query: String) {
         //merge fish species and survey sites, filter by query string, then take a max of 15 results
-        val matchesQuery: Observable<SearchResultable> =
-                Observable.concat(
+
+        val everything: Observable<SearchResultable> = Observable.concat(
                     dataRepository.getFishSpeciesAll(),
                     dataRepository.getSurveySitesAll())
-                .filter({ it.matchesQuery(query) })
-                .take(15)
+
+        val matchesQuery: Observable<SearchResultable> = everything
+                .filter({it.matchesQuery(query)})
+                .take(SearchFragment.MAX_ITEM_DISPLAY_COUNT)
 
         //map the resulting species/sites to SearchResults
         val resultsObservable: Observable<SearchResult> = matchesQuery

@@ -8,8 +8,6 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 
-import com.squareup.haha.perflib.Main;
-
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 import me.jludden.reeflifesurvey.Injection;

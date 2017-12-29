@@ -40,6 +40,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.checkInternetConnection;
+import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.setUpFavoritesButton;
+import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.setSiteFavoritedDrawable;
 
 /**
  * Created by Jason on 5/15/2017.
@@ -237,14 +239,27 @@ public class MapViewFragment extends Fragment
         mSelectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(SELECTED_SITE_COLOR));
         //hideFABmenu();
 
+
+
+
         //mFAB.setImageResource(R.drawable.ic_fab_add_loc); //todo animate and change
-        mFAB.setImageResource(R.drawable.ic_favorites_heart_filled_two);
+//        mFAB.setImageResource(R.drawable.ic_favorites_heart_filled_two);
+//
+//        //mFAB.setImageResource(R.drawable.ic_favorite_heart_outline_trim_white);
+
 
 //        mFAB.setImageResource(R.drawable.ic_favorite_heart_filled);
 //        mFAB.setImageResource(R.drawable.ic_favorite_heart_outline);
 //        mFAB.setImageResource(R.drawable.ic_star_selected);
 
-        mMapViewFragmentInteractionListener.peekBottomSheet((SurveySite) marker.getTag());
+
+        SurveySite site = (SurveySite) marker.getTag();
+        mMapViewFragmentInteractionListener.peekBottomSheet(site);
+
+
+
+        setSiteFavoritedDrawable(site, mFAB);
+
 
 
         //todo want to center the map, but it doesnt work so well
@@ -279,7 +294,11 @@ public class MapViewFragment extends Fragment
         mMapViewFragmentInteractionListener.expandBottomSheet((SurveySite) marker.getTag());
     }*/
 
-    /**t
+    /**
+     * todo have some animations?
+     *  and this could use some refactoring - starting with the way we store favorites in SurveySiteList
+     *
+     *
      * 12/24 - todo animate/change fab icon for favorited vs unfavorited
      *      allow unfavoriting.
      *      dont unselect site when favoriting
@@ -292,37 +311,39 @@ public class MapViewFragment extends Fragment
     public void onFABclick() {
         Log.d(TAG ,"map view fragment fab clicked. markersel? "+(mSelectedMarker!=null));
 
-        if(mSelectedMarker != null) { //Add marker to sitelist as appropriate
+        if(mSelectedMarker != null && (mSelectedMarker.getTag() != null)) { //Add marker to sitelist as appropriate
             //TODO animate the FAB being clicked here as well
-            SurveySite oldMarkerSite = ((SurveySite) mSelectedMarker.getTag());
-            String code = oldMarkerSite != null ? oldMarkerSite.getCode(): "-1";
+            SurveySite site = (SurveySite) mSelectedMarker.getTag();
+            String code = site != null ? site.getCode(): "-1";
 
             if(mSurveySiteList.getFavoritedSiteCodes().contains(code)) {
-                Snackbar.make(mMapView, getString(R.string.site_already_added, mSelectedMarker.getTitle()), Snackbar.LENGTH_LONG).show();
-                //todo animate and unfavorite
+                //Snackbar.make(mMapView, getString(R.string.site_already_added, mSelectedMarker.getTitle()), Snackbar.LENGTH_LONG).show();
+
+                mSelectedSiteList.remove(mSelectedMarker);
+                mSurveySiteList.removeFavoriteSite(code, getContext());
+                mSelectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(NORMAL_SITE_COLOR));
+                setSiteFavoritedDrawable(site, mFAB);
+
             } else {
                 mSelectedSiteList.add(mSelectedMarker); //todo only using this for removing last added site (from snackbar->undo)
-                String siteCode = ((SurveySite) mSelectedMarker.getTag()).getCode();
-                mSurveySiteList.addFavoriteSite(siteCode, getContext());
+                mSurveySiteList.addFavoriteSite(code, getContext());
                 mSelectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(FAVORITED_SITE_COLOR));
+                setSiteFavoritedDrawable(site, mFAB);
 
-//                mSelectedMarker = null;
-//                mFAB.setImageResource(R.drawable.ic_add_white);
-
-                Snackbar.make(mMapView, R.string.new_favorited_site, Snackbar.LENGTH_LONG)
+                /*Snackbar.make(mMapView, R.string.new_favorited_site, Snackbar.LENGTH_LONG)
                         .setAction("Undo", new android.view.View.OnClickListener() {
 
-                            /**
+                            *//**
                              * Called when a view has been clicked.
                              *
                              * @param v The view that was clicked.
-                             */
+                             *//*
                             @Override
                             public void onClick(View v) {
                                 MapViewFragment.this.removeLastMarker(); // fancy classname.this (qualified this) syntax
                                 if(mMapView != null) Snackbar.make(mMapView, R.string.site_removed, Snackbar.LENGTH_SHORT).show();
                             }
-                        }).show();
+                        }).show();*/
            }
         }
         else{
@@ -366,13 +387,26 @@ public class MapViewFragment extends Fragment
 
     }
 
+    //clears and re-adds the markers to the map
+    public void resetMarkers() {
+        if (mMap == null || mSurveySiteList == null) {
+            Log.e(TAG,"MapViewFragment resetMarkers failed");
+            return;
+        }
+        mMap.clear();
+        mSurveySiteList.loadFavoritedSites(getContext());
+        addSurveySites();
+    }
+
     //Add the loaded survey sites to the map
     //called both when the map has finished loading and the datafragment has finished loading
     private void addSurveySites() {
         if (mMap == null) {
-            Log.e("ludden.reeflifesurvey" ,"MapViewFragment addSurveySites mMap null");
+            Log.e(TAG ,"MapViewFragment addSurveySites mMap null");
             return;
         }
+
+
 
         //retrieve survey sites from data fragment
     /*    if(mDataRetrievalCallback != null){

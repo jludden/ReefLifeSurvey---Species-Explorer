@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.support.annotation.RawRes;
 import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
-import com.squareup.haha.perflib.Main;
 
 import org.json.JSONArray;
 import org.json.JSONException;

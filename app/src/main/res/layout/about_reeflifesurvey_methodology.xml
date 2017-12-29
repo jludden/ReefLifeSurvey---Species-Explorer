@@ -13,6 +13,13 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <ImageView
+            android:id="@+id/about_method_image_1"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:padding="10dp"
+            />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,9 +28,9 @@
             android:text="@string/rls_methodology_1"/>
 
         <ImageView
+            android:id="@+id/about_method_image_2"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            app:srcCompat="@drawable/rls_divers"
             android:padding="10dp"
             />
 

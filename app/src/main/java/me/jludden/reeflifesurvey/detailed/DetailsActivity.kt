@@ -21,6 +21,7 @@ import me.jludden.reeflifesurvey.data.*
 import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.setUpFavoritesButton
 import me.jludden.reeflifesurvey.data.DataSource.*
 import me.jludden.reeflifesurvey.data.model.*
+import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.FAVORITES_OUTLINE_WHITE
 import me.jludden.reeflifesurvey.data.utils.StoredImageLoader
 
 /**
@@ -39,7 +40,7 @@ class DetailsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_details)
 
         //supporting postpone enter transition, but it can be very slow
-        //currently only postponing transition for cardview -> details
+        //currently only postponing transition for fish species
         // supportPostponeEnterTransition() //postpone transition until the image is loaded
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true) // show back button
@@ -229,7 +230,7 @@ class DetailsActivity : AppCompatActivity() {
         if(speciesCard == null) {
             favoriteBtn.visibility = View.GONE
         } else {
-            setUpFavoritesButton(speciesCard, favoriteBtn, this, true)
+            setUpFavoritesButton(speciesCard, favoriteBtn, this, -1, FAVORITES_OUTLINE_WHITE)
         }
 
         return true

@@ -1,6 +1,8 @@
 package me.jludden.reeflifesurvey.data.model;
 
+import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -128,6 +130,7 @@ public class SurveySiteList {
             if(CODE_MAP.containsKey(siteCode)){
                 sitesLoaded.append(siteCode);
                 SELECTED_SURVEY_SITES.addAll(CODE_MAP.get(siteCode));
+                updateFavoritesCached(true);
             }
             else {
                 Log.e("jludden.reeflifesurvey"  ,"Loading Favorite Sites: unable to resolve favorited site key: "+siteCode);
@@ -152,6 +155,7 @@ public class SurveySiteList {
         else{
             SELECTED_SURVEY_SITES.addAll(list);
             updateFavSites(getFavoritedSiteCodes(), context);
+            updateFavoritesCached(true);
         }
     }
 
@@ -161,8 +165,15 @@ public class SurveySiteList {
             Log.e("jludden.reeflifesurvey"  ,"Removing favorite site - unable to resolve sites corresponding to code: "+siteCode);
         }
         else {
+            updateFavoritesCached(false);
             SELECTED_SURVEY_SITES.removeAll(list);
             updateFavSites(getFavoritedSiteCodes(), context);
+        }
+    }
+
+    private void updateFavoritesCached(Boolean favorited) {
+        for(SurveySite site : SELECTED_SURVEY_SITES){
+            site.setCachedFavorited(favorited);
         }
     }
 
@@ -170,7 +181,7 @@ public class SurveySiteList {
      * Class to represent a Survey Site location
      *  Only weird thing is that there are
      */
-    public static class SurveySite implements SearchResultable {
+    public static class SurveySite implements SearchResultable, Favoritable {
         public SurveySite(String combinedCode) {
             String[] parts = combinedCode.trim().split("(?=\\d)", 2);
             //Log.d("jludden.reeflifesurvey"  , "surveysite codes:" + combinedCode);
@@ -294,6 +305,39 @@ public class SurveySiteList {
             }
 
             return new SearchResult(name, description, SearchResultType.SurveySiteLocation, code);
+        }
+
+
+        /**
+         * TODO implement the Favoritable interface, instead of having all the logic at the SurveySiteList level
+         */
+        private boolean cachedFavorited = false; //favorited value that should hopefully be up to date, but the source of truth is {@link SurveySiteList.SELECTED_SURVEY_SITES}
+
+        private void setCachedFavorited(boolean favorited){
+            cachedFavorited = favorited;
+        }
+
+        /**
+         * @return the cached value of the favorites field
+         */
+        @Override
+        public boolean getFavorited() {
+            return getFavorited(null);
+        }
+
+        /**
+         * TODO updating SharedPreferences currently handled in MapViewFragment and SurveySiteList
+         */
+        @Override
+        public boolean getFavorited(@Nullable Activity activity) {
+            return cachedFavorited;
+        }
+
+        /**
+         * TODO updating SharedPreferences currently handled in MapViewFragment and SurveySiteList
+         */
+        @Override
+        public void setFavorited(boolean favorited, Activity activity) {
         }
     }
 }

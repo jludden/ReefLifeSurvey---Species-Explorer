@@ -3,9 +3,11 @@ package me.jludden.reeflifesurvey.data.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,17 +38,44 @@ public class SharedPreferencesUtils {
     public static final int FAVORITES_SELECTED = R.drawable.ic_favorite_heart_filled_trim;
 
 
+    //defines the interface for an item that has a favorites button and saves the favorited status to SharedPreferences
+    public interface Favoritable {
+        /**
+         * @return the cached value of the favorites field
+         */
+        public boolean getFavorited();
 
-    public static void setUpFavoritesButton(final FishSpecies cardDetails, final CheckBox favoriteBtn, final Activity activity) {
-        setUpFavoritesButton(cardDetails, favoriteBtn, activity, false);
+        /**
+         * Updates and returns the favorited value from SharedPreferences
+         * @param activity if null return the local cached value (default false)
+         * @return the updated value of the favorites field
+         */
+        public boolean getFavorited(@Nullable Activity activity);
+
+        /**
+         * Sets the updated favorites value
+         */
+        public void setFavorited(boolean favorited, Activity activity);
     }
 
-    //set up the favorites button initial state and onclick listener
-    public static void setUpFavoritesButton(final FishSpecies cardDetails, final CheckBox favoriteBtn, final Activity activity, final Boolean useWhiteOutline){
-        if(cardDetails.getFavorited(activity)) {
-            favoriteBtn.setButtonDrawable(FAVORITES_SELECTED); //todo check the SharedPreferences cache
+    public static void setUpFavoritesButton(final Favoritable item, final CheckBox favoriteBtn, final Activity activity) {
+        setUpFavoritesButton(item, favoriteBtn, activity, -1, -1);
+    }
+
+
+    /**
+     * set up the favorites button initial state and onclick listener
+     * @param item FishSpecies or SurveySite that can be favorited
+     * @param favoriteBtn
+     * @param activity
+     * @param altSelected -1 for default favorited drawable icon, or resID
+     * @param altUnselected -1 for default unfavorited drawable icon, or resID
+     */
+    public static void setUpFavoritesButton(final Favoritable item, final CheckBox favoriteBtn, final Activity activity, final int altSelected, final int altUnselected){
+        if(item.getFavorited(activity)) {
+            favoriteBtn.setButtonDrawable(altSelected == -1 ? FAVORITES_SELECTED : altSelected); //todo check the SharedPreferences cache
         } else {
-            favoriteBtn.setButtonDrawable(useWhiteOutline? FAVORITES_OUTLINE_WHITE : FAVORITES_OUTLINE);
+            favoriteBtn.setButtonDrawable(altUnselected == -1 ? FAVORITES_OUTLINE : altUnselected);
         }
 
         //set up favorites star button
@@ -54,24 +83,31 @@ public class SharedPreferencesUtils {
         {
             @Override
             public void onClick (View v){
-            onFavoritesButtonClick(cardDetails, favoriteBtn, activity, useWhiteOutline);
+            onFavoritesButtonClick(item, favoriteBtn, activity, altSelected, altUnselected);
         }
         });
     }
 
     //set up the on click listener for a favorites button
-    //todo unhappy about direct refernces to carddetails.favorited
-    public static void onFavoritesButtonClick(final FishSpecies cardDetails, final CheckBox favoriteBtn, final Activity activity, final Boolean useWhiteOutline) {
-        Log.d(TAG, "Favorites Button onClick. now favorited: " + !cardDetails.favorited);
+    private static void onFavoritesButtonClick(final Favoritable item, final CheckBox favoriteBtn, final Activity activity, final int altSelected, final int altUnselected) {
+        Log.d(TAG, "Favorites Button onClick. now favorited: " + !item.getFavorited(null));
 
-        if (cardDetails.favorited) {
-            favoriteBtn.setButtonDrawable(useWhiteOutline? FAVORITES_OUTLINE_WHITE : FAVORITES_OUTLINE);
-            cardDetails.favorited = false;
+        if (item.getFavorited()) {
+            item.setFavorited(false, activity);
+            favoriteBtn.setButtonDrawable(altUnselected == -1 ? FAVORITES_OUTLINE : altUnselected);
         } else {
-            cardDetails.favorited = true;
-            favoriteBtn.setButtonDrawable(FAVORITES_SELECTED);
+            item.setFavorited(true, activity);
+            favoriteBtn.setButtonDrawable(altSelected == -1 ? FAVORITES_SELECTED : altSelected);
         }
-        savePref(cardDetails.id, FishSpecies.PREF_FAVORITED, cardDetails.favorited, activity);
+    }
+
+    //separate implementation for my wonky map FAB todo can I combine them?
+    public static void setSiteFavoritedDrawable(final Favoritable item, final ImageButton favoriteBtn) {
+        if(item.getFavorited()){
+            favoriteBtn.setImageResource(R.drawable.ic_favorites_heart_filled_two);
+        } else {
+            favoriteBtn.setImageResource(R.drawable.ic_favorite_heart_outline_trim_white);
+        }
     }
 
 

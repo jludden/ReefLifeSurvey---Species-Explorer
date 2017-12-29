@@ -189,7 +189,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         int realPosition;
         FishSpecies cardDetails;
         //loop through each displayed item in the adapter
-        //NOTE THIS WILL ONLY WORK TO HIDE, not to
+        //NOTE THIS WILL ONLY WORK TO HIDE
         int i = 1;
         while(i < getItemCount()){
             realPosition = getDataSourcePosition(i);
@@ -306,15 +306,16 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
              * Invoked in a worker thread to filter the data according to the
              * constraint. When the constraint is null, the original
              * data must be restored.
-             * TODO i aint doing nothing here. could implement faster filtering...
-             * @param constraint the constraint used to filter the data
+             * TODO un-implemented filtering by search string
+             * @param constraint the constraint used to filter the data (currently unused - its the search string)
              * @return the results of the filtering operation THE LIST<STRING> of CARDS TO REMOVE
              */
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 Log.d(TAG,"CardViewAdapter getFilter() - background thread performFiltering(). constraint: "+constraint+" filterFAV: "+ CardViewFragment.CardViewSettings.FILTER_FAVORITES);
 
-                if(constraint == "" || constraint.length() <= 0){ //restore the original list
+                //code to filter by search string - currently unused
+                /*if(constraint == "" || constraint.length() <= 0){ //restore the original list
                     //results.values = mCardList;
                     //results.count = mCardList.size();
                     return null; //we will do additional filtering on UI thread and animate out the cards
@@ -322,8 +323,6 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 else {
                     FilterResults results = new FilterResults();
                     List<String> removeList = new ArrayList<>();
-
-                    //todo refactor this whole method
                     for(FishSpecies card : mCardList){
                         if(!card.cardName.toLowerCase().contains(constraint)&&
                                 !card.commonNames.toLowerCase().contains(constraint))
@@ -333,8 +332,24 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     results.values = removeList;
                     results.count = removeList.size();
                     return results;
-                }
+                }*/
                // return results;
+
+                //filtering by favorites
+                if(CardViewFragment.CardViewSettings.FILTER_FAVORITES) {
+                    List<String> removeList = new ArrayList<>();
+                    for(FishSpecies card : mCardList){
+                        if (!card.getFavorited(mCardViewFragment.getActivity())) {
+                            removeList.add(card.getId());
+                        }
+                    }
+                    FilterResults results = new FilterResults();
+                    results.values = removeList;
+                    results.count = removeList.size();
+                    return results;
+                }
+                else return null;
+
             }
 
             /**
@@ -356,13 +371,15 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 //                        updateItems((List<InfoCard.FishSpecies>) results.values);
 //                    }
                 }
-                else if(!((constraint == "" || constraint.length() <= 0))){
+//                else if(!((constraint == "" || constraint.length() <= 0))){
+                else {
                     mHiddenList = new ArrayList<>();
                     mHiddenList.addAll((List<String>) results.values);
                     notifyDataSetChanged();
                 }
                // else{ //filter out cards, one at a time. this could use the same model as the restore, but this way we have animations
-                    if(CardViewFragment.CardViewSettings.FILTER_FAVORITES)  applyFilter();
+                  // this method is a lot slower, but it does animate the cards going out
+                //  if(CardViewFragment.CardViewSettings.FILTER_FAVORITES)  applyFilter();
                 //}
 
 
