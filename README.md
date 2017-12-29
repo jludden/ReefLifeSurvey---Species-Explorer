@@ -13,7 +13,7 @@ ReefLifeSurvey brings the world's coral reefs and tropical fish to life!
 
 ## Contributing
 
-Feel free to fork! Ideally any new classes will be written in Kotlin. For an example written in Kotlin with MVP architecture and [RxAndroid](https://github.com/ReactiveX/RxAndroid), please see [Search Activity](app\src\main\java\me\jludden\reeflifesurvey\search) and related classes.
+Feel free to fork! Ideally any new classes will be written in Kotlin. For an example written in Kotlin with MVP architecture and [RxAndroid](https://github.com/ReactiveX/RxAndroid), please see [Search Activity](app/src/main/java/me/jludden/reeflifesurvey/search) and related classes.
 
 Also, please consider donating to [ReefLifeSurvey](https://reeflifesurvey.com/how-to/)
 
@@ -28,5 +28,5 @@ This project is licensed under the GNU General Public License - see the [LICENSE
 ## Acknowledgments
 
 * Heavily inspired by, and using the same datasource, as [Yanir Seroussi's](https://yanirseroussi.com/) [RLS frequency-explorer](https://github.com/yanirs/yanirs.github.io/tree/master/tools/rls)
-* (Plaid)[https://github.com/nickbutcher/plaid]
-* (Android Architecture Blueprints)[https://github.com/googlesamples/android-architecture]
+* [Plaid](https://github.com/nickbutcher/plaid)
+* [Android Architecture Blueprints](https://github.com/googlesamples/android-architecture)
