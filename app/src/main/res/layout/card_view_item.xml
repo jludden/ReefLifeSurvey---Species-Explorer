@@ -55,20 +55,21 @@
             android:minLines="1"
             android:maxLines="3"
             android:ellipsize="end"
-            android:paddingEnd="30dp"
-            android:paddingStart="30dp"
+            android:paddingEnd="44dp"
+            android:paddingStart="20dp"
             android:padding="16dp"/>
 
         <CheckBox
             android:id="@+id/favorite_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/info_text"
+            android:layout_below="@+id/card_image"
             android:layout_alignBottom="@+id/info_text"
+            android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
             android:button="@drawable/ic_favorite_heart_outline"
-            android:paddingEnd="8dp"
-            android:paddingStart="2dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="0dp"
             android:paddingTop="12dp" />
 
     </RelativeLayout>
