@@ -8,8 +8,18 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
+<!--
         <ImageView
+            android:id="@+id/details_image_main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:transitionName="@string/transition_launch_details"
+            android:contentDescription="@string/image_primary_content_description" />-->
+
+        <me.jludden.reeflifesurvey.customviews.TouchImageView
             android:id="@+id/details_image_main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

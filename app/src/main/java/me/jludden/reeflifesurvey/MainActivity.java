@@ -80,15 +80,10 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_main);
         setTheme(R.style.AppTheme_NoActionBar);
-        setContentView(R.layout.app_bar_main);
-
+        setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-
-        /*Caused by: java.lang.IllegalStateException: This Activity already has an action bar supplied by the window decor. Do not request Window.FEATURE_SUPPORT_ACTION_BAR and set windowActionBar to false in your theme to use a Toolbar instead.*/
-        setSupportActionBar(toolbar); //todo could this be the collapsing toolbar?
-
-
+        setSupportActionBar(toolbar);
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         //This will set Expanded text to transparent so it wont overlap the content of the toolbar
         collapsingToolbar.setExpandedTitleColor(Color.parseColor("#00FF0000"));//ContextCompat.getColor(this, R.color.transparent));
@@ -127,22 +122,6 @@ public class MainActivity extends AppCompatActivity implements
 //Set the color of collapsed toolbar text
      //   collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
 
-        Button quizButton = (Button) findViewById(R.id.toolbar_button_quiz);
-        quizButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                launchFullScreenQuizModeActivity();
-            }
-        });
-        ((Button) findViewById(R.id.toolbar_button_store_offline)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CardViewFragment viewFragment = (CardViewFragment) getSupportFragmentManager().findFragmentByTag(CardViewFragment.TAG);
-                if (viewFragment != null && viewFragment.isVisible()) {
-                    viewFragment.storeInLocal();
-                }
-            }
-        });
 
         ToggleButton mToolbarButton_starred = (ToggleButton) findViewById(R.id.toolbar_button_filter_favorites);
         mToolbarButton_starred.setOnCheckedChangeListener(this);
@@ -236,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements
              */
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                Log.d("jludden.reeflifesurvey"  , "Bottom Sheet OnStateChanged: "+newState);
+                Log.d(TAG  , "Bottom Sheet OnStateChanged: "+newState);
             }
 
             /**
@@ -298,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements
     // Inflate the menu; this adds items to the action bar if it is present.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.main_toolbar, menu);
         return true;
     }
 
@@ -373,10 +352,10 @@ public class MainActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch(requestCode){
             case(SearchActivity.REQUEST_CODE):
-                Log.d(TAG,"main activity onactivity result FROM SEARCH ACTIVITY");
+                Log.d(TAG,"main_toolbar activity onactivity result FROM SEARCH ACTIVITY");
                 break;
             case(DetailsActivity.REQUEST_CODE):
-                Log.d(TAG, "main activity onactivity result FROM DETAIL ACTIVITY");
+                Log.d(TAG, "main_toolbar activity onactivity result FROM DETAIL ACTIVITY");
                 CardViewFragment viewFragment = (CardViewFragment) getSupportFragmentManager().findFragmentByTag(CardViewFragment.TAG);
                 if(viewFragment != null) viewFragment.mRecyclerView.getAdapter().notifyDataSetChanged(); //possibly update favorites icon
                 break;
@@ -459,7 +438,7 @@ public class MainActivity extends AppCompatActivity implements
         Intent i = getIntent();
         FishSpecies cardInfo = (FishSpecies) i.getParcelableExtra("cardInfo");
         //
-        //                if(cardInfo != null)   Log.d("jludden.reeflifesurvey"  ,"mFAB onclick. cardinfo name"+cardInfo.cardName);
+        //                if(cardInfo != null)   Log.d("jludden.reeflifesurvey"  ,"mFAB onclick. cardinfo name"+cardInfo.scientificName);
         //
         //                //try passing some data to the new fragment
         //                ImageViewFragment imgFragment = new ImageViewFragment();
@@ -531,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements
         int index = 0;
         Techniques anim = animateIn ? SlideInUp : SlideOutDown;
         int rotation = animateIn ? 90 : 0;
-        ObjectAnimator.ofFloat(mFAB, "rotation", rotation).setDuration(FAB_ONCLICK_ANIMATION_DURATION).start(); //rotate the main FAB
+        ObjectAnimator.ofFloat(mFAB, "rotation", rotation).setDuration(FAB_ONCLICK_ANIMATION_DURATION).start(); //rotate the main_toolbar FAB
         for(FloatingActionButton fab : fabArray) {
             YoYo.with(anim)
                     .interpolate(new AnticipateOvershootInterpolator()) //overshoots and bounces back
@@ -584,7 +563,7 @@ public class MainActivity extends AppCompatActivity implements
 //        Log.d("jludden.reeflifesurvey"  ,"mainFAB bottomMargin: "+ mainFABparams.bottomMargin + " keyline: "+mainFABparams.keyline
 //            +"  height: "+mainFABparams.height + " topMargin: "+ mainFABparams.topMargin + " measuredheight: "+mFAB.getMeasuredHeight() );
 //
-//        View btmSheet = findViewById(R.id.bottom_sheet);
+//        View btmSheet = findViewById(R.id.maps_bottom_sheet);
 //        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(btmSheet);
 //
 //        CoordinatorLayout.LayoutParams btmSheetFABparams = (CoordinatorLayout.LayoutParams) btmSheet.getLayoutParams();
@@ -604,7 +583,7 @@ public class MainActivity extends AppCompatActivity implements
 
         Log.d("jludden.reeflifesurvey"  ,"bottomMargin before: "+ layoutParams.bottomMargin);
         layoutParams.bottomMargin = (int) (layoutParams.bottomMargin + direction * fab.getHeight() * (1.7 * (fabIndex))); //add or subtract from the current bottom margin
-        //layoutParams.bottomMargin = (int) (offset + direction * fab.getHeight() * (1.7 * (fabIndex))); //add or subtract from an offset - the estimated position of the main FAB
+        //layoutParams.bottomMargin = (int) (offset + direction * fab.getHeight() * (1.7 * (fabIndex))); //add or subtract from an offset - the estimated position of the main_toolbar FAB
 
         //if(!animateIn) layoutParams.bottomMargin = 40;
         Log.d("jludden.reeflifesurvey"  ,"bottomMargin after: "+ layoutParams.bottomMargin);
@@ -726,11 +705,6 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 }
                 break;
-/*            case(R.id.toolbar_button_store_offline):
-                if (viewFragment != null && viewFragment.isVisible()) {
-                    viewFragment.storeInLocal();
-                }
-                break;*/
             default: //handle survey site location button pressed
                 Log.d(TAG,"unhandled toggle button (#"+buttonView.getId()+") pressed: "+buttonView.getText());
 

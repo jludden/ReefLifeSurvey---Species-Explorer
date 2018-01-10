@@ -68,6 +68,7 @@
     <string name="site_removed">Removed</string>
     <string name="select_a_site">Select a location to add it to the list</string>
     <string name="search_view_max_items_displayed">More results not shown</string>
+    <string name="action_fullscreen">fullscreen</string>
 
 
 </resources>

@@ -127,12 +127,13 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 } else {
                     picasso
                             .load(cardDetails.getPrimaryImageURL())
+                            //.fit() todo possibly less memory used
                             .placeholder(R.drawable.ic_menu_camera)
                             .into(vhItem.mImageView);
                 }
             }
 
-            vhItem.mOverlayView.setText(cardDetails.cardName); //picture overlay text
+            vhItem.mOverlayView.setText(cardDetails.scientificName); //picture overlay text
 
             //set up details below image
             vhItem.mContentView.setText(cardDetails.toString());
@@ -324,7 +325,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     FilterResults results = new FilterResults();
                     List<String> removeList = new ArrayList<>();
                     for(FishSpecies card : mCardList){
-                        if(!card.cardName.toLowerCase().contains(constraint)&&
+                        if(!card.scientificName.toLowerCase().contains(constraint)&&
                                 !card.commonNames.toLowerCase().contains(constraint))
                             removeList.add(card.getId());
                     }

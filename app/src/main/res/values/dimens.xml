@@ -10,4 +10,5 @@
     <dimen name="padding_normal">16dp</dimen>
     <dimen name="drag_dismiss_distance">112dp</dimen>
     <dimen name="spacing_normal">8dp</dimen>
+    <dimen name="imageDrawer_height">120dp</dimen>
 </resources>

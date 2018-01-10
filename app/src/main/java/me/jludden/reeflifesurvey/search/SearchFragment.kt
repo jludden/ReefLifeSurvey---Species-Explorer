@@ -129,9 +129,7 @@ class SearchFragment : Fragment(), SearchContract.View {
             }
         }
 
-        fun ViewGroup.inflate(layoutRes: Int): View {
-            return LayoutInflater.from(context).inflate(layoutRes, this, false)
-        }
+        fun ViewGroup.inflate(layoutRes: Int) : View = LayoutInflater.from(context).inflate(layoutRes, this, false)
 
         override fun getItemCount() = resultsList.size
 
@@ -193,6 +191,7 @@ class SearchFragment : Fragment(), SearchContract.View {
         fun ImageView.loadURL(url: String) {
             Picasso.with(context)
                     .load(url)
+                    .placeholder(R.drawable.ic_menu_camera)
                     .error(R.drawable.ic_menu_camera)
                     .into(this)
 

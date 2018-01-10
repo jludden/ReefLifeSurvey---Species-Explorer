@@ -11,7 +11,6 @@ import android.util.Log;
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 import me.jludden.reeflifesurvey.Injection;
-import me.jludden.reeflifesurvey.MainActivity;
 import me.jludden.reeflifesurvey.data.model.SurveySiteList;
 import me.jludden.reeflifesurvey.data.utils.LoaderUtils;
 import me.jludden.reeflifesurvey.data.utils.StorageUtils;
@@ -35,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static me.jludden.reeflifesurvey.BuildConfig.DEBUG;
 import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.isOnline;
 import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.loadAllSitesStoredOffline;
 
@@ -331,7 +329,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<FishSpecies>> implement
         if(mPassedInSurveySiteCode.equals("")){
             siteList = mSurveySitesList.getFavoritedSitesAll();
             if(siteList.size() > 0)  Log.d(TAG  , "InfoCardLoader setupFishLocations loading "+siteList.size()+" favorite survey sites");
-            else Log.d(TAG, "sInfoCardLoader setupFishLocations no favorite sites or passed in site ");
+            else Log.d(TAG, "InfoCardLoader setupFishLocations no favorite sites or passed in site ");
         } else {
             siteList = mSurveySitesList.getSitesForCode(mPassedInSurveySiteCode);
             Log.d(TAG  , "InfoCardLoader setupFishLocations loading passed in survey site");
@@ -437,7 +435,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<FishSpecies>> implement
      * Created 10/24
      */
     public static FishSpecies parseSpeciesDetailsHelper(FishSpecies fishCard, JSONArray basicData) throws JSONException {
-        fishCard.cardName = basicData.getString(0);
+        fishCard.scientificName = basicData.getString(0);
         fishCard.commonNames = basicData.getString(1);
         fishCard.reefLifeSurveyURL = basicData.getString(2);
 
@@ -488,7 +486,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<FishSpecies>> implement
         offlineCards.subscribe(new Consumer<FishSpecies>() {
             @Override
             public void accept(FishSpecies cardDetails) throws Exception {
-                Log.d(TAG, "load offline accept: "+cardDetails.cardName+" ["+cardDetails.getId()+"]");
+                Log.d(TAG, "load offline accept: "+cardDetails.scientificName +" ["+cardDetails.getId()+"]");
 
                 cardDetails.setOffline(true);
                 mData.add(cardDetails);

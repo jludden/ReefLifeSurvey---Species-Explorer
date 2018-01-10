@@ -2,6 +2,7 @@ package me.jludden.reeflifesurvey.data.model;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -15,7 +16,6 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
-import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils;
 import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.Favoritable;
 import me.jludden.reeflifesurvey.data.utils.StoredImageLoader;
 
@@ -31,7 +31,7 @@ import static me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.savePr
  */
 public class FishSpecies implements Parcelable, Comparable, SearchResultable, Favoritable {
     public final String id;
-    public String cardName;
+    public String scientificName;
     public String commonNames;
     public int numSightings; //TODO
     public Dictionary<SurveySiteList.SurveySite, Integer> FoundInSites = new Hashtable<>();
@@ -119,7 +119,7 @@ public class FishSpecies implements Parcelable, Comparable, SearchResultable, Fa
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeString(cardName);
+        dest.writeString(scientificName);
         dest.writeString(commonNames);
     }
 
@@ -137,7 +137,7 @@ public class FishSpecies implements Parcelable, Comparable, SearchResultable, Fa
     //constructor for FishSpecies that takes a Parcel
     private FishSpecies(Parcel in){
         id = in.readString();
-        cardName = in.readString();
+        scientificName = in.readString();
         commonNames = in.readString();
      //   imageBitmap = in.readParcelable(Bitmap.class.getClassLoader());
     }
@@ -185,7 +185,7 @@ public class FishSpecies implements Parcelable, Comparable, SearchResultable, Fa
 
     public String getPrimaryImageURL() {
         if(imageURLs == null || imageURLs.get(0) == null) {
-            Log.d(TAG, "Card "+getId()+ "-"+cardName+" no primary URL found");
+            Log.d(TAG, "Card "+getId()+ "-"+ scientificName +" no primary URL found");
             return "";
         } else {
             return imageURLs.get(0);
@@ -194,13 +194,13 @@ public class FishSpecies implements Parcelable, Comparable, SearchResultable, Fa
 
     @Override
     public boolean matchesQuery(@NotNull String query) {
-        return cardName.toLowerCase().contains(query) || commonNames.toLowerCase().contains(query);
+        return scientificName.toLowerCase().contains(query) || commonNames.toLowerCase().contains(query);
     }
 
     @NotNull
     @Override
     public SearchResult createResult(@NotNull String query) {
-        return new SearchResult(cardName, commonNames, getPrimaryImageURL(), SearchResultType.FishSpecies, getId());
+        return new SearchResult(scientificName, commonNames, getPrimaryImageURL(), SearchResultType.FishSpecies, getId());
     }
 
     /**

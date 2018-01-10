@@ -6,6 +6,7 @@
     <item android:id="@+id/action_search"
         android:title="@string/action_search"
         android:icon="@drawable/ic_search_24dp"
+        android:orderInCategory="1"
         app:showAsAction="always"/>
 
     <!--<item android:id="@+id/action_search"-->
@@ -15,8 +16,10 @@
 
     <item android:id="@+id/settings_opt_del_favorite_sites"
         android:icon="@drawable/ic_menu_camera"
+        android:title="@string/del_favorite_sites"
+        android:orderInCategory="4"
         app:showAsAction="never"
-        android:title="@string/del_favorite_sites"/>
+        />
 
 <!--    <item android:id="@+id/settings_opt_del_favorite_species"
         android:icon="@drawable/ic_menu_camera"
@@ -25,11 +28,13 @@
 
     <item android:id="@+id/settings_opt_del_offline_sites"
         android:icon="@drawable/ic_store_offline"
-        app:showAsAction="never"
-        android:title="@string/del_offline_sites"/>
+        android:title="@string/del_offline_sites"
+        android:orderInCategory="4"
+        app:showAsAction="never" />
 
     <item android:id="@+id/settings_opt_about"
         android:icon="@drawable/ic_menu_share"
-        app:showAsAction="never"
-        android:title="@string/about_app" />
+        android:title="@string/about_app"
+        android:orderInCategory="5"
+        app:showAsAction="never" />
 </menu>

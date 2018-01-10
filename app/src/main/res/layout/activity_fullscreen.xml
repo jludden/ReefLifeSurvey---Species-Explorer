@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_layout"
+    android:background="@color/black"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <me.jludden.reeflifesurvey.customviews.ExtendedViewPager
+        android:id="@+id/fullscreen_activity_pager"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+         />
+
+    <me.jludden.reeflifesurvey.customviews.ImageDrawer
+        android:id="@+id/image_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:alpha="0.7"
+        android:background="@color/black_semi_transparent"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="90dp"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"/>
+
+
+    <!-- TODO-using layout below to keep the viewpager from covering the button-->
+    <!--android:elevation="1dp"
+        android:layout_below="@+id/button_close"-->
+
+    <!--<Button
+        android:id="@+id/button_close"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        app:srcCompat="@drawable/ic_close"
+        android:background="@drawable/button_background"
+        android:textColor="#ffffff"
+        android:text="Close" />-->
+    <ImageButton
+        android:id="@+id/button_close"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        app:layout_anchor="@+id/fullscreen_activity_pager"
+        app:layout_anchorGravity="top|right"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="15dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:src="@drawable/ic_button_cancel"
+        android:background="?android:selectableItemBackgroundBorderless" />
+
+    <ImageButton
+        android:id="@+id/button_show_hud"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        app:layout_anchor="@id/fullscreen_activity_pager"
+        app:layout_anchorGravity="top|right"
+        android:layout_marginEnd="45dp"
+        android:layout_marginTop="15dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:src="@drawable/ic_button_info"
+        android:background="?android:selectableItemBackgroundBorderless" />
+
+<!--todo del
+         android:background="@drawable/button_background"
+        ic_info
+        ic_close
+-->
+
+    <TextView
+        android:id="@+id/details_text"
+        android:background="@color/black_semi_transparent"
+        app:layout_anchor="@+id/fullscreen_activity_pager"
+        app:layout_anchorGravity="top|left"
+        android:textColor="#ffffff"
+        android:layout_width="200dp"
+        android:layout_height="80dp"
+        android:visibility="gone"
+        android:alpha="0.7"/>
+
+
+
+</android.support.design.widget.CoordinatorLayout>

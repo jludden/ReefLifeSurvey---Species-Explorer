@@ -342,7 +342,7 @@ class SaveToStorageTask(private val root: String, private val speciesToDownload:
                             saveToInternalStorage(bitmap, root, it.getFileName(0))
                         }
                         else {
-                            Log.e(StorageUtils.TAG, "Failed to download image for ${it.cardName} [${it.getId()}]: ${it.primaryImageURL}")
+                            Log.e(StorageUtils.TAG, "Failed to download image for ${it.scientificName} [${it.getId()}]: ${it.primaryImageURL}")
                             success = false
                         }
                     } catch (e: IOException){

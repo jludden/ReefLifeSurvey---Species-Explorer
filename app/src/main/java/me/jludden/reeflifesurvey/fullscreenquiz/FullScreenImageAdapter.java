@@ -26,13 +26,15 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
-
+import me.jludden.reeflifesurvey.fullscreenquiz.FullScreenImageListener;
+import me.jludden.reeflifesurvey.customviews.TouchImageView;
 import me.jludden.reeflifesurvey.data.model.FishSpecies;
 import me.jludden.reeflifesurvey.R;
 
 
 public class FullScreenImageAdapter extends PagerAdapter {
 
+    private final FullScreenImageListener mListener;
     private Activity mActivity;
     private LayoutInflater mLayoutInflater;
     private List<FishSpecies> mCardList;
@@ -40,9 +42,10 @@ public class FullScreenImageAdapter extends PagerAdapter {
     private int mCurrentPos;
 
     // constructor
-    public FullScreenImageAdapter(Activity activity) {
+    public FullScreenImageAdapter(Activity activity, FullScreenImageListener listener) {
         this.mActivity = activity;
         this.mCardList = new ArrayList<>();
+        this.mListener = listener;
     }
 
     @Override
@@ -59,12 +62,13 @@ public class FullScreenImageAdapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, int position) {
         mCurrentPos = position;
 
+
          //Add Image View
         Button btnClose;
         mLayoutInflater = (LayoutInflater) mActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View viewLayout = mLayoutInflater.inflate(R.layout.image_pager_item, container, false);
         //viewLayout.setRotationY(180); //todo testing
-        mImgDisplay = (ImageView) viewLayout.findViewById(R.id.full_screen_image_view);
+        mImgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_view);
         container.addView(viewLayout);
 
         //Log.d("jludden.reeflifesurvey"  , "FullScreenImageAdapter instantiateItem mCardList empty:"+mCardList.isEmpty());
@@ -73,6 +77,7 @@ public class FullScreenImageAdapter extends PagerAdapter {
         if(!mCardList.isEmpty()){
            // Log.d("jludden.reeflifesurvey"  , "FullScreenImageAdapter instantiateItem mCardList not empty");
             FishSpecies cardDetails = mCardList.get(position);
+//            mListener.updateItemDescription(cardDetails);
 
             //set up image
             Picasso.with(mActivity)
@@ -135,5 +140,13 @@ public class FullScreenImageAdapter extends PagerAdapter {
 //            Snackbar.make(rootView, description, Snackbar.LENGTH_SHORT).show();
 
         }
+    }
+
+    public int findPageForItem(FishSpecies speciesID) {
+        return mCardList.indexOf(speciesID);
+    }
+
+    public FishSpecies findItemForPage(int page) {
+        return mCardList.get(page);
     }
 }

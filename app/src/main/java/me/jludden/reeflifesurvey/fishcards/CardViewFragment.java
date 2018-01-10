@@ -15,6 +15,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -28,6 +31,7 @@ import com.squareup.picasso.Picasso;
 import org.jetbrains.annotations.NotNull;
 
 import me.jludden.reeflifesurvey.Injection;
+import me.jludden.reeflifesurvey.MainActivity;
 import me.jludden.reeflifesurvey.data.DataRepository;
 import me.jludden.reeflifesurvey.data.InfoCardLoader;
 import me.jludden.reeflifesurvey.data.utils.StorageUtils;
@@ -37,7 +41,12 @@ import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.data.model.FishSpecies;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.checkInternetConnection;
 
@@ -140,6 +149,7 @@ public class CardViewFragment extends Fragment implements
         }
 
         checkInternetConnection(getActivity(), "www.reeflifesurvey.com", R.string.no_internet_detected);
+        setHasOptionsMenu(true);
 
         Log.d("jludden.reeflifesurvey"  ,"CardViewFragment Created. Card type: "+mCardType);
 
@@ -406,8 +416,7 @@ public class CardViewFragment extends Fragment implements
         LinearLayout toolbarLayout = (LinearLayout) getActivity().findViewById(R.id.toolbar_layout);
         //todo try getSupportActionBar
         if(toolbarLayout == null ) return;
-
-        int offset=3;//TODO this is the number of buttons before the survey sites
+        int offset = 1;//TODO this is the number of buttons before the survey sites
 
         //remove the previously added site buttons
         int childCount = toolbarLayout.getChildCount()-offset;
@@ -443,7 +452,7 @@ public class CardViewFragment extends Fragment implements
 
             List<String> favCodes = sites.getFavoritedSiteCodes();
 
-            if(sites.size() > 1){ //can't handle multiple sites yet
+            if(favCodes.size() != 1){ //can't handle multiple sites yet
                 topImage.setImageDrawable(getActivity().getDrawable(R.drawable.rls_logo_horizontal_rev));
                 return;
             }
@@ -503,6 +512,30 @@ public class CardViewFragment extends Fragment implements
             onLoadMore(true);
         }
     }
+
+    //region override options menu for card fragment specific toolbar items
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.cardview_toolbar, menu); //main activity menu already inflated - add to it
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) { //handle items in cardview_toolbar. rest handled in MainActivity
+            case R.id.action_fullscreen:
+                Log.d(TAG,"options select action fullscreen");
+                ((MainActivity) getActivity()).launchFullScreenQuizModeActivity();
+                return true;
+            case R.id.action_download_site:
+                Log.d(TAG,"options select action download");
+                storeInLocal();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    //endregion
 
     public static class CardViewSettings {
         public static boolean LOAD_ALL = false;

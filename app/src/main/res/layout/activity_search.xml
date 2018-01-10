@@ -111,7 +111,7 @@
         -->
         <!-- Include the bottom sheet -->
    <!--     <me.jludden.reeflifesurvey.InterfaceComponents.BottomSheet
-            android:id="@+id/bottom_sheet"
+            android:id="@maps_bottom_sheetheet"
             android:layout_width="match_parent"
             android:layout_height="450dp"
             android:background="@android:color/darker_gray"

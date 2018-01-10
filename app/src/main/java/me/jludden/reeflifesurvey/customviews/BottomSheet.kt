@@ -11,7 +11,7 @@ import com.daimajia.slider.library.SliderLayout
 import com.daimajia.slider.library.SliderTypes.BaseSliderView
 import com.daimajia.slider.library.SliderTypes.TextSliderView
 import me.jludden.reeflifesurvey.data.DataSource.*
-import kotlinx.android.synthetic.main.bottom_sheet.view.*
+import kotlinx.android.synthetic.main.maps_bottom_sheet.view.*
 import me.jludden.reeflifesurvey.Injection
 import me.jludden.reeflifesurvey.data.*
 import me.jludden.reeflifesurvey.R
@@ -50,9 +50,11 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
     private fun inflateViews(context: Context) {
         val inflater = context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        inflater.inflate(R.layout.bottom_sheet, this)
+        inflater.inflate(R.layout.maps_bottom_sheet, this)
 
-        if (context is OnBottomSheetInteractionListener) interactionListener = context else TODO()
+        if (context is OnBottomSheetInteractionListener) interactionListener = context
+        else throw RuntimeException("$context must implement BottomSheet.OnBottomSheetInteractionListener")
+
 
         dataRepo = Injection.provideDataRepository(context.applicationContext)
         imageSliders = findViewById(R.id.site_preview_carousel)
@@ -117,7 +119,7 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
 
     //creates a TextSliderView (a fish preview image, with description and onclick listener) that can be added to a SliderLayout (an image carousel of fish previews)
     private fun addSliderImage(card: FishSpecies) {
-        val name = card.cardName
+        val name = card.scientificName
         val textSliderView = TextSliderView(context)
         textSliderView
                 .description(name)

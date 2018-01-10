@@ -18,20 +18,6 @@ Defines a layout for buttons, filters, and other goodies that exist in a horizon
         android:visibility="visible"
         android:id="@+id/toolbar_layout">
 
-        <Button
-            android:id="@+id/toolbar_button_quiz"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:drawableStart="@drawable/ic_fab_fullscreen"
-            android:text="@string/toolbar_button_quiz" />
-
-        <Button
-            android:id="@+id/toolbar_button_store_offline"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:drawableStart="@drawable/ic_store_offline"
-            android:text="@string/toolbar_button_download_offline" />
-
         <ToggleButton
             android:id="@+id/toolbar_button_filter_favorites"
             android:layout_width="wrap_content"

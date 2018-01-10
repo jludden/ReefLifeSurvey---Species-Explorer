@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:theme="@style/AppTheme.AppBarOverlay"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways|snap">
             <!-- scroll|enterAlways|exitUntilCollapsed - will allow the toolbar to start displaying even if the list isn't at the top
                contentScrim - color it takes when completely collapsed
                collapsed height = toolbarheight + marginBottom
@@ -75,7 +75,7 @@
 
 
 
-    <!-- The main content view where fragments are loaded -->
+    <!-- main_toolbarmain content view where fragments are loaded -->
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
@@ -124,8 +124,8 @@
 
     <!--        app:backgroundTint="#FF0000"-->
     <!--        app:layout_behavior="EnhancedFABBehavior"-->
-    <!--        app:layout_anchor="@layout/bottom_sheet"-->
-    <!--        app:layout_anchor="@id/bottom_sheet"-->
+    <!--        app:layout_anchor="@laymaps_bottom_sheetheet"-->
+    <!--        app:layout_anchor="maps_bottom_sheetheet"-->
     <!--        android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"-->
 

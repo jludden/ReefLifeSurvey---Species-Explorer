@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.transition.Transition
 import android.util.Log
 import android.view.Menu
@@ -38,6 +39,9 @@ class DetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_details)
+        val toolbar = findViewById<View>(R.id.details_toolbar) as Toolbar
+        setSupportActionBar(toolbar)
+
 
         //supporting postpone enter transition, but it can be very slow
         //currently only postponing transition for fish species
@@ -120,7 +124,7 @@ class DetailsActivity : AppCompatActivity() {
         val commonNames = findViewById<TextView>(R.id.details_label_common)
 
         speciesCard = card
-        scientificNames.text = card.cardName
+        scientificNames.text = card.scientificName
         commonNames.text = card.commonNames
 
         //set up favorites button
@@ -128,7 +132,7 @@ class DetailsActivity : AppCompatActivity() {
         //setUpFavoritesButton(card, favoriteBtn, this)
 
         //set up toolbar
-        supportActionBar?.title = card.cardName
+        supportActionBar?.title = card.scientificName
         /*val toolbarView = findViewById<View>(R.id.app_bar) as AppBarLayout
 
 
@@ -137,7 +141,7 @@ class DetailsActivity : AppCompatActivity() {
 //        android.widget.CheckBox
 
         val newText = StringBuilder(
-            "Card Name " + card.cardName + "\n" +
+            "Card Name " + card.scientificName + "\n" +
                 "Common Names" + card.commonNames + "\n" +
                 "Num sightings " + card.numSightings + "\n" +
                 "Found in " + card.FoundInSites.size() + " sites" + "\n")
