@@ -39,9 +39,14 @@ import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.data.DataRepository;
 import me.jludden.reeflifesurvey.data.DataSource;
 import me.jludden.reeflifesurvey.data.model.SurveySiteList;
+import me.jludden.reeflifesurvey.data.utils.LoaderUtils.SPECIES_TO_LOAD;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.SPECIES_TO_LOAD.ALL_SPECIES;
+import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.SPECIES_TO_LOAD.FAVORITE_SITES;
+import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.SPECIES_TO_LOAD.SINGLE_SITE;
 
 /**
  * Created by Jason on 9/6/2017.
@@ -86,6 +91,35 @@ public class LoaderUtils {
                 MainActivity.showSimpleSnackbarMessage(activity, activity.getString(message));
             }
         });
+    }
+
+    public enum SPECIES_TO_LOAD {
+        SINGLE_SITE,
+        FAVORITE_SITES,
+        FAVORITE_SPECIES,
+        ALL_SPECIES
+    }
+
+    public static SPECIES_TO_LOAD determineLoadTime(String mPassedInSurveySiteCode, SurveySiteList mSurveySitesList) {
+        List<SurveySiteList.SurveySite> siteList;
+        if(!mPassedInSurveySiteCode.equals("")){
+            siteList = mSurveySitesList.getSitesForCode(mPassedInSurveySiteCode);
+            Log.d("InfoCardLoader", "InfoCardLoader setupFishLocations loading passed in survey site");
+            return SINGLE_SITE;
+        }
+
+        siteList = mSurveySitesList.getFavoritedSitesAll();
+        if(siteList.size() > 0){
+            Log.d("InfoCardLoader", "InfoCardLoader setupFishLocations loading "+siteList.size()+" favorite survey sites");
+            return FAVORITE_SITES;
+        }
+        else {
+            Log.d("InfoCardLoader", "InfoCardLoader setupFishLocations no favorite sites or passed in site ");
+
+            return ALL_SPECIES;
+        }
+
+
     }
 
 

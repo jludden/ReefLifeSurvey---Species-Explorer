@@ -122,8 +122,11 @@ class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnI
         mViewPager.currentItem = page
     }
 
-    override fun onDrawerExpanded() {
+    override fun onDrawerStateChanged(newState: Int) {
         //todo load more!!
+
+
+
     }
 
 
@@ -165,7 +168,7 @@ class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnI
         var count = 0
         for(fish in data) {
             imageDrawer.addItem(BaseDisplayableImage(fish.primaryImageURL, fish))
-//            if(count++ > 5) break //todo
+            if(count++ > 80) break //todo
         }
 
     }

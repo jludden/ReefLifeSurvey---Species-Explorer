@@ -12,6 +12,7 @@ import android.support.v4.view.PagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import android.app.Activity;
 import android.content.Context;
@@ -79,10 +80,16 @@ public class FullScreenImageAdapter extends PagerAdapter {
             FishSpecies cardDetails = mCardList.get(position);
 //            mListener.updateItemDescription(cardDetails);
 
-            //set up image
-            Picasso.with(mActivity)
-                    .load(cardDetails.getPrimaryImageURL())
-                    .into(mImgDisplay);
+            if(Objects.equals(cardDetails.getPrimaryImageURL(), "")){
+                Picasso.with(mActivity)
+                        .load(R.drawable.ic_menu_camera)
+                        .into(mImgDisplay);
+            } else {
+                //set up image
+                Picasso.with(mActivity)
+                        .load(cardDetails.getPrimaryImageURL())
+                        .into(mImgDisplay);
+            }
         }
 
         return viewLayout;
