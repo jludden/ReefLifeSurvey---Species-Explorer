@@ -39,45 +39,10 @@
               <option value="plugin:org.jetbrains.kotlin.android:experimental=false" />
               <option value="plugin:org.jetbrains.kotlin.android:enabled=true" />
               <option value="plugin:org.jetbrains.kotlin.android:defaultCacheImplementation=hashMap" />
-              <option value="plugin:org.jetbrains.kotlin.android:package=me.jludden.reeflifesurvey" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=main;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\main\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=mock;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\mock\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=prod;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\prod\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:package=me.jludden.reeflifesurvey" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=main;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\main\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=mock;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\mock\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=prod;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\prod\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:package=me.jludden.reeflifesurvey" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=main;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\main\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=mock;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\mock\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=prod;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\prod\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:package=me.jludden.reeflifesurvey" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=main;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\main\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=mock;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\mock\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=prod;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\prod\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:package=me.jludden.reeflifesurvey" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=main;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\main\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=mock;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\mock\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=prod;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\prod\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:package=me.jludden.reeflifesurvey" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=main;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\main\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=mock;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\mock\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=prod;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\prod\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:package=me.jludden.reeflifesurvey" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=main;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\main\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=mock;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\mock\res" />
-              <option value="plugin:org.jetbrains.kotlin.android:variant=prod;C:\Users\Jason\Google Drive\AndroidStudioProjects\ReefLifeSurvey\app\src\prod\res" />
             </array>
           </option>
           <option name="pluginClasspaths">
             <array>
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-android-extensions/1.2.10/10eb9a3d66aa7c5e17afdf93116082018d0d4643/kotlin-android-extensions-1.2.10.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-android-extensions/1.2.10/10eb9a3d66aa7c5e17afdf93116082018d0d4643/kotlin-android-extensions-1.2.10.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-android-extensions/1.2.10/10eb9a3d66aa7c5e17afdf93116082018d0d4643/kotlin-android-extensions-1.2.10.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-android-extensions/1.2.10/10eb9a3d66aa7c5e17afdf93116082018d0d4643/kotlin-android-extensions-1.2.10.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-android-extensions/1.2.10/10eb9a3d66aa7c5e17afdf93116082018d0d4643/kotlin-android-extensions-1.2.10.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-android-extensions/1.2.10/10eb9a3d66aa7c5e17afdf93116082018d0d4643/kotlin-android-extensions-1.2.10.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-android-extensions/1.2.10/10eb9a3d66aa7c5e17afdf93116082018d0d4643/kotlin-android-extensions-1.2.10.jar" />
               <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-android-extensions/1.2.10/10eb9a3d66aa7c5e17afdf93116082018d0d4643/kotlin-android-extensions-1.2.10.jar" />
             </array>
           </option>
@@ -85,7 +50,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
     <output url="file://$MODULE_DIR$/build/intermediates/classes/prod/debug" />
     <output-test url="file://$MODULE_DIR$/build/intermediates/classes/test/prod/debug" />
     <exclude-output />
@@ -296,6 +261,5 @@
     <orderEntry type="library" name="com.squareup.leakcanary:leakcanary-watcher:1.5.4@jar" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-tasks-license-11.6.2" level="project" />
     <orderEntry type="library" name="android-android-26" level="project" />
-    <orderEntry type="library" name="com.squareup.leakcanary:leakcanary-android-no-op-1.5.4" level="project" />
   </component>
 </module>

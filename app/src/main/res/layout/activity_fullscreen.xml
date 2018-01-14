@@ -81,7 +81,6 @@
         app:layout_anchor="@+id/fullscreen_activity_pager"
         app:layout_anchorGravity="top|left"
         android:textColor="#ffffff"
-        android:padding="30dp"
         android:layout_width="200dp"
         android:layout_height="80dp"
         android:visibility="gone"

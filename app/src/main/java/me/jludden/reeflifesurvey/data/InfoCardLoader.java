@@ -250,22 +250,55 @@ public class InfoCardLoader extends AsyncTaskLoader<List<FishSpecies>> implement
     private void loadFishCardsIncremental() throws IOException, JSONException {
         // Call to set up the site surveys
         if(mCardDict ==  null) {
+            //terrible todo
+            if(mSurveySitesList == null) {
+                Injection.provideDataRepository(getContext().getApplicationContext())
+                        .getSurveySites(SurveySiteType.ALL_IDS, this);
+                int i = 0;
+                while (mSurveySitesList == null && i < 50) { //todo handle failure to load
+                    try {
+                        Log.d(TAG, "InfoCardLoader loading waiting: " + i++);
+                        wait(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (i >= 50) {
+                    Log.e(TAG, "InfoCardLoader failed to load survey sites");
+                }
+            }
+
+            //todo restructure
+            LoaderUtils.SPECIES_LOAD_TYPE loadList = LoaderUtils.determineLoadType(mPassedInSurveySiteCode, mSurveySitesList, null);
+            Log.d(TAG, "setupFishLocations: loading: "+loadList);
+
+            if(loadList == LoaderUtils.SPECIES_LOAD_TYPE.ALL_SPECIES) {
+                mCardDict = new HashMap<>(); //dictionary mapping a fish id to its carddetails
+                Injection.provideDataRepository(getContext().getApplicationContext())
+                        .getFishSpeciesAll()
+                        .take(CardViewFragment.CardViewSettings.LOAD_ALL ? 999 : 20)
+                        .subscribe(fish -> mData.add(fish));
+                return;
+            }
 
             JSONObject speciesJSON = setupFishLocations();
-            if(speciesJSON.length()==0) return; //todo quit better
+            if (speciesJSON.length() == 0) return; //todo quit better
 
             mCardDict = mergeFishSpecies(speciesJSON);
 
             //sort the species by most common TODO performance could be improved, certainly
             //todo the number of sitings is not accurate, so this probably doesn't do anything
             //FishSpecies[] fishArray =  (FishSpecies[]) mCardDict.values().toArray(FishSpecies.type());
-            FishSpecies[] fishArray =  new FishSpecies[mCardDict.size()];
+            FishSpecies[] fishArray = new FishSpecies[mCardDict.size()];
             mCardDict.values().toArray(fishArray);
             List<FishSpecies> fishList = new ArrayList<>(Arrays.asList(fishArray));
             Collections.sort(fishList);
             mCardListIterator = fishList.iterator();
             //or, if we don't want it sorted, just do: //Iterator<String> mCardListIterator = mCardDict.keySet().iterator(); //species iterator from dictionary
         }
+
+        //todo
+        if(LoaderUtils.determineLoadType(mPassedInSurveySiteCode, mSurveySitesList, null) == LoaderUtils.SPECIES_LOAD_TYPE.ALL_SPECIES) return;
 
 //        int MAX_NUM_EL = mLoadAll ? 999 : 20; //only applies if loading incrementally
         int MAX_NUM_EL = CardViewFragment.CardViewSettings.LOAD_ALL ? 999 : 20; //only applies if loading incrementally
@@ -307,25 +340,10 @@ public class InfoCardLoader extends AsyncTaskLoader<List<FishSpecies>> implement
      */
     private JSONObject setupFishLocations(){
 
-        //terrible todo
-        if(mSurveySitesList == null) {
-            Injection.provideDataRepository(getContext().getApplicationContext())
-                    .getSurveySites(SurveySiteType.ALL_IDS, this);
-            int i = 0;
-            while (mSurveySitesList == null && i < 50) { //todo handle failure to load
-                try {
-                    Log.d(TAG, "InfoCardLoader loading waiting: " + i++);
-                    wait(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (i >= 50) {
-                Log.e(TAG, "InfoCardLoader failed to load survey sites");
-            }
-        }
+
 
         List<SurveySite> siteList;
+        //todo moving this logic to LoaderUtils.determineLoadType
         if(mPassedInSurveySiteCode.equals("")){
             siteList = mSurveySitesList.getFavoritedSitesAll();
             if(siteList.size() > 0)  Log.d(TAG  , "InfoCardLoader setupFishLocations loading "+siteList.size()+" favorite survey sites");

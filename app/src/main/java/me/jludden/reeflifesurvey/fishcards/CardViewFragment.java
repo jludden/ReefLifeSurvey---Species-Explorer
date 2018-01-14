@@ -200,8 +200,6 @@ public class CardViewFragment extends Fragment implements
                 int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
 
                 //Log.d("jludden.reeflifesurvey"  ,"CardViewfragment onScrolled! "+visibleItemCount+" tot"+totalItemCount+" first: "+firstVisibleItem+" isloading:"+mIsLoading);
-
-
                 if (mIsLoading) {
                     if (totalItemCount > mPreviousTotalItemCount) {
                         mIsLoading = false;

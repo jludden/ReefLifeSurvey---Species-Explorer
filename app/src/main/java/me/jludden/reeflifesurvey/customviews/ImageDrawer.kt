@@ -12,15 +12,16 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.image_drawer_item.view.*
 import me.jludden.reeflifesurvey.R
 import android.support.v7.widget.GridLayoutManager
 import com.squareup.picasso.RequestCreator
+import kotlinx.android.synthetic.main.image_drawer_item.view.*
 import kotlinx.android.synthetic.main.image_drawer.view.*
 
 
 /**
- * Created by Jason on 1/2/2018.
+ * View that holds a list of images, with bottom sheet behavior, and the list of images can be expanded into a grid of images
+ *  Created by Jason Ludden on 1/2/2018
  */
 class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
 
@@ -57,10 +58,8 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
         if (context is ImageDrawer.OnImageDrawerInteractionListener) interactionListener = context
         else throw RuntimeException("$context must implement ImageDrawer.OnImageDrawerInteractionListener")
 
-        val recyclerView = findViewById<RecyclerView>(R.id.image_drawer_content)
-        recyclerView.layoutManager = LinearLayoutManager(context, orientation, false)
         viewAdapter = ImageDrawerAdapter<T>(interactionListener)
-        recyclerView.adapter = viewAdapter
+        setupRecyclerView(LinearLayoutManager(context, orientation, false))
     }
 
     override fun onAttachedToWindow() {
@@ -78,48 +77,41 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
                 interactionListener.onDrawerStateChanged(newState)
 
                 if(newState == BottomSheetBehavior.STATE_EXPANDED){
-                    val test = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-
+                    val layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
 //                    val test = LayoutParams(LayoutParams.MATCH_PARENT, HEIGHT_GRID_EXPANDED)
-                    image_drawer_rv_container.layoutParams = test //todo
-                    image_drawer_content.layoutParams = test
-
-                    val recyclerView = findViewById<RecyclerView>(R.id.image_drawer_content)
-                    recyclerView.layoutManager = GridLayoutManager(context, SPAN_COUNT)
-                    recyclerView.adapter = viewAdapter
-
+                    image_drawer_rv_container.layoutParams = layoutParams //todo
+                    image_drawer_content.layoutParams = layoutParams
+                    setupRecyclerView(GridLayoutManager(context, SPAN_COUNT))
                 }
                 else {
-
                     val newHeight = context.resources.getDimension(R.dimen.imageDrawer_height_collapsed).toInt() // converts dp to px
                     image_drawer_rv_container.layoutParams.height = newHeight //todo
                     image_drawer_content.layoutParams.height = newHeight
-
-                    val recyclerView = findViewById<RecyclerView>(R.id.image_drawer_content)
-                    recyclerView.layoutManager = LinearLayoutManager(context, orientation, false)
-                    recyclerView.adapter = viewAdapter
+                    setupRecyclerView(LinearLayoutManager(context, orientation, false))
                 }
             }
 
-            /**
-             * Called when the bottom sheet is being dragged.
-             *
-             * @param bottomSheet The bottom sheet view.
-             * @param slideOffset The new offset of this bottom sheet within [-1,1] range. Offset
-             * increases as this bottom sheet is moving upward. From 0 to 1 the sheet
-             * is between collapsed and expanded states and from -1 to 0 it is
-             */
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 Log.d(TAG, "Image Drawer Bottom Sheet onSlide. old offset: $prevSlideOffset   new offset: $slideOffset")
-
                 /* offset 0 -> 0.9 alpha
                  *        1 -> 1
                  */
-
                 bottomSheet.alpha = (slideOffset)/10 + 0.9f
                 prevSlideOffset = slideOffset
             }
         })
+    }
+
+    //sets the layout manager, adapter, and scroll listener for the recyclerview
+    private fun setupRecyclerView(layoutManager: LinearLayoutManager) {
+        val recyclerView = image_drawer_content//findViewById<RecyclerView>(R.id.image_drawer_content)
+        if(recyclerView.layoutManager != null){ //scroll to previous position
+            layoutManager.scrollToPosition((recyclerView.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition())
+        }
+        recyclerView.clearOnScrollListeners()
+        recyclerView.layoutManager = layoutManager
+        recyclerView.adapter = viewAdapter
+        recyclerView.addOnScrollListener(RVScrollListener({interactionListener.onLoadMoreRequested()}, layoutManager))
     }
 
     override fun onFinishInflate() {
@@ -129,18 +121,25 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
 
     fun addItem(item: T) {
         Log.d(TAG, "add item $item")
-        viewAdapter.updateItems(item)
+        viewAdapter.updateItems(element = item)
     }
 
     fun setList(list: MutableList<T>) {
         Log.d(TAG, "add list: ${list.size} items")
         viewAdapter.updateItems(list = list)
+        //image_drawer_content.adapter = viewAdapter
+    }
+
+    fun scrollTo(position: Int) {
+        (findViewById<RecyclerView>(R.id.image_drawer_content).layoutManager as LinearLayoutManager).scrollToPosition(position)
     }
 
     interface OnImageDrawerInteractionListener {
         fun onImageClicked(item: BaseDisplayableImage, sharedElement: View)
 
         fun onDrawerStateChanged(newState: Int)
+
+        fun onLoadMoreRequested()
     }
 
     /**
@@ -166,13 +165,6 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
             = (holder as ImageViewHolder).bind(data[position], interactionListener)
     }
 
-   /* override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-
-        setMeasuredDimension(measuredWidth, ((measuredWidth * 1.32f).toInt()));
-
-    }*/
-
     /**
      * ViewHolder
      */
@@ -184,8 +176,6 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
                 listener.onImageClicked(item, itemView) }) //call main_toolbar drawer listener
         }
         private fun ImageView.loadURL(url: String) {
-            Log.d(TAG, "measured height: ${this.measuredHeight}")
-
             val picassoRequest : RequestCreator
             if(url == ""){
                 picassoRequest = Picasso.with(context).load(R.drawable.ic_menu_camera)
@@ -195,10 +185,39 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
 
             picassoRequest
                     .resize(0, 300)
-                    //.resize(this.measuredHeight, 0)
-                    // .fit() //  .resize(90,90)
                     .error(FALLBACK_DRAWABLE)
                     .into(this)
+        }
+    }
+
+    /*props https://github.com/juanchosaravia/KedditBySteps/blob/master/app/src/main/java/com/droidcba/kedditbysteps/commons/InfiniteScrollListener.kt#L36*/
+    class RVScrollListener(val onLoadMore: () -> Unit, val layoutManager: LinearLayoutManager)
+        : RecyclerView.OnScrollListener() {
+        private var previousTotal = 0
+        private var loading = true
+        private var visibleThreshold = 2
+        private var firstVisibleItem = 0
+        private var visibleItemCount = 0
+        private var totalItemCount = 0
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            visibleItemCount = recyclerView.childCount
+            totalItemCount = layoutManager.itemCount
+            firstVisibleItem = layoutManager.findFirstVisibleItemPosition()
+
+            if (loading) {
+                if (totalItemCount > previousTotal) {
+                    loading = false
+                    previousTotal = totalItemCount
+                }
+            }
+            if (!loading && (totalItemCount - visibleItemCount)
+                    <= (firstVisibleItem + visibleThreshold)) {
+                onLoadMore()
+                loading = true
+            }
         }
     }
 
@@ -208,6 +227,8 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
 
         //TODO dimen?
         const val SPAN_COUNT = 4
+
+        const val SCROLLING_VISIBLE_THRESHOLD = 1
     }
 }
 
@@ -217,8 +238,8 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
  *  @param identifier - optional object that can be associated with the image and retrieved when the item is clicked (such as a String identifier)
  *  @param imageClickListener - optional listener for when this item, but not others, is clicked
  */
-open class BaseDisplayableImage(val imageURL: String, val identifier: kotlin.Any?,
-                                var imageClickListener: OnBaseDisplayableImageClickListener? = null) {
+open class BaseDisplayableImage(val imageURL: String,
+            val identifier: kotlin.Any?, var imageClickListener: OnBaseDisplayableImageClickListener? = null) {
     interface OnBaseDisplayableImageClickListener {
         fun onImageClick(obj : BaseDisplayableImage)
     }

@@ -13,6 +13,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import kotlinx.android.synthetic.main.activity_fullscreen.*
+import kotlinx.android.synthetic.main.card_view_item.*
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.customviews.BaseDisplayableImage
 import me.jludden.reeflifesurvey.customviews.ImageDrawer
@@ -29,6 +30,8 @@ import me.jludden.reeflifesurvey.fishcards.CardViewFragment
 class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnImageDrawerInteractionListener, LoaderManager.LoaderCallbacks<List<FishSpecies>> {
     internal lateinit var mViewAdapter: FullScreenImageAdapter
     internal lateinit var mViewPager: ViewPager
+    internal var isLoading: Boolean = true
+    internal var itemsLoaded = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,14 +101,14 @@ class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnI
         // mViewPager.setCurrentItem(0); //set the viewpager to the passed in index
 
         //start loader
-        supportLoaderManager.initLoader(0, null, this) //need to be calling initloader for incremental as well
+        supportLoaderManager.initLoader(LOADER_ID, null, this) //need to be calling initloader for incremental as well
     }
 
     /**
      * update text box
      * todo update drawer selected
      */
-    override fun updateItemDescription(fish: FishSpecies) {
+    fun updateItemDescription(fish: FishSpecies) {
         Log.d(TAG, "FullScreenImageListener update item description ")
         details_text.text = "${fish.scientificName} \n ${fish.commonNames}"
         details_text.scrollTo(0,0)
@@ -117,18 +120,34 @@ class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnI
     override fun onImageClicked(item: BaseDisplayableImage, sharedElement: View) {
         Log.d(TAG, "Bottom sheet image clicked ${item.identifier}")
 
-        //todo go to image
         val page = mViewAdapter.findPageForItem(item.identifier as FishSpecies)
         mViewPager.currentItem = page
+
+        val bottomSheetBehavior = BottomSheetBehavior.from<View>(image_drawer)
+        if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED){
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
     }
 
     override fun onDrawerStateChanged(newState: Int) {
-        //todo load more!!
-
-
-
+        when(newState){
+            BottomSheetBehavior.STATE_EXPANDED -> {
+                details_text.visibility = View.GONE
+            }
+            BottomSheetBehavior.STATE_COLLAPSED -> {
+                findViewById<ImageDrawer<BaseDisplayableImage>>(R.id.image_drawer).scrollTo(mViewPager.currentItem)
+            }
+        }
     }
 
+    //incrementally load more -- todo also load more after adapter gets to end
+    override fun onLoadMoreRequested() {
+        if(!isLoading){
+            isLoading = true
+            Log.d(TAG, "load more requested")
+            supportLoaderManager.getLoader<Any>(LOADER_ID).onContentChanged()
+        }
+    }
 
     /**
      * Set the View to Sticky Immersive Mode
@@ -150,8 +169,8 @@ class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnI
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<List<FishSpecies>> {
         Log.d(TAG, "FullScreenImageActivity OnCreateLoader")
-        return InfoCardLoader(this, CardViewFragment.CardType.Fish, "")    }
-
+        return InfoCardLoader(this, CardViewFragment.CardType.Fish, "")
+    }
 
     override fun onLoadFinished(loader: Loader<List<FishSpecies>>, data: List<FishSpecies>) {
         Log.d(TAG, "FullScreenImageActivity onLoadFinished loaderid: " + loader.id + " data length: " + data.size)
@@ -159,18 +178,25 @@ class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnI
         mViewAdapter.updateItems(data) //update items in the adapter
         updateItemDescription(data[mViewPager.currentItem])
 
-        addDrawerItems(data)
+        addDrawerItems(data, itemsLoaded)
+        isLoading = false
+        itemsLoaded = data.size
     }
 
-    private fun addDrawerItems(data: List<FishSpecies>) {
+    private fun addDrawerItems(data: List<FishSpecies>, startIndex: Int) {
         val imageDrawer = findViewById<ImageDrawer<BaseDisplayableImage>>(R.id.image_drawer)
-
         var count = 0
+//        val itemList =  ArrayList<BaseDisplayableImage>()
         for(fish in data) {
-            imageDrawer.addItem(BaseDisplayableImage(fish.primaryImageURL, fish))
-            if(count++ > 80) break //todo
+//            itemList.add(BaseDisplayableImage(fish.primaryImageURL, fish))
+            if(count++ >= startIndex) {
+                    imageDrawer.addItem(BaseDisplayableImage(fish.primaryImageURL, fish))
+//                Log.d(TAG, "FullScreenImageActivity Already added 80 items to drawer, won't add any more")
+//                break
+            } //todo.. load incrementally
         }
 
+//        imageDrawer.setList(itemList)
     }
 
     override fun onLoaderReset(loader: Loader<List<FishSpecies>>) {}
@@ -178,11 +204,10 @@ class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnI
     companion object {
         const val TAG = "FullScreenImageActivity"
         private val MIN_SWIPE_DISTANCE = 250f
+        private const val LOADER_ID = 0
     }
-
-
 }
 
 interface FullScreenImageListener {
-    fun updateItemDescription(fish : FishSpecies)
+    fun onLoadMoreRequested()
 }

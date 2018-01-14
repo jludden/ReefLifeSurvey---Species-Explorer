@@ -41,6 +41,7 @@ public class FullScreenImageAdapter extends PagerAdapter {
     private List<FishSpecies> mCardList;
     private ImageView mImgDisplay;
     private int mCurrentPos;
+    private final int PAGE_CHANGE_THRESHOLD = 3;
 
     // constructor
     public FullScreenImageAdapter(Activity activity, FullScreenImageListener listener) {
@@ -63,6 +64,7 @@ public class FullScreenImageAdapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, int position) {
         mCurrentPos = position;
 
+        if(position >= (mCardList.size() - PAGE_CHANGE_THRESHOLD)) mListener.onLoadMoreRequested();
 
          //Add Image View
         Button btnClose;

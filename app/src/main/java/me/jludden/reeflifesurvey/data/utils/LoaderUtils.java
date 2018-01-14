@@ -2,11 +2,7 @@ package me.jludden.reeflifesurvey.data.utils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.annotation.RawRes;
 import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
@@ -22,16 +18,12 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
 import me.jludden.reeflifesurvey.MainActivity;
@@ -39,14 +31,13 @@ import me.jludden.reeflifesurvey.R;
 import me.jludden.reeflifesurvey.data.DataRepository;
 import me.jludden.reeflifesurvey.data.DataSource;
 import me.jludden.reeflifesurvey.data.model.SurveySiteList;
-import me.jludden.reeflifesurvey.data.utils.LoaderUtils.SPECIES_TO_LOAD;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.SPECIES_TO_LOAD.ALL_SPECIES;
-import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.SPECIES_TO_LOAD.FAVORITE_SITES;
-import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.SPECIES_TO_LOAD.SINGLE_SITE;
+import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.SPECIES_LOAD_TYPE.ALL_SPECIES;
+import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.SPECIES_LOAD_TYPE.FAVORITE_SITES;
+import static me.jludden.reeflifesurvey.data.utils.LoaderUtils.SPECIES_LOAD_TYPE.SINGLE_SITE;
 
 /**
  * Created by Jason on 9/6/2017.
@@ -93,29 +84,29 @@ public class LoaderUtils {
         });
     }
 
-    public enum SPECIES_TO_LOAD {
+    public enum SPECIES_LOAD_TYPE {
         SINGLE_SITE,
         FAVORITE_SITES,
         FAVORITE_SPECIES,
         ALL_SPECIES
     }
 
-    public static SPECIES_TO_LOAD determineLoadTime(String mPassedInSurveySiteCode, SurveySiteList mSurveySitesList) {
-        List<SurveySiteList.SurveySite> siteList;
-        if(!mPassedInSurveySiteCode.equals("")){
-            siteList = mSurveySitesList.getSitesForCode(mPassedInSurveySiteCode);
+    public static SPECIES_LOAD_TYPE determineLoadType(String passedInSurveySiteCode,
+                                                      SurveySiteList surveySitesList, List<SurveySiteList.SurveySite> siteListOut) {
+        if(!passedInSurveySiteCode.equals("")){
+            siteListOut = surveySitesList.getSitesForCode(passedInSurveySiteCode);
             Log.d("InfoCardLoader", "InfoCardLoader setupFishLocations loading passed in survey site");
             return SINGLE_SITE;
         }
 
-        siteList = mSurveySitesList.getFavoritedSitesAll();
-        if(siteList.size() > 0){
-            Log.d("InfoCardLoader", "InfoCardLoader setupFishLocations loading "+siteList.size()+" favorite survey sites");
+        siteListOut = surveySitesList.getFavoritedSitesAll();
+        if(siteListOut.size() > 0){
+            Log.d("InfoCardLoader", "InfoCardLoader setupFishLocations loading "+siteListOut.size()+" favorite survey sites");
             return FAVORITE_SITES;
         }
         else {
             Log.d("InfoCardLoader", "InfoCardLoader setupFishLocations no favorite sites or passed in site ");
-
+            siteListOut = null;
             return ALL_SPECIES;
         }
 
@@ -169,7 +160,7 @@ public class LoaderUtils {
        //     InfoCard.FishSpecies fishCard = new InfoCard.FishSpecies(speciesKey);
         //    int numSightings = fullSpeciesJSON.getInt(speciesKey); //number of sightings of this fish in this survey site (may not be accurate due to datasource)
 
-/*            if(fishCards.contains(fishCard)) { //todo verify using overriden equals() func
+/*            if(fishCards.contains(fishCard)) { //todo verify using overriden equals() onLoadMore
                 Log.d(TAG  , "load single site - already have fish card loaded: "+fishCard.getId()+"-"+fishCard.commonNames);
 
                 int index = fishCards.indexOf(fishCard);

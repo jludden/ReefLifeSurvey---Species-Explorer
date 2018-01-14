@@ -127,7 +127,8 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 } else {
                     picasso
                             .load(cardDetails.getPrimaryImageURL())
-                            //.fit() todo possibly less memory used
+                            .fit()
+                            .centerCrop()
                             .placeholder(R.drawable.ic_menu_camera)
                             .into(vhItem.mImageView);
                 }
