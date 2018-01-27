@@ -1,7 +1,7 @@
 package me.jludden.reeflifesurvey.customviews
 
 import android.content.Context
-import android.support.design.widget.BottomSheetBehavior
+import android.support.design.widget.CoordinatorLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
@@ -23,11 +23,11 @@ import kotlinx.android.synthetic.main.image_drawer.view.*
  * View that holds a list of images, with bottom sheet behavior, and the list of images can be expanded into a grid of images
  *  Created by Jason Ludden on 1/2/2018
  */
+@CoordinatorLayout.DefaultBehavior(BottomDrawerBehavior::class)
 class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
 
     private lateinit var interactionListener: ImageDrawer.OnImageDrawerInteractionListener
     private lateinit var viewAdapter: ImageDrawerAdapter<T>
-
     private var prevSlideOffset = 0.0f
 
     constructor(context: Context) : super(context) {
@@ -64,8 +64,8 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        val bottomSheetBehavior = BottomSheetBehavior.from(this)
-        bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+        val behavior = BottomDrawerBehavior.from(this)
+        behavior.setBottomSheetCallback(object : BottomDrawerBehavior.BottomSheetCallback() {
             /**
              * Called when the bottom sheet changes its state.
              *
@@ -76,9 +76,8 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
                 Log.d(TAG, "Image Drawer Bottom Sheet OnStateChanged: " + newState)
                 interactionListener.onDrawerStateChanged(newState)
 
-                if(newState == BottomSheetBehavior.STATE_EXPANDED){
+                if(newState == BottomDrawerBehavior.STATE_EXPANDED){
                     val layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-//                    val test = LayoutParams(LayoutParams.MATCH_PARENT, HEIGHT_GRID_EXPANDED)
                     image_drawer_rv_container.layoutParams = layoutParams //todo
                     image_drawer_content.layoutParams = layoutParams
                     setupRecyclerView(GridLayoutManager(context, SPAN_COUNT))
@@ -92,7 +91,7 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                Log.d(TAG, "Image Drawer Bottom Sheet onSlide. old offset: $prevSlideOffset   new offset: $slideOffset")
+//                Log.d(TAG, "Image Drawer Bottom Sheet onSlide. old offset: $prevSlideOffset   new offset: $slideOffset")
                 /* offset 0 -> 0.9 alpha
                  *        1 -> 1
                  */
@@ -171,22 +170,40 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
     class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(item: BaseDisplayableImage, listener: OnImageDrawerInteractionListener) = with(itemView) {
             image_drawer_item_imageview.loadURL(item.imageURL)
+//            val drawerHeight =  context.resources.getDimension(R.dimen.imageDrawer_height_collapsed).toInt() // converts dp to px
+//            image_drawer_item_imageview.drawable.setBounds(0,0,drawerHeight,        drawerHeight)
+
             setOnClickListener({
                 item.imageClickListener?.onImageClick(item) //call individual onclick listener if it's set
                 listener.onImageClicked(item, itemView) }) //call main_toolbar drawer listener
         }
+
         private fun ImageView.loadURL(url: String) {
-            val picassoRequest : RequestCreator
-            if(url == ""){
-                picassoRequest = Picasso.with(context).load(R.drawable.ic_menu_camera)
-            } else {
-                picassoRequest = Picasso.with(context).load(url)
-            }
+            val picassoRequest : RequestCreator =
+                if(url == "") Picasso.with(context).load(FALLBACK_DRAWABLE_RES)
+                else Picasso.with(context).load(url)
+
+            val drawerHeight =  context.resources.getDimension(R.dimen.imageDrawer_height_collapsed).toInt() // converts dp to px
+//            Log.d(TAG,"drawer height: $drawerHeight")
+
+            val ph = resources.getDrawable(FALLBACK_DRAWABLE_RES) //todo
+            ph.setBounds(0, 0, drawerHeight, drawerHeight)
+            this
 
             picassoRequest
-                    .resize(0, 300)
-                    .error(FALLBACK_DRAWABLE)
+                    .resize(0, drawerHeight)
+                    .error(FALLBACK_DRAWABLE_RES)
+                    .placeholder(ph)
                     .into(this)
+//                    .into(this, object : Callback{
+//                        override fun onSuccess() {
+//                        }
+//
+//                        override fun onError() {
+//                            this@loadURL.layoutParams = RecyclerView.LayoutParams(drawerHeight, drawerHeight)
+//                            this@loadURL.setImageDrawable(context.getDrawable(FALLBACK_DRAWABLE_RES))
+//                        }
+//                    })
         }
     }
 
@@ -223,7 +240,8 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
 
     companion object {
         const val TAG = "ImageDrawer"
-        const val FALLBACK_DRAWABLE = R.drawable.ic_menu_camera
+//        const val FALLBACK_DRAWABLE_RES = R.drawable.image_drawer_placeholder //todo need a white version?
+        const val FALLBACK_DRAWABLE_RES = R.drawable.ic_menu_camera //todo need a white version?
 
         //TODO dimen?
         const val SPAN_COUNT = 4

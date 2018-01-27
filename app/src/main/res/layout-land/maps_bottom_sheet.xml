@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_sheet"
+    android:layout_width="300dp"
+    android:layout_height="500dp"
+    android:layout_gravity="end"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    app:behavior_hideable="true"
+    app:behavior_peekHeight="80dp"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+    <!--    app:layout_behavior="EnhancedBottomSheetBehavior">-->
+
+    <!--REGION PEEK-->
+    <me.jludden.reeflifesurvey.customviews.AutoResizeTextView
+        android:id="@+id/bottom_sheet_top"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/white"
+        android:gravity="start"
+        android:paddingEnd="70dp"
+        android:paddingStart="10dp"
+        android:minLines="1"
+        android:maxLines="2"
+        android:textSize="36sp"
+        android:textAlignment="textStart"
+     />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:weightSum="300"
+        >
+
+        <TextView
+            android:id="@+id/bottom_sheet_number_surveys"
+            android:layout_width="0dp"
+            android:layout_weight="200"
+            android:layout_height="match_parent"
+            android:paddingStart="10dp"
+            android:gravity="center_vertical"
+
+            />
+
+        <Button
+            android:id="@+id/bottom_sheet_launch_species"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="100"
+            android:background="@color/colorPrimary"
+            android:drawableLeft="@drawable/ic_view_in_list"
+            android:gravity="center_vertical"
+            android:paddingRight="5dp"
+            android:text="@string/bottom_sheet_secondary_button_browse"
+            android:textAlignment="center"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+    <!--REGION DETAILS-->
+    <com.daimajia.slider.library.SliderLayout
+        android:id="@+id/site_preview_carousel"
+        android:layout_width="match_parent"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:paddingTop="10dp"
+        android:layout_height="200dp" />
+
+<!--
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".3"
+            android:text="Eco Region"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
+            />
+
+        <TextView
+            android:id="@+id/eco_region"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".7"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium" />
+
+    </LinearLayout>-->
+
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:includeFontPadding="true"-->
+        <!--android:textSize="18sp"-->
+        <!--android:text="Sites surveyed: "/>-->
+
+    <TextView
+        android:id="@+id/bottom_sheet_main_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:includeFontPadding="true"
+        android:padding="10dp"
+        android:scrollbars="vertical" />
+
+</LinearLayout>

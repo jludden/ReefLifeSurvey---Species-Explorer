@@ -6,6 +6,9 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 
 import android.support.v4.app.Fragment;
@@ -13,6 +16,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -92,15 +96,11 @@ public class CardViewFragment extends Fragment implements
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
+     * to the activity
      */
     public interface OnCardViewFragmentInteractionListener {
         void onFishDetailsRequested(FishSpecies cardDetails, View sharedElement);
+
     }
 
     public CardViewFragment() {
@@ -287,6 +287,15 @@ public class CardViewFragment extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
+        AppBarLayout toolbar = (AppBarLayout) getActivity().findViewById(R.id.app_bar);
+//        AppBarLayout toolbar = (AppBarLayout) getActivity().findViewById(R.id.app_bar);
+//        CollapsingToolbarLayout toolbar2 = (CollapsingToolbarLayout) view.findViewById(R.id.collapsing_toolbar);
+//        Toolbar toolbar3 = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setExpanded(false, false);
+        CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) toolbar.getLayoutParams();
+        lp.height = -2; //wrap content
+        ////         android:layout_height="@dimen/app_bar_height_expanded"
+//        getResources().getDimension(R.dimen.app_bar_height_expanded
     }
 
     @Override

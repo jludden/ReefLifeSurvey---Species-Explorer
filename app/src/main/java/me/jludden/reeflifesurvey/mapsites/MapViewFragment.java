@@ -90,8 +90,6 @@ public class MapViewFragment extends Fragment
     private FloatingActionButton mFAB;
 
     public static final String TAG = "MapViewFragment";
-
-    //data retrieval from the retained, headless fragment
     private SurveySiteList mSurveySiteList;
 
     private MapViewFragmentInteractionListener mMapViewFragmentInteractionListener;
@@ -160,7 +158,7 @@ public class MapViewFragment extends Fragment
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d(TAG, "onViewCreated: ");
+        Log.d(TAG, "onViewCreated. mmap null?: "+(mMap == null));
         if(mMap == null) {
             mMapView = view.findViewById(R.id.fragment_map);
             //mMapView = (MapView) rootView.findViewById(R.id.fragment_map);
@@ -454,7 +452,7 @@ public class MapViewFragment extends Fragment
     public void onResume() {
         super.onResume();
 
-        Log.d(TAG, "onResume: ");
+        Log.d(TAG, "onResume: mMapView?:"+(mMapView != null));
 
         //TODO - can move camera back to previous position, if necessary
         //   if(mPrevCameraPos != null) mMap.moveCamera(CameraUpdateFactory.newLatLng(mPrevCameraPos));

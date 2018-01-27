@@ -1,26 +1,33 @@
 package me.jludden.reeflifesurvey.fullscreenquiz
 
+import android.app.Activity
+import android.app.ActivityOptions
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.app.FragmentActivity
 import android.support.v4.app.LoaderManager
 import android.support.v4.content.Loader
 import android.support.v4.view.ViewPager
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.util.Pair
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import kotlinx.android.synthetic.main.activity_fullscreen.*
 import kotlinx.android.synthetic.main.card_view_item.*
+import kotlinx.android.synthetic.main.fullscreen_view_pager_item.*
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.customviews.BaseDisplayableImage
+import me.jludden.reeflifesurvey.customviews.BottomDrawerBehavior
 import me.jludden.reeflifesurvey.customviews.ImageDrawer
 import me.jludden.reeflifesurvey.customviews.ImageDrawer.*
 
 import me.jludden.reeflifesurvey.data.model.FishSpecies
 import me.jludden.reeflifesurvey.data.InfoCardLoader
+import me.jludden.reeflifesurvey.detailed.DetailsActivity
 import me.jludden.reeflifesurvey.fishcards.CardViewFragment
 
 /**
@@ -43,31 +50,11 @@ class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnI
         mViewAdapter = FullScreenImageAdapter(this, this)
         mViewPager = findViewById<View>(R.id.fullscreen_activity_pager) as ViewPager
         mViewPager.adapter = mViewAdapter
-
-        //Set the On Touch Listener for this view. When a swipe up is detected, show some details about the image
-        // mViewPager.requestDisallowInterceptTouchEvent(true); //prevent the pager from intercepting touch events
-     /*   mViewPager.setOnTouchListener(object : View.OnTouchListener {
-            internal var y2: Float = 0.toFloat()
-            internal var y1 = -1f
-
-            override fun onTouch(v: View, event: MotionEvent): Boolean {
-                //Log.d(TAG  , "FullScreenImageACTIVITY on touch :"+event);
-
-                val action = MotionEventCompat.getActionMasked(event)
-                if (action == MotionEvent.ACTION_DOWN)
-                    y1 = event.y
-                else if (action == MotionEvent.ACTION_MOVE) {
-                    y2 = event.y
-                    val deltaY = y1 - y2
-                    if (y1 > -1 && Math.abs(deltaY) > MIN_SWIPE_DISTANCE) {
-                        Log.d(TAG, "FullScreenImageACTIVITY SWIPE UP: " + deltaY)
-                        mViewAdapter.showDetails() //have the view adapter actually notify the user
-                    }
-                }
-                return false //return false to allow the onPageChange for the view to still fire
-            }
-        })*/
-
+        BottomDrawerBehavior.from<View>(image_drawer).state = BottomDrawerBehavior.STATE_HIDDEN
+        /*val b = BottomDrawerBehavior.from<View>(image_drawer)
+        b.state = BottomDrawerBehavior.STATE_DRAGGING
+        b.onNestedScroll()
+*/
 
         //page change listener. update
         mViewPager.addOnPageChangeListener(object: ViewPager.SimpleOnPageChangeListener(){
@@ -78,15 +65,17 @@ class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnI
             }
         })
 
+
+
         //button click listeners
         findViewById<ImageButton>(R.id.button_show_hud).setOnClickListener({
             Log.d(TAG, "FullScreenImageActivity hud button pressed")
             if(details_text.visibility == View.GONE) {
                 details_text.visibility = View.VISIBLE
-                BottomSheetBehavior.from<View>(image_drawer).setState(BottomSheetBehavior.STATE_COLLAPSED)
+                BottomDrawerBehavior.from<View>(image_drawer).state = BottomDrawerBehavior.STATE_COLLAPSED
             } else {
                 details_text.visibility = View.GONE
-                BottomSheetBehavior.from<View>(image_drawer).setState(BottomSheetBehavior.STATE_HIDDEN)
+                BottomDrawerBehavior.from<View>(image_drawer).state = BottomDrawerBehavior.STATE_HIDDEN
             }
         })
         findViewById<ImageButton>(R.id.button_close).setOnClickListener {
@@ -94,6 +83,15 @@ class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnI
             finish()
         }
         details_text.movementMethod = ScrollingMovementMethod()
+        details_text.setOnClickListener {
+            val options = ActivityOptions.makeSceneTransitionAnimation(this,
+                    Pair(full_screen_image_view, getString(R.string.transition_launch_details)))
+            val intent = Intent(this@FullScreenImageActivity,
+                    DetailsActivity::class.java)
+            intent.putExtra(FishSpecies.INTENT_EXTRA, mViewAdapter.findItemForPage(mViewPager.currentItem))
+//            intent.putExtra(DetailsActivity.ARGS_NO_POSTPONE, true)
+            startActivityForResult(intent, DetailsActivity.REQUEST_CODE, options.toBundle())
+        }
 
         //TODO - get data passed in from main_toolbar activity
         //        Intent i = getIntent();
@@ -123,18 +121,18 @@ class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnI
         val page = mViewAdapter.findPageForItem(item.identifier as FishSpecies)
         mViewPager.currentItem = page
 
-        val bottomSheetBehavior = BottomSheetBehavior.from<View>(image_drawer)
-        if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED){
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        val behavior = BottomDrawerBehavior.from<View>(image_drawer)
+        if(behavior.state == BottomDrawerBehavior.STATE_EXPANDED){
+            behavior.state = BottomDrawerBehavior.STATE_COLLAPSED
         }
     }
 
     override fun onDrawerStateChanged(newState: Int) {
         when(newState){
-            BottomSheetBehavior.STATE_EXPANDED -> {
+            BottomDrawerBehavior.STATE_EXPANDED -> {
                 details_text.visibility = View.GONE
             }
-            BottomSheetBehavior.STATE_COLLAPSED -> {
+            BottomDrawerBehavior.STATE_COLLAPSED -> {
                 findViewById<ImageDrawer<BaseDisplayableImage>>(R.id.image_drawer).scrollTo(mViewPager.currentItem)
             }
         }

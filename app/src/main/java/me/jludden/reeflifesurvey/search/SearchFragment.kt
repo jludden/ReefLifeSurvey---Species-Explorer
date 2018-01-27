@@ -99,7 +99,7 @@ class SearchFragment : Fragment(), SearchContract.View {
       Log.d(TAG, "searchfragment launchResultDetails CALLED")
 
         val intent = Intent()
-        intent.setClass(activity,DetailsActivity::class.java)
+        intent.setClass(activity, DetailsActivity::class.java)
         intent.putExtra(SearchResult.INTENT_EXTRA, searchResult)
         val options: ActivityOptions =
             ActivityOptions.makeSceneTransitionAnimation(activity,

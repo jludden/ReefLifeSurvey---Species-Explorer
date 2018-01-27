@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,14 +16,17 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewCompat;
 import android.util.Log;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -78,9 +82,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
         setTheme(R.style.AppTheme_NoActionBar);
         setContentView(R.layout.activity_main);
+        Log.d(TAG,"MainActivity onCreate");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -101,28 +105,6 @@ public class MainActivity extends AppCompatActivity implements
                 }
         });
 
-
-        //  collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.black_semi_transparent));
-
-////        CoordinatorLayout.LayoutParams params =(CoordinatorLayout.LayoutParams) collapsingToolbar.getLayoutParams();
-//
-       // AppBarLayout toolbar_layout = (AppBarLayout) findViewById(R.id.app_bar);
-        //toolbar_layout.setMinimumHeight(400);
-//        CoordinatorLayout.LayoutParams params =(CoordinatorLayout.LayoutParams) toolbar_layout.getLayoutParams();
-//        params.height = 400;
-//        toolbar_layout.setLayoutParams(params);
-
-     //   toolbar_layout.setExpanded(false);
-        // collapsingToolbar.setexpanded
-        //collapsingToolbar.
-
-        //set The custom text
-     //   collapsingToolbar.setTitle("TEXTTTs");
-
-//Set the color of collapsed toolbar text
-     //   collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
-
-
         ToggleButton mToolbarButton_starred = (ToggleButton) findViewById(R.id.toolbar_button_filter_favorites);
         mToolbarButton_starred.setOnCheckedChangeListener(this);
 
@@ -136,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements
                 if (mapFrag != null && mapFrag.isVisible()) {
                     mapFrag.onFABclick();
                 }
-                //else, show a fab menu definitely
+                //else, show a fab menu
                 else {
                     if(mFabMenuVisible) hideFABmenu();
                     else showFABmenu();
@@ -242,9 +224,10 @@ public class MainActivity extends AppCompatActivity implements
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);*/
 
-        //start the home fragment
         hideClutter();
-        launchUIFragment(new HomeFragment(), HomeFragment.TAG, true, false);
+        if (savedInstanceState == null) { //start the home fragment
+            launchUIFragment(new HomeFragment(), HomeFragment.TAG, true, false);
+        }
     }
 
     @Override
@@ -273,6 +256,16 @@ public class MainActivity extends AppCompatActivity implements
         }*/
 
     }
+
+   /* @Override
+    protected void onSaveInstanceState(Bundle b){
+        super.onSaveInstanceState(b);
+    }*/
+
+    /*@Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+
+    }*/
 
     // Inflate the menu; this adds items to the action bar if it is present.
     @Override
@@ -383,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements
             mBottomSheetButton.setVisibility(View.VISIBLE);
             AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
             toolbar.setExpanded(false,true);
-            launchUIFragment(newFragment, tag); //todo make it so there aren't multiple map fragments on the backstack
+            launchUIFragment(newFragment, tag);
         }
     }
 
@@ -408,29 +401,6 @@ public class MainActivity extends AppCompatActivity implements
 
         tx.commit();
     }
-
-  /*  @Override
-    public SurveySiteList retrieveSurveySiteList(){
-        return mDataFragment.getSurveySites();
-    }
-
-    @Override
-    public JSONObject retrieveFishSpecies() {
-        return mDataFragment.getFishSpecies();
-    }
-*/
-   /*  @Override
-    public void onDataFragmentLoadFinished() {
-       MapViewFragment mapFrag = (MapViewFragment) getSupportFragmentManager().findFragmentByTag(MapViewFragment.TAG);
-        if (mapFrag != null && mapFrag.isVisible()) {
-            mapFrag.onDataFragmentLoadFinished();
-        }*/
-
-        /*CardViewFragment viewFragment = (CardViewFragment) getSupportFragmentManager().findFragmentByTag(CardViewFragment.TAG);
-        if (viewFragment != null && viewFragment.isVisible()) {
-            viewFragment.();
-        }
-    }*/
 
     //todo - launch activity - right now just the full screen quiz mode - currently not passing in anything useful
     public void launchFullScreenQuizModeActivity(){
@@ -720,17 +690,64 @@ public class MainActivity extends AppCompatActivity implements
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
+
+
+
         AppBarLayout toolbar = (AppBarLayout) findViewById(R.id.app_bar);
-        toolbar.setExpanded(false,true);
+        CollapsingToolbarLayout toolbar2 = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        Toolbar toolbar3 = (Toolbar) findViewById(R.id.toolbar);
+
+        //works but need a new impl for toolbarheader
+        /*
+        toolbar.setExpanded(false,false);
+        CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams)toolbar.getLayoutParams();
+        lp.height = (int) getResources().getDimension(R.dimen.toolbar_height);
+        */
+
+
+        toolbar.setExpanded(false, true);
+        int actionBarHeight = 65;
+        // Calculate ActionBar height
+        TypedValue tv = new TypedValue();
+        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+        {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
+        }
+
+
+/*
+        final TypedArray styledAttributes = getTheme().obtainStyledAttributes(
+                new int[] { android.R.attr.actionBarSize });
+        int actionBarHeight = (int) styledAttributes.getDimension(0, 0);
+        styledAttributes.recycle();*/
+
+        //int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, actionBarHeight, getResources().getDisplayMetrics());
+        CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) toolbar.getLayoutParams();
+
+        Log.d(TAG, "action bar height before:"+lp.height+"  after:"+actionBarHeight);
+        lp.height = actionBarHeight; //px;
+
+
+
+
+        toolbar.setLayoutParams(lp);
+        toolbar2.setTitleEnabled(false);
+        toolbar3.setTitle("ReefLifeSurvey"); //todo
+
+
+     //   toolbar.setVisibility(View.GONE);
+       // toolbar2.setVisibility(View.GONE);
+
+
 
         //todo stuff below works, but I think i want to keep the toolbar for now
 
         //trying everything to get this bar to hide
         //getSupportActionBar().hide();
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        //collapsingToolbar.setVisibility(View.GONE);
+//        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+//        collapsingToolbar.setVisibility(View.GONE);
 
-        //toolbar.setVisibility(View.GONE);
+//        toolbar.setVisibility(View.GONE);
 
         /*View mDecorView;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -745,6 +762,36 @@ public class MainActivity extends AppCompatActivity implements
                 * | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
                 * | View.SYSTEM_UI_FLAG_IMMERSIVE
                 */
+    }
+
+    public static void lockToolbar(boolean locked, final AppBarLayout appbar, final CollapsingToolbarLayout toolbar) {
+
+        if (locked) {
+            // We want to lock so add the listener and collapse the toolbar
+
+            appbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+
+                @Override
+                public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                    if (toolbar.getHeight() + verticalOffset < 2 * ViewCompat.getMinimumHeight(toolbar)) {
+                        // Now fully expanded again so remove the listener
+                            appbar.removeOnOffsetChangedListener(this);
+
+                    } else {
+                        // Fully collapsed so set the flags to lock the toolbar
+                        AppBarLayout.LayoutParams lp = (AppBarLayout.LayoutParams) toolbar.getLayoutParams();
+                        lp.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED);
+                    }
+                }
+            });
+            appbar.setExpanded(false, true);
+        } else {
+            // Unlock by restoring the flags and then expand
+            AppBarLayout.LayoutParams lp = (AppBarLayout.LayoutParams) toolbar.getLayoutParams();
+            lp.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED);
+            appbar.setExpanded(true, true);
+        }
+
     }
 
     @Override

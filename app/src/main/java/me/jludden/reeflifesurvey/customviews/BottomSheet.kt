@@ -123,7 +123,7 @@ class BottomSheet : LinearLayout, LoadSurveySitesCallBack, LoadFishCardCallBack 
         val textSliderView = TextSliderView(context)
         textSliderView
                 .description(name)
-                .setScaleType(BaseSliderView.ScaleType.Fit)
+                .setScaleType(BaseSliderView.ScaleType.CenterInside)
                 .setOnSliderClickListener {
                     interactionListener.onImageSliderClick(card, textSliderView.view)
                 }

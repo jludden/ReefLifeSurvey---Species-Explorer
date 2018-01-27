@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <item>
+        <bitmap
+            android:height="@dimen/imageDrawer_height_collapsed"
+            android:width="@dimen/imageDrawer_height_collapsed"
+            android:src="@drawable/ic_menu_camera"/>
+    </item>
+</layer-list>
