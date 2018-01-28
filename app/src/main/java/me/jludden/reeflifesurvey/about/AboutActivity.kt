@@ -4,9 +4,12 @@ import android.app.FragmentManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
+import android.os.PersistableBundle
 import android.support.v4.view.PagerAdapter
 import android.support.v7.app.AppCompatActivity
 import android.transition.TransitionInflater
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -112,6 +115,14 @@ class AboutActivity : AppCompatActivity() {
 
         override fun destroyItem(container: ViewGroup, position: Int, view: Any) {
             container.removeView(view as View)
+        }
+
+        override fun saveState(): Parcelable { //remove the libraries fragment from the backstack
+            fragmentManager
+                    .beginTransaction()
+                    .remove(fragmentManager.findFragmentByTag(librariesFragmentTAG))
+                    .commit()
+            return Bundle()
         }
 
     }
