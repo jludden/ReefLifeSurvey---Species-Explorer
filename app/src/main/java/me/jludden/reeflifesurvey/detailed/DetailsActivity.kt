@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.details_view_pager_item.*
 import me.jludden.reeflifesurvey.Injection
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.customviews.BottomSheet
+import me.jludden.reeflifesurvey.customviews.ImageDrawer
 import me.jludden.reeflifesurvey.customviews.TouchImageView
 import me.jludden.reeflifesurvey.data.*
 import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.setUpFavoritesButton

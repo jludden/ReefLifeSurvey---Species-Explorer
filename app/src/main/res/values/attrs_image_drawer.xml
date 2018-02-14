@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ImageDrawer">
+        <attr name="collapsedHeight" format="dimension" />
+        <attr name="expandable" format="boolean" />
+        <attr name="drawerStyle" format="enum">
+            <enum name="below" value="0" />
+            <enum name="floating" value="1" />
+        </attr>
+    </declare-styleable>
+</resources>

@@ -13,7 +13,7 @@
     android:padding="16dp">
     <!-- card_view_item:cardElevation="1dp"
         android:layout_width="200dp"
-    android:layout_height="200dp"
+        android:layout_height="200dp"
         android:layout_gravity="center"
         card_view:cardCornerRadius="4dp"
         -->
@@ -38,6 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:textSize="16sp"
+            android:textStyle="italic"
             android:layout_toEndOf="@+id/results_card_image"
             android:paddingTop="8dp"
             android:paddingStart="12dp"

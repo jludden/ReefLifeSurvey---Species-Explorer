@@ -130,6 +130,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                             .fit()
                             .centerCrop()
                             .placeholder(R.drawable.ic_menu_camera)
+                            .error(R.drawable.ic_menu_camera)
                             .into(vhItem.mImageView);
                 }
             }

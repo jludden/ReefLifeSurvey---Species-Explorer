@@ -1,5 +1,6 @@
 package me.jludden.reeflifesurvey.customviews
 
+import android.app.Activity
 import android.content.Context
 import android.support.design.widget.CoordinatorLayout
 import android.support.v7.widget.LinearLayoutManager
@@ -17,6 +18,9 @@ import android.support.v7.widget.GridLayoutManager
 import com.squareup.picasso.RequestCreator
 import kotlinx.android.synthetic.main.image_drawer_item.view.*
 import kotlinx.android.synthetic.main.image_drawer.view.*
+import android.util.DisplayMetrics
+
+
 
 
 /**
@@ -29,17 +33,33 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
     private lateinit var interactionListener: ImageDrawer.OnImageDrawerInteractionListener
     private lateinit var viewAdapter: ImageDrawerAdapter<T>
     private var prevSlideOffset = 0.0f
+    private var GRID_LAYOUT = false
+    private var GRID_WIDTH = 0 //todo
+    private var DRAWER_HEIGHT_COLLAPSED: Float = 0f
+    private var DRAWER_EXPANDABLE: Boolean = false
+    private var DRAWER_STYLE: Int = 1 //todo
+    //= (context as Activity).windowManager.defaultDisplay.getMetrics(DisplayMetrics()).
+/*                val displayMetrics = DisplayMetrics()
+                (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
+                val width = displayMetrics.widthPixels / SPAN_COUNT*/
 
     constructor(context: Context) : super(context) {
         inflateViews(context)
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        inflateViews(context)
 
-        val myheight = attrs?.getAttributeIntValue("http://schemas.android.com/apk/r‌​es/android", "layout_height", 98)
-        val realheight = attrs?.getAttributeIntValue("http://schemas.android.com/apk/res-auto", "behavior_peekHeight", 99)
-        Log.d(TAG, "constructor 2 attributes: $height + myheight:$myheight + realheight:$realheight")
+        val a = context.theme.obtainStyledAttributes(attrs, R.styleable.ImageDrawer, 0, 0)
+        try {
+            DRAWER_HEIGHT_COLLAPSED = a.getDimension(R.styleable.ImageDrawer_collapsedHeight, 200f) //todo def 236.25? 200? or consider the .toInt value
+            DRAWER_EXPANDABLE =  a.getBoolean(R.styleable.ImageDrawer_expandable, false)
+            DRAWER_STYLE = a.getInteger(R.styleable.ImageDrawer_drawerStyle, 111)
+            Log.d(TAG, "constructor 2.b my typed attributes. collapsedheight: $DRAWER_HEIGHT_COLLAPSED + expandable:$DRAWER_EXPANDABLE + style:$DRAWER_STYLE")
+        } finally {
+            a.recycle()
+        }
+
+        inflateViews(context)
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
@@ -60,6 +80,10 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
 
         viewAdapter = ImageDrawerAdapter<T>(interactionListener)
         setupRecyclerView(LinearLayoutManager(context, orientation, false))
+
+        val displayMetrics = DisplayMetrics()
+        (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
+        GRID_WIDTH = displayMetrics.widthPixels / SPAN_COUNT
     }
 
     override fun onAttachedToWindow() {
@@ -83,7 +107,7 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
                     setupRecyclerView(GridLayoutManager(context, SPAN_COUNT))
                 }
                 else {
-                    val newHeight = context.resources.getDimension(R.dimen.imageDrawer_height_collapsed).toInt() // converts dp to px
+                    val newHeight = DRAWER_HEIGHT_COLLAPSED.toInt() // converts dp to px
                     image_drawer_rv_container.layoutParams.height = newHeight //todo
                     image_drawer_content.layoutParams.height = newHeight
                     setupRecyclerView(LinearLayoutManager(context, orientation, false))
@@ -111,6 +135,7 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = viewAdapter
         recyclerView.addOnScrollListener(RVScrollListener({interactionListener.onLoadMoreRequested()}, layoutManager))
+        GRID_LAYOUT = (layoutManager is GridLayoutManager)
     }
 
     override fun onFinishInflate() {
@@ -144,7 +169,7 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
     /**
      * RecyclerView Adapter implementation
      */
-    class ImageDrawerAdapter<T : BaseDisplayableImage>(private val interactionListener: OnImageDrawerInteractionListener)
+    inner class ImageDrawerAdapter<T : BaseDisplayableImage>(private val interactionListener: OnImageDrawerInteractionListener)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private var data: MutableList<T> = ArrayList()
         fun updateItems(element: T? = null, list: MutableList<T>? = null){
@@ -161,50 +186,70 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
         fun ViewGroup.inflate(layoutRes: Int): View = LayoutInflater.from(context).inflate(layoutRes, this, false)
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int)
-            = (holder as ImageViewHolder).bind(data[position], interactionListener)
-    }
+            = (holder as ImageDrawer<T>.ImageDrawerAdapter<T>.ImageViewHolder).bind(data[position], interactionListener)
+
 
     /**
      * ViewHolder
      */
-    class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(item: BaseDisplayableImage, listener: OnImageDrawerInteractionListener) = with(itemView) {
             image_drawer_item_imageview.loadURL(item.imageURL)
-//            val drawerHeight =  context.resources.getDimension(R.dimen.imageDrawer_height_collapsed).toInt() // converts dp to px
-//            image_drawer_item_imageview.drawable.setBounds(0,0,drawerHeight,        drawerHeight)
 
             setOnClickListener({
                 item.imageClickListener?.onImageClick(item) //call individual onclick listener if it's set
-                listener.onImageClicked(item, itemView) }) //call main_toolbar drawer listener
+                listener.onImageClicked(item, itemView)     //call entire drawer listener
+            })
         }
 
         private fun ImageView.loadURL(url: String) {
-            val picassoRequest : RequestCreator =
-                if(url == "") Picasso.with(context).load(FALLBACK_DRAWABLE_RES)
-                else Picasso.with(context).load(url)
+            val picassoRequest: RequestCreator =
+                    if (url == "") Picasso.with(context).load(FALLBACK_DRAWABLE_RES)
+                    else Picasso.with(context).load(url)
 
-            val drawerHeight =  context.resources.getDimension(R.dimen.imageDrawer_height_collapsed).toInt() // converts dp to px
-//            Log.d(TAG,"drawer height: $drawerHeight")
+            val drawerHeight = DRAWER_HEIGHT_COLLAPSED.toInt()
+//            Log.d(TAG, "dhb4 ${context.resources.getDimension(R.dimen.imageDrawer_height_collapsed)} dhb4_int ${context.resources.getDimension(R.dimen.imageDrawer_height_collapsed).toInt()} dhaf ${DRAWER_HEIGHT_COLLAPSED} dhaf_int ${DRAWER_HEIGHT_COLLAPSED.toInt()}")
 
-            val ph = resources.getDrawable(FALLBACK_DRAWABLE_RES) //todo
-            ph.setBounds(0, 0, drawerHeight, drawerHeight)
-            this
+            if (GRID_LAYOUT) {
 
-            picassoRequest
-                    .resize(0, drawerHeight)
-                    .error(FALLBACK_DRAWABLE_RES)
-                    .placeholder(ph)
-                    .into(this)
-//                    .into(this, object : Callback{
-//                        override fun onSuccess() {
-//                        }
-//
-//                        override fun onError() {
-//                            this@loadURL.layoutParams = RecyclerView.LayoutParams(drawerHeight, drawerHeight)
-//                            this@loadURL.setImageDrawable(context.getDrawable(FALLBACK_DRAWABLE_RES))
-//                        }
-//                    })
+                val ph = resources.getDrawable(FALLBACK_DRAWABLE_RES) //todo
+                ph.setBounds(0, 0, GRID_WIDTH, drawerHeight)
+
+                picassoRequest
+                        .placeholder(ph)
+                        .error(ph)
+                        .resize(GRID_WIDTH, 0)
+                        .onlyScaleDown()
+
+                        .into(this)
+
+                } else { //ROW Layout
+    //            Log.d(TAG,"drawer height: $drawerHeight")
+
+                    val ph = resources.getDrawable(FALLBACK_DRAWABLE_RES) //todo
+                    ph.setBounds(0, 0, drawerHeight, drawerHeight)
+
+                    picassoRequest
+                            .placeholder(ph)
+                            .error(ph)
+                            //  .fit()
+                            .resize(0, drawerHeight)
+                        .onlyScaleDown()
+    //                    .centerCrop()
+                            //.centerInside()
+                            .into(this)
+    //                    .into(this, object : Callback{
+    //                        override fun onSuccess() {
+    //                        }
+    //
+    //                        override fun onError() {
+    //                            this@loadURL.layoutParams = RecyclerView.LayoutParams(drawerHeight, drawerHeight)
+    //                            this@loadURL.setImageDrawable(context.getDrawable(FALLBACK_DRAWABLE_RES))
+    //                        }
+    //                    })
+                }
         }
+    }
     }
 
     /*props https://github.com/juanchosaravia/KedditBySteps/blob/master/app/src/main/java/com/droidcba/kedditbysteps/commons/InfiniteScrollListener.kt#L36*/

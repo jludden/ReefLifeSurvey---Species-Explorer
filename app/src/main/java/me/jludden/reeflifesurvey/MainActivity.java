@@ -226,7 +226,9 @@ public class MainActivity extends AppCompatActivity implements
 
         hideClutter();
         if (savedInstanceState == null) { //start the home fragment
-            launchUIFragment(new HomeFragment(), HomeFragment.TAG, true, false);
+            Fragment home = new HomeFragment();
+            home.setRetainInstance(true);
+            launchUIFragment(home, HomeFragment.TAG, true, false);
         }
     }
 
@@ -360,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements
      * @param fragmentClass
      */
     public void launchNewFragment(Class fragmentClass){
+        Log.d(TAG, "launchnewfrag called");
         if(fragmentClass == CardViewFragment.class){
             launchNewCardViewFragment("");
         }

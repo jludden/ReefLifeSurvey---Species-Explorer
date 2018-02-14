@@ -51,10 +51,6 @@ class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnI
         mViewPager = findViewById<View>(R.id.fullscreen_activity_pager) as ViewPager
         mViewPager.adapter = mViewAdapter
         BottomDrawerBehavior.from<View>(image_drawer).state = BottomDrawerBehavior.STATE_HIDDEN
-        /*val b = BottomDrawerBehavior.from<View>(image_drawer)
-        b.state = BottomDrawerBehavior.STATE_DRAGGING
-        b.onNestedScroll()
-*/
 
         //page change listener. update
         mViewPager.addOnPageChangeListener(object: ViewPager.SimpleOnPageChangeListener(){
@@ -64,8 +60,6 @@ class FullScreenImageActivity : FragmentActivity(), FullScreenImageListener, OnI
                 //todo update zoom level
             }
         })
-
-
 
         //button click listeners
         findViewById<ImageButton>(R.id.button_show_hud).setOnClickListener({

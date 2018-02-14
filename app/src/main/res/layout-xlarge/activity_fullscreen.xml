@@ -22,11 +22,13 @@
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         app:behavior_hideable="true"
-        app:behavior_peekHeight="@dimen/imageDrawer_height_collapsed"
-        custom:collapsedHeight="@dimen/imageDrawer_height_collapsed"
+        app:behavior_peekHeight="@dimen/imageDrawer_height_collapsed_large"
+        custom:collapsedHeight="@dimen/imageDrawer_height_collapsed_large"
         custom:expandable="true"
         custom:drawerStyle="floating"
+
         app:layout_behavior="me.jludden.reeflifesurvey.customviews.BottomDrawerBehavior"/>
+        <!--app:layout_behavior="android.support.design.widget.BottomSheetBehavior"/>-->
 
 
     <!-- TODO-using layout below to keep the viewpager from covering the button-->

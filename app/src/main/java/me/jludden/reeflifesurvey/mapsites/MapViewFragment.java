@@ -93,6 +93,7 @@ public class MapViewFragment extends Fragment
     private SurveySiteList mSurveySiteList;
 
     private MapViewFragmentInteractionListener mMapViewFragmentInteractionListener;
+    private Snackbar mCurrentSnackbar;
 
     public interface MapViewFragmentInteractionListener{
         void peekBottomSheet(SurveySite siteInfo);
@@ -108,7 +109,7 @@ public class MapViewFragment extends Fragment
 
     public static MapViewFragment newInstance() {
         MapViewFragment mapFragment = new MapViewFragment();
-        mapFragment.setRetainInstance(true);
+       // mapFragment.setRetainInstance(true);
         return mapFragment;
     }
 
@@ -232,6 +233,8 @@ public class MapViewFragment extends Fragment
     public boolean onMarkerClick(Marker marker) {
         Log.d("ludden.reeflifesurvey" , "MapViewFragment onMarkerClick marker: "+ marker.toString());
 
+        if(mCurrentSnackbar != null) mCurrentSnackbar.dismiss();
+
         resetMarkerColor(mSelectedMarker);
         mSelectedMarker = marker;
         mSelectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(SELECTED_SITE_COLOR));
@@ -345,7 +348,10 @@ public class MapViewFragment extends Fragment
            }
         }
         else{
-            if(mMapView != null) Snackbar.make(mMapView, R.string.select_a_site, Snackbar.LENGTH_LONG).show();
+            if(mMapView != null) {
+                mCurrentSnackbar = Snackbar.make(mMapView, R.string.select_a_site, Snackbar.LENGTH_SHORT);
+                mCurrentSnackbar.show();
+            }
         }
 
         Log.d(TAG ,"map view fragment fab clicked. markerlist: "+ mSelectedSiteList.toString());

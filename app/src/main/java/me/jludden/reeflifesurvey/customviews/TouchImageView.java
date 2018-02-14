@@ -197,7 +197,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     			// If the image is already rendered, scaleType has been called programmatically
     			// and the TouchImageView should be updated with the new scaleType.
     			//
-                if(getDrawable() != null) setZoom(this);  //jludden - fixing crash on return animation to an empty TouchImageView
+                setZoom(this);  //jludden - fixing crash on return animation to an empty TouchImageView
             }
     	}
     }
@@ -409,9 +409,9 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
      * @param
      */
     public void setZoom(TouchImageView img) {
-        if(img == null) return; //jludden - fixing crash
     	PointF center = img.getScrollPosition();
-    	setZoom(img.getCurrentZoom(), center.x, center.y, img.getScaleType());
+    	center = center != null ? center : new PointF(0.5f,0.5f); //jludden - add default if no drawable
+        setZoom(img.getCurrentZoom(), center.x, center.y, img.getScaleType());
     }
     
     /**

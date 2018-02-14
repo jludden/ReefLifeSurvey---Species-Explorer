@@ -276,7 +276,7 @@ public class InfoCardLoader extends AsyncTaskLoader<List<FishSpecies>> implement
                 mCardDict = new HashMap<>(); //dictionary mapping a fish id to its carddetails
                 Injection.provideDataRepository(getContext().getApplicationContext())
                         .getFishSpeciesAll()
-                        .take(CardViewFragment.CardViewSettings.LOAD_ALL ? 999 : 20)
+//                        .take(CardViewFragment.CardViewSettings.LOAD_ALL ? 999) //todo
                         .subscribe(fish -> mData.add(fish));
                 return;
             }

@@ -11,6 +11,7 @@
     <dimen name="drag_dismiss_distance">112dp</dimen>
     <dimen name="spacing_normal">8dp</dimen>
     <dimen name="imageDrawer_height_collapsed">90dp</dimen>
+    <dimen name="imageDrawer_height_collapsed_large">150dp</dimen>
     <dimen name="toolbar_height">56dp</dimen>
     <dimen name="cardview_height_medium">250dp</dimen>
     <dimen name="cardview_height_large">400dp</dimen>
