@@ -47,6 +47,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="5dp"
             android:elegantTextHeight="true"
+            android:textStyle="italic"
             android:labelFor="@+id/card_image"
             android:textColor="@android:color/white"
             android:textSize="22sp" />

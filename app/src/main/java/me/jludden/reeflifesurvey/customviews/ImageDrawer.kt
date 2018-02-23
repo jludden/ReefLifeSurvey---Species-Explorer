@@ -27,7 +27,7 @@ import android.util.DisplayMetrics
  * View that holds a list of images, with bottom sheet behavior, and the list of images can be expanded into a grid of images
  *  Created by Jason Ludden on 1/2/2018
  */
-@CoordinatorLayout.DefaultBehavior(BottomDrawerBehavior::class)
+@CoordinatorLayout.DefaultBehavior(BottomDrawerBehavior::class) //todo dunno
 class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
 
     private lateinit var interactionListener: ImageDrawer.OnImageDrawerInteractionListener
@@ -48,26 +48,25 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-
-        val a = context.theme.obtainStyledAttributes(attrs, R.styleable.ImageDrawer, 0, 0)
-        try {
-            DRAWER_HEIGHT_COLLAPSED = a.getDimension(R.styleable.ImageDrawer_collapsedHeight, 200f) //todo def 236.25? 200? or consider the .toInt value
-            DRAWER_EXPANDABLE =  a.getBoolean(R.styleable.ImageDrawer_expandable, false)
-            DRAWER_STYLE = a.getInteger(R.styleable.ImageDrawer_drawerStyle, 111)
-            Log.d(TAG, "constructor 2.b my typed attributes. collapsedheight: $DRAWER_HEIGHT_COLLAPSED + expandable:$DRAWER_EXPANDABLE + style:$DRAWER_STYLE")
-        } finally {
-            a.recycle()
-        }
-
+        if(attrs != null) setupAttributes(attrs)
         inflateViews(context)
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        if(attrs != null) setupAttributes(attrs)
         inflateViews(context)
+    }
 
-        val myheight = attrs?.getAttributeIntValue("http://schemas.android.com/apk/r‌​es/android", "layout_height", 98)
-        val realheight = attrs?.getAttributeIntValue("http://schemas.android.com/apk/res-auto", "behavior_peekHeight", 99)
-        Log.d(TAG, "constructor 3 attributes: $height + myheight:$myheight + realheight:$realheight")
+    private fun setupAttributes(attrs: AttributeSet){
+        val styledAttributes = context.theme.obtainStyledAttributes(attrs, R.styleable.ImageDrawer, 0, 0)
+        try {
+            DRAWER_HEIGHT_COLLAPSED = styledAttributes.getDimension(R.styleable.ImageDrawer_collapsedHeight, 200f) //todo def 236.25? 200? or consider the .toInt value
+            DRAWER_EXPANDABLE =  styledAttributes.getBoolean(R.styleable.ImageDrawer_expandable, false)
+            DRAWER_STYLE = styledAttributes.getInteger(R.styleable.ImageDrawer_drawerStyle, 111)
+            Log.d(TAG, "my typed attributes. collapsedheight: $DRAWER_HEIGHT_COLLAPSED + expandable:$DRAWER_EXPANDABLE + style:$DRAWER_STYLE")
+        } finally {
+            styledAttributes.recycle()
+        }
     }
 
     private fun inflateViews(context: Context) {
@@ -88,6 +87,8 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        if(layoutParams !is CoordinatorLayout.LayoutParams) return
+
         val behavior = BottomDrawerBehavior.from(this)
         behavior.setBottomSheetCallback(object : BottomDrawerBehavior.BottomSheetCallback() {
             /**
@@ -223,7 +224,7 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
 
                         .into(this)
 
-                } else { //ROW Layout
+            } else { //ROW Layout
     //            Log.d(TAG,"drawer height: $drawerHeight")
 
                     val ph = resources.getDrawable(FALLBACK_DRAWABLE_RES) //todo
@@ -298,11 +299,11 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
 /**
  * Base class for images that can be displayed in the image drawer
  *  @param imageURL - string or res loaded with picasso
- *  @param identifier - optional object that can be associated with the image and retrieved when the item is clicked (such as a String identifier)
+ *  @param tag - optional object that can be associated with the image and retrieved when the item is clicked (such as a String tag)
  *  @param imageClickListener - optional listener for when this item, but not others, is clicked
  */
 open class BaseDisplayableImage(val imageURL: String,
-            val identifier: kotlin.Any?, var imageClickListener: OnBaseDisplayableImageClickListener? = null) {
+                                val tag: kotlin.Any?, var imageClickListener: OnBaseDisplayableImageClickListener? = null) {
     interface OnBaseDisplayableImageClickListener {
         fun onImageClick(obj : BaseDisplayableImage)
     }

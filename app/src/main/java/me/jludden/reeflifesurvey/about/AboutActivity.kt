@@ -27,7 +27,7 @@ import me.jludden.reeflifesurvey.R.id.*
 /**
  * Created by Jason on 11/30/2017.
  *
- * Species thanks to the Plaid app
+ * Special thanks to the Plaid app
  *  - the UI depends heavily on Nick Butcher's ElasticDragDismissFrameLayout and InkPageIndicator classes
  */
 class AboutActivity : AppCompatActivity() {

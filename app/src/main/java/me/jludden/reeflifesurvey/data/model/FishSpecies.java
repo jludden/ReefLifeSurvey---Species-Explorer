@@ -16,6 +16,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import me.jludden.reeflifesurvey.customviews.BaseDisplayableImage;
 import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.Favoritable;
 import me.jludden.reeflifesurvey.data.utils.StoredImageLoader;
 

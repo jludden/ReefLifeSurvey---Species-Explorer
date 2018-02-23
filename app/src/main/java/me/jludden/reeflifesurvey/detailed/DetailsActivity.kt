@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.transition.Transition
@@ -16,45 +17,57 @@ import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.details_view_pager_item.*
 import me.jludden.reeflifesurvey.Injection
 import me.jludden.reeflifesurvey.R
+import me.jludden.reeflifesurvey.customviews.BaseDisplayableImage
 import me.jludden.reeflifesurvey.customviews.BottomSheet
 import me.jludden.reeflifesurvey.customviews.ImageDrawer
-import me.jludden.reeflifesurvey.customviews.TouchImageView
+import me.jludden.reeflifesurvey.customviews.ImageDrawer.OnImageDrawerInteractionListener
 import me.jludden.reeflifesurvey.data.*
 import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.setUpFavoritesButton
 import me.jludden.reeflifesurvey.data.DataSource.*
 import me.jludden.reeflifesurvey.data.model.*
 import me.jludden.reeflifesurvey.data.utils.SharedPreferencesUtils.FAVORITES_OUTLINE_WHITE
 import me.jludden.reeflifesurvey.data.utils.StoredImageLoader
+import me.jludden.reeflifesurvey.fullscreenquiz.ImagePagerAdapter
 
 /**
  * Created by Jason on 11/19/2017.
  *
  * supporting postpone enter transition, but it can be very slow currently only postponing transition for fish species
  */
-class DetailsActivity : AppCompatActivity() {
+class DetailsActivity : AppCompatActivity(), OnImageDrawerInteractionListener {
     private lateinit var dataRepo: DataSource
+
     private var speciesCard: FishSpecies? = null
     private lateinit var favoriteBtn: CheckBox
     private val additionalImageURLs: MutableList<String> = ArrayList()
     private var isInitialLoad: Boolean = true
     private lateinit var storedImageLoader: StoredImageLoader
-
+    private lateinit var viewAdapter: ImagePagerAdapter<BaseDisplayableImage>
+    private lateinit var viewPager: ViewPager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
         setContentView(R.layout.activity_details)
         val toolbar = findViewById<View>(R.id.details_toolbar) as Toolbar
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true) // show back button
         isInitialLoad = (savedInstanceState==null)
-        var postpone = true
+        var postpone = false //todo !!
         val b = intent.extras
         if(b != null && b.getBoolean(ARGS_NO_POSTPONE)) {
             postpone = false
         }
         Log.d(TAG, "details oncreate savedinstancestate-null?:${savedInstanceState==null}  postpone:$postpone ${b==null} ${b.getBoolean(ARGS_NO_POSTPONE)}")
 
+        viewPager = findViewById<View>(R.id.main_image_pager) as ViewPager
+        viewAdapter = ImagePagerAdapter(this, object: ImagePagerAdapter.ImagePagerAdapterListener{
+            override fun onSuccess() { supportStartPostponedEnterTransition() }
+
+            override fun onError() { supportStartPostponedEnterTransition() }
+
+            override fun onLoadMoreRequested() { }
+        })
+        viewPager.adapter = viewAdapter
 
         dataRepo = Injection.provideDataRepository(applicationContext)
         storedImageLoader = StoredImageLoader(applicationContext)
@@ -127,7 +140,6 @@ class DetailsActivity : AppCompatActivity() {
 
     fun setupFishDetails(card: FishSpecies) {
 
-        val mainImageView = findViewById<TouchImageView>(R.id.details_image_main)
    /*   //todo do this in a viewpager instead
         mainImageView.setOnTouchListener { v, event ->
             if(event.action == MotionEvent.ACTION_MOVE && !mainImageView.isZoomed){
@@ -162,7 +174,10 @@ class DetailsActivity : AppCompatActivity() {
             newText.append("\n" + site.siteName + "\t" + numSightings)
         }
 
+
         //global listener to resize view after layout changes
+        //todo need to do this to the viewpager?
+        /*
         val globalListener = ViewTreeObserver.OnGlobalLayoutListener {
             mainImageView.loadURL(card.imageURLs.get(0), null)
 //            mainImageView.viewTreeObserver.removeOnGlobalLayoutListener(this@)
@@ -176,41 +191,36 @@ class DetailsActivity : AppCompatActivity() {
         } else {
             supportStartPostponedEnterTransition()
         }
+        */
 
-        val additionalImages = findViewById<LinearLayout>(R.id.details_additional_images)
+
+
         if (card.imageURLs == null) {
             Log.d(TAG, "DetailsviewAdapter card details no images to load")
             newText.append("\n No Images Found")
         }
         else {
             newText.append("Number of images: " + card.imageURLs.size + "\n")
+            val imageDrawer = findViewById<ImageDrawer<BaseDisplayableImage>>(R.id.image_drawer)
+
             for (url in card.imageURLs) {
-                val iv = ImageView(this)
-                iv.layoutParams = LinearLayout.LayoutParams(250, 250)
+                val item = BaseDisplayableImage(url, null, null)
+                imageDrawer.addItem(item)
+                viewAdapter.addItem(item)
 
-                //todo really shouldnt make a new one for each item
-                iv.setOnClickListener { loadNextImage(url, mainImageView, globalListener) }
-
-                Picasso.with(this)
-                    .load(url)
-                    .placeholder(R.drawable.ic_menu_camera)
-                    .into(iv)
-                iv.setPadding(0, 0, 0, 5)
-                additionalImages.addView(iv)
-
-                additionalImageURLs.add(url)
+                additionalImageURLs.add(url) //todo ? do i need
             }
         }
 
         newText.append("\n").append("SPECIES PAGE URL: ").append(card.reefLifeSurveyURL)
         Log.d(TAG, newText.toString())
     }
-
-
-    private fun loadNextImage(url: String, mainImageView: TouchImageView, globalListener: ViewTreeObserver.OnGlobalLayoutListener) {
-        mainImageView.viewTreeObserver.removeOnGlobalLayoutListener(globalListener)
+/*
+    private fun loadNextImage(url: String, mainImageView: TouchImageView, globalListener: ViewTreeObserver.OnGlobalLayoutListener?) {
+        if(globalListener != null) mainImageView.viewTreeObserver.removeOnGlobalLayoutListener(globalListener)
         mainImageView.loadURL(url, mainImageView.drawable)
-    }
+    }*/
+
 
     private fun ImageView.loadURL(url: String, placeholder: Drawable?) {
         Picasso.with(context)
@@ -260,6 +270,15 @@ class DetailsActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDrawerStateChanged(newState: Int) { }
+
+    override fun onLoadMoreRequested() {  }
+
+    override fun onImageClicked(item: BaseDisplayableImage, sharedElement: View) {
+        val page = viewAdapter.findPageForItem(item)
+        viewPager.currentItem = page
     }
 
     companion object {
