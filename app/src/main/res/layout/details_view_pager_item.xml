@@ -5,20 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/details_fishspecies_scrollview">
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
+        <!--main image pager-->
         <me.jludden.reeflifesurvey.customviews.ExtendedViewPager
             android:id="@+id/main_image_pager"
             android:layout_width="fill_parent"
             android:layout_height="400dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
             android:transitionName="@string/transition_launch_details"
             />
-
+        <!--400dp-->
         <!--            android:layout_height="wrap_content"-->
 
         <!--layout to show additional images-->
@@ -27,30 +26,11 @@
             android:id="@+id/image_drawer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/fullscreen_activity_pager"
-            android:alpha="0.9"
             android:background="@color/black_semi_transparent"
             android:orientation="horizontal"
-            android:layout_alignParentBottom="true"
-            app:behavior_hideable="true"
             app:behavior_peekHeight="@dimen/imageDrawer_height_collapsed"
             custom:collapsedHeight="@dimen/imageDrawer_height_collapsed"
-            custom:expandable="true"
             custom:drawerStyle="floating"/>
-
-        <!--            android:layout_alignBaseline="@+id/details_additional_images_scrollview"
-            android:layout_alignBottom="@+id/details_additional_images_scrollview"-->
-    <!--    <CheckBox
-            android:id="@+id/favorite_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/details_image_main"
-            android:layout_alignBottom="@+id/details_image_main"
-            android:layout_alignParentEnd="true"
-            android:button="@drawable/ic_favorite_heart_outline"
-            android:paddingEnd="8dp"
-            android:paddingStart="2dp"
-            android:paddingTop="12dp" />-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -59,7 +39,6 @@
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:id="@+id/details_scientific_name"
-            android:layout_below="@id/image_drawer"
             android:weightSum="1">
 
             <TextView
@@ -77,7 +56,6 @@
                 android:layout_weight=".7"
                 android:textStyle="italic"
                 android:textAppearance="@android:style/TextAppearance.Material.Medium" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -87,7 +65,6 @@
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:id="@+id/details_common_name"
-            android:layout_below="@id/details_scientific_name"
             android:weightSum="1">
 
             <TextView
@@ -103,25 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight=".7"
                 android:textAppearance="@android:style/TextAppearance.Material.Medium"  />
-
         </LinearLayout>
 
-
-  <!--      <Button
-            android:id="@+id/link_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/details_common_name"
-            android:layout_alignParentRight="true"
-            android:text="@string/launch_in_website"
-            android:drawableLeft="@drawable/ic_open_in_browser"/>-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/details_text"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@id/details_common_name"-->
-            <!--android:text="hello this is textview"/>-->
-
-    </RelativeLayout>
+    </LinearLayout>
 </ScrollView>

@@ -190,7 +190,7 @@ class FullScreenImageActivity : FragmentActivity(), ImagePagerAdapterListener, O
 
     override fun onLoaderReset(loader: Loader<List<FishSpecies>>) {}
 
-    //Picasso loading callbacks
+    //unused Picasso loading callbacks
     override fun onSuccess() {}
     override fun onError() { }
 

@@ -56,6 +56,9 @@ class ImagePagerAdapter<T : BaseDisplayableImage>(private val mActivity: Activit
         mImgDisplay = viewLayout.findViewById<View>(R.id.full_screen_image_view) as TouchImageView
         container.addView(viewLayout)
 
+        //todo offline
+        //todo resize?
+
         //Set the Card Image
         if (!mCardList.isEmpty()) {
             val cardDetails = mCardList[position]

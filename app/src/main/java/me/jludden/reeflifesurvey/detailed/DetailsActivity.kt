@@ -52,7 +52,7 @@ class DetailsActivity : AppCompatActivity(), OnImageDrawerInteractionListener {
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true) // show back button
         isInitialLoad = (savedInstanceState==null)
-        var postpone = false //todo !!
+        var postpone = true //todo !!
         val b = intent.extras
         if(b != null && b.getBoolean(ARGS_NO_POSTPONE)) {
             postpone = false
