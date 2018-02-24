@@ -2,7 +2,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_layout"
-    android:background="@color/colorPrimary"
+    android:background="@color/black"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -28,25 +28,6 @@
         custom:drawerStyle="floating"
         app:layout_behavior="me.jludden.reeflifesurvey.customviews.BottomDrawerBehavior"/>
 
-
-    <!-- TODO-using layout below to keep the viewpager from covering the button-->
-    <!--android:elevation="1dp"
-        android:layout_below="@+id/button_close"-->
-
-    <!--<Button
-        android:id="@+id/button_close"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="15dp"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp"
-        app:srcCompat="@drawable/ic_close"
-        android:background="@drawable/button_background"
-        android:textColor="#ffffff"
-        android:text="Close" />-->
     <ImageButton
         android:id="@+id/button_close"
         android:layout_width="wrap_content"
