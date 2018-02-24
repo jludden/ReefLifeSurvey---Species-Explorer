@@ -10,6 +10,7 @@ import android.support.annotation.IdRes
 import android.support.v7.app.AppCompatActivity
 import android.transition.Transition
 import android.transition.TransitionSet
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.SearchView

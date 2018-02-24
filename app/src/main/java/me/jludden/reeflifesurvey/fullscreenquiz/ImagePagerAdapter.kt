@@ -10,22 +10,19 @@ import android.support.v4.view.PagerAdapter
 
 
 import java.util.ArrayList
-
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.squareup.picasso.Callback
-
 import com.squareup.picasso.Picasso
-
 import me.jludden.reeflifesurvey.customviews.TouchImageView
 import me.jludden.reeflifesurvey.data.model.FishSpecies
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.customviews.BaseDisplayableImage
+import me.jludden.reeflifesurvey.data.utils.StoredImageLoader
 
 
 class ImagePagerAdapter<T : BaseDisplayableImage>(private val mActivity: Activity, private val mListener: ImagePagerAdapterListener) : PagerAdapter() {
@@ -34,6 +31,7 @@ class ImagePagerAdapter<T : BaseDisplayableImage>(private val mActivity: Activit
     private var mImgDisplay: ImageView? = null
     private var mCurrentPos: Int = 0
     private val PAGE_CHANGE_THRESHOLD = 3
+    private val storedImageLoader = StoredImageLoader(mActivity.applicationContext)
 
     interface ImagePagerAdapterListener : Callback {
         fun onLoadMoreRequested()
@@ -52,30 +50,34 @@ class ImagePagerAdapter<T : BaseDisplayableImage>(private val mActivity: Activit
         if (position >= mCardList.size - PAGE_CHANGE_THRESHOLD) mListener.onLoadMoreRequested()
 
         mLayoutInflater = mActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val viewLayout = mLayoutInflater!!.inflate(R.layout.fullscreen_view_pager_item, container, false)
+        val viewLayout = mLayoutInflater!!.inflate(R.layout.image_pager_item, container, false)
         mImgDisplay = viewLayout.findViewById<View>(R.id.full_screen_image_view) as TouchImageView
         container.addView(viewLayout)
 
-        //todo offline
-        //todo resize?
-
         //Set the Card Image
-        if (!mCardList.isEmpty()) {
-            val cardDetails = mCardList[position]
-            if (cardDetails.imageURL == "") {
-                Picasso.with(mActivity)
-                        .load(R.drawable.ic_menu_camera)
-                        .into(mImgDisplay, mListener)
-            } else {
-                Picasso.with(mActivity)
-                        .load(cardDetails.imageURL)
-                        .placeholder(R.drawable.ic_menu_camera)
-                        .error(R.drawable.ic_menu_camera)
-                        .into(mImgDisplay, mListener)
-            }
+        val card = mCardList[position]
+        var loadedSuccessfully = false
+        if(position == 0) {
+            loadedSuccessfully = (card.tag as FishSpecies).tryLoadPrimaryImageOffline(storedImageLoader, mImgDisplay)
         }
-
+        if(!loadedSuccessfully) (mImgDisplay as TouchImageView).loadURL(card.imageURL)
         return viewLayout
+    }
+
+    //note - normally would resize to save space. In this case, we want the highest detail possible
+    private fun TouchImageView.loadURL(url: String) {
+        if(url == ""){
+            Picasso.with(mActivity)
+                    .load(R.drawable.ic_menu_camera)
+                    .into(mImgDisplay, mListener)
+        } else {
+            Picasso.with(context)
+                    .load(url)
+                    .placeholder(R.drawable.ic_menu_camera)
+                    .error(R.drawable.ic_menu_camera)
+//                    .resize(SCREEN_WIDTH, 0)
+                    .into(this, mListener)
+        }
     }
 
   /*  fun updateItems(data: List<FishSpecies>) {
@@ -103,4 +105,5 @@ class ImagePagerAdapter<T : BaseDisplayableImage>(private val mActivity: Activit
     fun findItemForPage(page: Int): T {
         return mCardList[page]
     }
+
 }

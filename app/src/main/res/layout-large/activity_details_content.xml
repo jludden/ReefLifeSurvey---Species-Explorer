@@ -14,7 +14,7 @@
         <me.jludden.reeflifesurvey.customviews.ExtendedViewPager
             android:id="@+id/main_image_pager"
             android:layout_width="fill_parent"
-            android:layout_height="400dp"
+            android:layout_height="@dimen/details_viewpager_height_xlarge"
             android:transitionName="@string/transition_launch_details"
             />
         <!--400dp-->
@@ -26,7 +26,7 @@
             android:id="@+id/image_drawer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/black_semi_transparent"
+            android:background="@color/white"
             android:orientation="horizontal"
             app:behavior_peekHeight="@dimen/imageDrawer_height_collapsed"
             custom:collapsedHeight="@dimen/imageDrawer_height_collapsed"

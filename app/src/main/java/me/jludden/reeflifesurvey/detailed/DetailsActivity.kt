@@ -14,7 +14,7 @@ import android.widget.*
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_details.*
-import kotlinx.android.synthetic.main.details_view_pager_item.*
+import kotlinx.android.synthetic.main.activity_details_content.*
 import me.jludden.reeflifesurvey.Injection
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.customviews.BaseDisplayableImage
@@ -41,7 +41,6 @@ class DetailsActivity : AppCompatActivity(), OnImageDrawerInteractionListener {
     private lateinit var favoriteBtn: CheckBox
     private val additionalImageURLs: MutableList<String> = ArrayList()
     private var isInitialLoad: Boolean = true
-    private lateinit var storedImageLoader: StoredImageLoader
     private lateinit var viewAdapter: ImagePagerAdapter<BaseDisplayableImage>
     private lateinit var viewPager: ViewPager
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +69,6 @@ class DetailsActivity : AppCompatActivity(), OnImageDrawerInteractionListener {
         viewPager.adapter = viewAdapter
 
         dataRepo = Injection.provideDataRepository(applicationContext)
-        storedImageLoader = StoredImageLoader(applicationContext)
 
         if(intent.hasExtra(FishSpecies.INTENT_EXTRA)){
             val card = intent.getParcelableExtra<FishSpecies>(FishSpecies.INTENT_EXTRA)
@@ -132,23 +130,12 @@ class DetailsActivity : AppCompatActivity(), OnImageDrawerInteractionListener {
                 setupFishDetails(card)
             }
 
-            override fun onDataNotAvailable(reason: String) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+            override fun onDataNotAvailable(reason: String) { } //todo ;)
         })
     }
 
     fun setupFishDetails(card: FishSpecies) {
 
-   /*   //todo do this in a viewpager instead
-        mainImageView.setOnTouchListener { v, event ->
-            if(event.action == MotionEvent.ACTION_MOVE && !mainImageView.isZoomed){
-                Log.d(TAG, "move action registered")
-                //todo same as onclick
-            }
-            false
-        }
-*/
         val scientificNames = findViewById<TextView>(R.id.details_label_scientific)
         val commonNames = findViewById<TextView>(R.id.details_label_common)
         speciesCard = card
@@ -158,7 +145,7 @@ class DetailsActivity : AppCompatActivity(), OnImageDrawerInteractionListener {
         //set up toolbar
         supportActionBar?.title = card.scientificName
 
-        val newText = StringBuilder(
+        val summaryText = StringBuilder(
             "Card Name " + card.scientificName + "\n" +
                 "Common Names" + card.commonNames + "\n" +
                 "Num sightings " + card.numSightings + "\n" +
@@ -171,40 +158,20 @@ class DetailsActivity : AppCompatActivity(), OnImageDrawerInteractionListener {
             site = siteKeys.nextElement()
 
             val numSightings = card.FoundInSites.get(site)
-            newText.append("\n" + site.siteName + "\t" + numSightings)
+            summaryText.append("\n" + site.siteName + "\t" + numSightings)
         }
-
-
-        //global listener to resize view after layout changes
-        //todo need to do this to the viewpager?
-        /*
-        val globalListener = ViewTreeObserver.OnGlobalLayoutListener {
-            mainImageView.loadURL(card.imageURLs.get(0), null)
-//            mainImageView.viewTreeObserver.removeOnGlobalLayoutListener(this@)
-        }
-
-        val loadedSuccessfully = card.tryLoadPrimaryImageOffline(storedImageLoader, mainImageView)
-        if(!loadedSuccessfully && (card.imageURLs != null && card.imageURLs.size >= 1)) {
-            //load image after layout is measured so we can fill the whole view
-            mainImageView.viewTreeObserver.addOnGlobalLayoutListener(globalListener)
-
-        } else {
-            supportStartPostponedEnterTransition()
-        }
-        */
-
-
 
         if (card.imageURLs == null) {
             Log.d(TAG, "DetailsviewAdapter card details no images to load")
-            newText.append("\n No Images Found")
+            summaryText.append("\n No Images Found")
+            supportStartPostponedEnterTransition()
         }
         else {
-            newText.append("Number of images: " + card.imageURLs.size + "\n")
+            summaryText.append("Number of images: " + card.imageURLs.size + "\n")
             val imageDrawer = findViewById<ImageDrawer<BaseDisplayableImage>>(R.id.image_drawer)
 
             for (url in card.imageURLs) {
-                val item = BaseDisplayableImage(url, null, null)
+                val item = BaseDisplayableImage(url, card, null)
                 imageDrawer.addItem(item)
                 viewAdapter.addItem(item)
 
@@ -212,31 +179,8 @@ class DetailsActivity : AppCompatActivity(), OnImageDrawerInteractionListener {
             }
         }
 
-        newText.append("\n").append("SPECIES PAGE URL: ").append(card.reefLifeSurveyURL)
-        Log.d(TAG, newText.toString())
-    }
-/*
-    private fun loadNextImage(url: String, mainImageView: TouchImageView, globalListener: ViewTreeObserver.OnGlobalLayoutListener?) {
-        if(globalListener != null) mainImageView.viewTreeObserver.removeOnGlobalLayoutListener(globalListener)
-        mainImageView.loadURL(url, mainImageView.drawable)
-    }*/
-
-
-    private fun ImageView.loadURL(url: String, placeholder: Drawable?) {
-        Picasso.with(context)
-            .load(url)
-            .placeholder(placeholder)
-            .resize(details_fishspecies_scrollview.width,0) //only works after layout measured
-            .error(R.drawable.ic_menu_camera)
-            .into(this, object: Callback {
-                override fun onSuccess() {
-                    supportStartPostponedEnterTransition()
-                }
-
-                override fun onError() {
-                    supportStartPostponedEnterTransition()
-                }
-            })
+        summaryText.append("\n").append("SPECIES PAGE URL: ").append(card.reefLifeSurveyURL)
+        Log.d(TAG, summaryText.toString())
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

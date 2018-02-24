@@ -80,9 +80,7 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
         viewAdapter = ImageDrawerAdapter<T>(interactionListener)
         setupRecyclerView(LinearLayoutManager(context, orientation, false))
 
-        val displayMetrics = DisplayMetrics()
-        (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
-        GRID_WIDTH = displayMetrics.widthPixels / SPAN_COUNT
+        GRID_WIDTH = (context as Activity).getScreenWidthPx()
     }
 
     override fun onAttachedToWindow() {
@@ -294,6 +292,15 @@ class ImageDrawer<T : BaseDisplayableImage>: LinearLayout {
 
         const val SCROLLING_VISIBLE_THRESHOLD = 1
     }
+}
+
+/**
+ * Returns the width of the screen in pixels
+ */
+fun Activity.getScreenWidthPx(): Int {
+    val displayMetrics = DisplayMetrics()
+    windowManager.defaultDisplay.getMetrics(displayMetrics)
+    return (displayMetrics.widthPixels / ImageDrawer.SPAN_COUNT)
 }
 
 /**

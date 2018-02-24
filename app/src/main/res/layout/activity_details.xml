@@ -19,7 +19,7 @@
 
 
     <!--SHOWN by default - details for fish species-->
-    <include layout="@layout/details_view_pager_item" />
+    <include layout="@layout/activity_details_content" />
 
     <!--HIDDEN by default - details for survey sites-->
     <ScrollView

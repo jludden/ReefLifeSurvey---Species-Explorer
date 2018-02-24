@@ -14,7 +14,7 @@ import android.util.Pair
 import android.view.View
 import android.widget.ImageButton
 import kotlinx.android.synthetic.main.activity_fullscreen.*
-import kotlinx.android.synthetic.main.fullscreen_view_pager_item.*
+import kotlinx.android.synthetic.main.image_pager_item.*
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.customviews.BaseDisplayableImage
 import me.jludden.reeflifesurvey.customviews.BottomDrawerBehavior
