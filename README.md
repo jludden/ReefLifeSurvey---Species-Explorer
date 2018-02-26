@@ -1,7 +1,6 @@
 # ReefLifeSurvey - Species Explorer
 
-<img src="screenshots/launching_details_gif.gif" width="51%" align="right" hspace="20">
-<img src="screenshots/launching_fullscreen_gif.gif" width="51%" align="right" hspace="20">
+<img src="screenshots/launching_details_gif.gif" width="300" align="right" hspace="20">
 
 Android application for browsing fish species and survey site locations based on data collected by the Australian non-profit [ReefLifeSurvey](www.reeflifesurvey.com)
 
