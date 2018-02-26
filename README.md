@@ -5,6 +5,9 @@ Android application for browsing fish species and survey site locations based on
 
 ReefLifeSurvey brings the world's coral reefs and tropical fish to life!
 
+<img src="screenshots/launching_details_gif.gif" width="300" align="left" hspace="20">
+<img src="screenshots/launching_fullscreen_gif.gif" width="300" align="right" hspace="20">
+
 <img src="screenshots/card_view_framed.png" width="50%" />
 <img src="screenshots/map_view_framed.png" width="50%" />
 
@@ -19,7 +22,7 @@ Also, please consider donating to [ReefLifeSurvey](https://reeflifesurvey.com/ho
 
 ## Authors
 
-* [Jason Ludden](https://www.linkedin.com/in/jason-ludden-13778b46/)
+* [Jason Ludden](https://www.linkedin.com/in/jason-ludden/)
 
 ## License
 
