@@ -10,6 +10,8 @@ ReefLifeSurvey brings the world's coral reefs and tropical fish to life!
 
 **[Install on Google Play (Beta Testing)](https://play.google.com/apps/testing/me.jludden.reeflifesurvey)**
 
+**[Try it in the web browser] (https://appetize.io/embed/eqepaxgutfcqpr5yxud87f2u6r?device=nexus5&scale=75&orientation=portrait&osVersion=7.1)**
+
 ### Screenshots
 
 <img src="screenshots/cardview.png" width="25%" />
