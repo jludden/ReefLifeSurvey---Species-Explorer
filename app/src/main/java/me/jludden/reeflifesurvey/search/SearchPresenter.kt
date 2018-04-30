@@ -39,34 +39,17 @@ class SearchPresenter(
         searchView.setProgressIndicator(true)
 
         //merge fish species and survey sites, filter by query string, then take a max of 15 results
-        /*val allResults: Observable<SearchResultable> = Observable.concat(
-                    dataRepository.getFishSpeciesAll(),
-                    dataRepository.getSurveySitesAll())
-
-        val matchesQuery: Observable<SearchResultable> = allResults
-                .filter({it.matchesQuery(query)})
-                .take(SearchFragment.MAX_ITEM_DISPLAY_COUNT)
-        */
-
-        //merge fish species and survey sites, filter by query string, then take a max of 15 results
-        val allResults: Observable<SearchResultable> = Observable.concat(
-                    dataRepository.getFishSpeciesAll(),
-                    dataRepository.getSurveySitesAll())
-
-        val matchesQuery: Observable<SearchResultable> = allResults
-                .filter({it.matchesQuery(query)})
-                .take(SearchFragment.MAX_ITEM_DISPLAY_COUNT)
-
-        //remove progress indicator if no results returned
-//        matchesQuery.count().subscribe({count -> if(count == 0L) searchView.setAdditionalMessage(Message.NO_RESULTS_RETURNED) })
-
-        //map the resulting species/sites to SearchResults
-        val resultsObservable: Observable<SearchResult> = matchesQuery
-                .map({ res -> res.createResult(query) })
+        val resultsObservable = Observable.concat<SearchResultable>(
+                dataRepository.getFishSpeciesAll(), dataRepository.getSurveySitesAll())
+                .filter({ it.matchesQuery(query) })
+                .take( SearchFragment.MAX_ITEM_DISPLAY_COUNT )
+                .map<SearchResult>({ found -> found.createResult(query) }) //map to correct type
 
         //subscribe in the SearchView and add it to the composite so it will be cleaned up later
+        //  subscribe on count as well to notify view if no results are found
         compositeSubscription.addAll(
-                resultsObservable.subscribe({ res -> searchView.addSearchResult(res) }),
+                resultsObservable.subscribe(
+                        { res -> searchView.addSearchResult(res) }),
                 resultsObservable.count().subscribe(
                         {count -> if(count == 0L) noResultsFound() }))
     }

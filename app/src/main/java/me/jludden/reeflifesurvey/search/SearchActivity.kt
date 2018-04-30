@@ -43,6 +43,11 @@ class SearchActivity : AppCompatActivity() {
         //Create View
         val searchFragment = supportFragmentManager.findFragmentById(R.id.search_results_container)
                 as SearchFragment? ?: SearchFragment.newInstance()
+        searchFragment.setupSearchChips(object: SearchFragment.SearchChipHandler{
+            override fun onChipClicked(chipText: String) {
+                search_view.setQuery(chipText, true)
+            }
+        })
 
         supportFragmentManager
                 .beginTransaction()
@@ -51,9 +56,9 @@ class SearchActivity : AppCompatActivity() {
 
         //Create Presenter
         val searchPresenter = SearchPresenter(
-                Injection.provideDataRepository(applicationContext),
-                compositeSubscription,
-                searchFragment
+                dataRepository = Injection.provideDataRepository(applicationContext),
+                compositeSubscription = compositeSubscription,
+                searchView = searchFragment
         )
 
         //set up return button and searchbox
@@ -107,6 +112,10 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onEnterAnimationComplete() {
         search_view.requestFocus()
+
+        //display search chips when loading completes
+        (supportFragmentManager.findFragmentById(R.id.search_results_container)
+                as SearchFragment).displayChips(true)
     }
 
     //credit Nick Butcher - Plaid app

@@ -2,8 +2,12 @@ package me.jludden.reeflifesurvey.search
 
 import android.app.ActivityOptions
 import android.content.Intent
+import android.opengl.Visibility
+import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.ViewHolder
@@ -13,9 +17,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_fullscreen.*
 import me.jludden.reeflifesurvey.data.model.SearchResult
 import kotlinx.android.synthetic.main.search_results_item.view.*
 import me.jludden.reeflifesurvey.data.model.SearchResultType
@@ -24,6 +30,8 @@ import me.jludden.reeflifesurvey.detailed.DetailsActivity
 import me.jludden.reeflifesurvey.detailed.DetailsActivity.Companion.REQUEST_CODE
 import me.jludden.reeflifesurvey.fishcards.CardViewFragment.animateView
 import me.jludden.reeflifesurvey.search.SearchContract.View.Message
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -46,6 +54,7 @@ class SearchFragment : Fragment(), SearchContract.View {
 
     lateinit var recyclerView: RecyclerView
     lateinit var viewAdapter: SearchResultsAdapter
+    lateinit var searchChipHandler: SearchChipHandler
     internal var itemListener: SearchResultItemListener = object : SearchResultItemListener {
         override fun onItemClicked(item: SearchResult, v: View) {
             //presenter.onItemClicked(item)
@@ -67,16 +76,59 @@ class SearchFragment : Fragment(), SearchContract.View {
         return root
     }
 
+    fun setupSearchChips(handler: SearchChipHandler) {
+        searchChipHandler = handler
+    }
+
+    //display some common search options
+    fun displayChips(active: Boolean) {
+        val chipContainer = view?.findViewById<LinearLayout>(R.id.chip_container) as LinearLayout
+//        chipContainer.animate().alpha(1.0f)
+        //or animateView(...
+
+        if(!active) animateView(chipContainer, View.INVISIBLE, 0f, 200)
+        else {
+            // random chip contents
+            //animate them in sequentially
+            chipContainer.removeAllViews()
+            animateView(chipContainer, View.VISIBLE, 1f, 400)
+
+            var count = 0
+            getRandomChips().forEach {
+                val chip = layoutInflater.inflate(R.layout.search_chip, null) as TextView
+                val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+//                params.gravity = LinearLayout.LayoutParams.
+                params.setMargins(16, 16, 16, 16)
+                chip.layoutParams = params
+                chip.visibility = View.GONE
+                val mt : String = it
+                chip.text = it
+//                chip.isClickable = true
+                chip.setTextColor(resources.getColor(R.color.white))
+                chip.setOnClickListener({
+                    searchChipHandler.onChipClicked(mt)
+//                    presenter.onQueryTextChange(mt)
+//                    presenter.onQueryTextChange((it as TextView).text as String?)
+                })
+                animateView(chip, View.VISIBLE, 1f, 600 + (++count*300))
+                chipContainer.addView(chip)
+            }
+
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         presenter.start()
     }
 
-    //TODO animateView when loading/clear data (see cardviewfragment.animateView)
     //true - show an overlay loading bar, false - remove
     override fun setProgressIndicator(active: Boolean) {
         val progressBar =  view?.findViewById<View>(R.id.progress_overlay)
-        if(active) animateView(progressBar, View.VISIBLE, 0.4f, 200)
+        if(active){
+            animateView(progressBar, View.VISIBLE, 0.4f, 0)
+            displayChips(false)
+        }
         else animateView(progressBar, View.GONE, 0f, 200)
     }
 
@@ -103,13 +155,14 @@ class SearchFragment : Fragment(), SearchContract.View {
         Log.d(TAG, "searchfragment addSearchResult "+newResult)
 
         viewAdapter.updateItems(element = result)
-        setProgressIndicator(false);
+        setProgressIndicator(false)
     }
 
     override fun clearSearchResults() {
         viewAdapter.updateItems(list = ArrayList())
         setProgressIndicator(false)
         setAdditionalMessage(Message.NONE)
+        displayChips(true)
     }
 
     /**
@@ -204,9 +257,7 @@ class SearchFragment : Fragment(), SearchContract.View {
             }
         }
 
-        fun ImageView.loadRes(resId: Int) {
-            Picasso.with(context).load(resId).into(this)
-        }
+        fun ImageView.loadRes(resId: Int) = Picasso.with(context).load(resId).into(this)
 
         fun ImageView.loadURL(url: String) {
             Picasso.with(context)
@@ -218,8 +269,30 @@ class SearchFragment : Fragment(), SearchContract.View {
 
     }
 
+    private fun getRandomChips() : Array<String> {
+        val NUM_CHIPS = 3 //todo maybe more in larger / landscape
+        val all = arrayOf("Spiny Lobster", "Shark", "Octopus", "Rockfish", "Stonefish", "Sphyrna lewini", "Blacktip",
+                "Catshark", "Zebra Shark", "Zebrasoma", "Whaler", "Stingray", "Manta birostris", "Butterflyfish",
+                "Seastar", "Urchin", "Nudibranch", "Sea slug", "Lionfish")
+        val res = ArrayList<String>()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Random().ints(0, all.size).distinct().limit(NUM_CHIPS.toLong()).forEach { res.add(all[it]) }
+        } else {
+            for(i in 0..NUM_CHIPS) {
+                res.add(all[Random().nextInt(all.size)])
+            }
+        }
+
+        return res.toTypedArray()
+    }
+
     interface SearchResultItemListener {
         fun onItemClicked(item: SearchResult, v: View)
         fun onMaxItemsDisplayed()
+    }
+
+    interface SearchChipHandler {
+        fun onChipClicked(chipText: String)
     }
 }

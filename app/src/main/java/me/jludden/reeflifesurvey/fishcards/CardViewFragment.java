@@ -268,6 +268,8 @@ public class CardViewFragment extends Fragment implements
      * @param duration     Animation duration in ms
      */
     public static void animateView(final View view, final int toVisibility, float toAlpha, int duration) {
+        if(view == null) Log.e("jludden", "Trying to animate NULL VIEW");
+
         boolean show = toVisibility == View.VISIBLE;
         if (show) {
             view.setAlpha(0);
