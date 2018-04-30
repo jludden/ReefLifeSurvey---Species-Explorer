@@ -17,6 +17,10 @@ class SearchContract {
         fun clearSearchResults()
 
         fun launchResultDetails(searchResult: SearchResult)
+
+        fun setAdditionalMessage(message: Message)
+
+        enum class Message { NONE, NO_RESULTS_RETURNED, MAX_RESULTS_RETURNED }
     }
 
     interface Presenter : BasePresenter {

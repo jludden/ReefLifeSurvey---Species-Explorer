@@ -3,7 +3,6 @@ package me.jludden.reeflifesurvey.search
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -14,13 +13,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import com.squareup.picasso.Picasso
 import me.jludden.reeflifesurvey.data.model.SearchResult
-import kotlinx.android.synthetic.main.activity_search_results_item.view.*
+import kotlinx.android.synthetic.main.search_results_item.view.*
 import me.jludden.reeflifesurvey.data.model.SearchResultType
 import me.jludden.reeflifesurvey.R
 import me.jludden.reeflifesurvey.detailed.DetailsActivity
 import me.jludden.reeflifesurvey.detailed.DetailsActivity.Companion.REQUEST_CODE
+import me.jludden.reeflifesurvey.fishcards.CardViewFragment.animateView
+import me.jludden.reeflifesurvey.search.SearchContract.View.Message
 
 
 /**
@@ -30,6 +33,7 @@ import me.jludden.reeflifesurvey.detailed.DetailsActivity.Companion.REQUEST_CODE
  *  implements the View portion of the SearchContract MVP architecture
  */
 class SearchFragment : Fragment(), SearchContract.View {
+
     companion object {
         const val TAG: String = "SearchResultsFragment"
         const val MAX_ITEM_DISPLAY_COUNT : Long = 15
@@ -49,13 +53,12 @@ class SearchFragment : Fragment(), SearchContract.View {
         }
 
         override fun onMaxItemsDisplayed() {
-            //todo display a message to notify the user that there are more results that aren't displayed
-//            Snackbar.make(recyclerView, R.string.search_view_max_items_displayed, Snackbar.LENGTH_SHORT)
+            setAdditionalMessage(Message.MAX_RESULTS_RETURNED)
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.activity_search_results_fragment, container, false)
+        val root = inflater.inflate(R.layout.search_results_fragment, container, false)
         recyclerView = root.findViewById(R.id.search_results_cards) as RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(context)
         viewAdapter = SearchResultsAdapter(ArrayList(), itemListener)
@@ -70,8 +73,27 @@ class SearchFragment : Fragment(), SearchContract.View {
     }
 
     //TODO animateView when loading/clear data (see cardviewfragment.animateView)
+    //true - show an overlay loading bar, false - remove
     override fun setProgressIndicator(active: Boolean) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val progressBar =  view?.findViewById<View>(R.id.progress_overlay)
+        if(active) animateView(progressBar, View.VISIBLE, 0.4f, 200)
+        else animateView(progressBar, View.GONE, 0f, 200)
+    }
+
+
+    override fun setAdditionalMessage(message: Message) {
+        val messageView = view?.findViewById<TextView>(R.id.additional_message);
+
+        when(message){
+            Message.NONE -> animateView(messageView, View.GONE, 0f, 200)
+            Message.NO_RESULTS_RETURNED -> {
+                animateView(messageView, View.VISIBLE, 0.4f, 200)
+                messageView?.text = "No results found"
+            }
+            Message.MAX_RESULTS_RETURNED -> {
+                Toast.makeText(context.applicationContext, "More results not loaded. Try narrowing your search criteria", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun addSearchResult(result: SearchResult) {
@@ -81,10 +103,13 @@ class SearchFragment : Fragment(), SearchContract.View {
         Log.d(TAG, "searchfragment addSearchResult "+newResult)
 
         viewAdapter.updateItems(element = result)
+        setProgressIndicator(false);
     }
 
     override fun clearSearchResults() {
         viewAdapter.updateItems(list = ArrayList())
+        setProgressIndicator(false)
+        setAdditionalMessage(Message.NONE)
     }
 
     /**
@@ -143,7 +168,7 @@ class SearchFragment : Fragment(), SearchContract.View {
          * @return A new ViewHolder that holds a View of the given view type.
          */
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)
-                = SearchResultsViewHolder(parent.inflate(R.layout.activity_search_results_item))
+                = SearchResultsViewHolder(parent.inflate(R.layout.search_results_item))
 
 
         /**
@@ -180,12 +205,7 @@ class SearchFragment : Fragment(), SearchContract.View {
         }
 
         fun ImageView.loadRes(resId: Int) {
-            Picasso.with(context).load(resId)
-                    .into(this)
-        /*   Glide.with(context)
-                    .load(resId)
-                    .transition(withCrossFade())
-                    .into(this)*/
+            Picasso.with(context).load(resId).into(this)
         }
 
         fun ImageView.loadURL(url: String) {
@@ -194,11 +214,6 @@ class SearchFragment : Fragment(), SearchContract.View {
                     .placeholder(R.drawable.ic_menu_camera)
                     .error(R.drawable.ic_menu_camera)
                     .into(this)
-
-         /*   Glide.with(context)
-                    .load(url)
-                    .transition(withCrossFade())
-                    .into(this)*/
         }
 
     }
