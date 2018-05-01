@@ -273,7 +273,9 @@ class SearchFragment : Fragment(), SearchContract.View {
         val NUM_CHIPS = 3 //todo maybe more in larger / landscape
         val all = arrayOf("Spiny Lobster", "Shark", "Octopus", "Rockfish", "Stonefish", "Sphyrna lewini", "Blacktip",
                 "Catshark", "Zebra Shark", "Zebrasoma", "Whaler", "Stingray", "Manta birostris", "Butterflyfish",
-                "Seastar", "Urchin", "Nudibranch", "Sea slug", "Lionfish")
+                "Seastar", "Urchin", "Nudibranch", "Sea slug", "Lionfish", "Rock Lobster", "Hermit Crab", "Mao Mao",
+                "Maori Wrasse", "Sea Cucumber", "Blue Tang", "Clownfish", "Triplefin", "Razorfish", "Mantis Shrimp", "Abalone",
+                "Angelfish", "Unicornfish", "Trumpetfish", "Sweetlips", "Parrotfish", "Triggerfish", "Klipfish", "Sally Lightfoot")
         val res = ArrayList<String>()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
